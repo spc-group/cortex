@@ -1,4 +1,4 @@
-import { getRuns, getApiInfo, Container, parseNode } from "./tiled_api";
+import { getRuns, getApiInfo } from "./tiled_api";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
 const client = {
@@ -55,7 +55,7 @@ describe("getApiInfo() function", () => {
 	client.get.mockClear();
     });
     it("calls the API", async () => {
-	const response = await getApiInfo({client});
+	await getApiInfo({client});
 	expect(client.get.mock.calls).toHaveLength(1);
     });
 });

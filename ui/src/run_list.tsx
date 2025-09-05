@@ -1,12 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PresentationChartLineIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
-import RunTable, { allColumns } from "./run_table";
+import RunTable from "./run_table";
+import { allColumns } from "./columns";
 import useDebounce from "./debounce";
 import { getRuns } from "./tiled_api";
 
@@ -21,14 +18,13 @@ export function Paginator({ runCount, pageLimit=10, setPageLimit, pageOffset, se
         });
     };
     const nextPage = () => {
-        setPageOffset((prevOffset) => {
+        setPageOffset(() => {
             const newOffset = Math.min(pageOffset + pageLimit, runCount - pageLimit);
             return newOffset;
         });
     };
 
     // Render
-    const currentPage = (pageOffset / pageLimit) + 1;
     return (
         <div className="space-x-4 inline">
           <div className="join">
@@ -60,12 +56,36 @@ export default function RunList() {
     // State for selecting which field to use for sorting
     const [sortField, setSortField] = useState(null);
 
-    // State variables to keep track of how to filer the runs
-    const columns = [...allColumns];
-    for (let col of columns) {
-        [ col.filter, col.setFilter ] = useState("");
-	col.debouncedFilter = useDebounce(col.filter);
+    // State variables to keep track of how to filter the runs
+    const useFilterCol = (col) => {
+	const newCol = structuredClone(col);
+	[newCol.filter, newCol.setFilter] = useState("");
+	newCol.debouncedFilter = useDebounce(newCol.filter);
+	return newCol;
+    };
+    if (allColumns.length !== 8) {
+	throw new Error("allColumns is not the expected length");
     }
+    const columns = [
+	useFilterCol(allColumns[0]),
+	useFilterCol(allColumns[1]),
+	useFilterCol(allColumns[2]),
+	useFilterCol(allColumns[3]),
+	useFilterCol(allColumns[4]),
+	useFilterCol(allColumns[5]),
+	useFilterCol(allColumns[6]),
+	useFilterCol(allColumns[7]),
+    ];
+    // const columns = allColumns.map((col) => {
+    // 	[col.filter, col.setFilter] = useState("");
+    // 	col.debouncedFilter = useDebouce(col.filter);
+    // 	return col
+    // });
+    // const columns = [...allColumns];
+    // for (const col of columns) {
+    //     [ col.filter, col.setFilter ] = useState("");
+    // 	col.debouncedFilter = useDebounce(col.filter);
+    // }
     const filterStates = columns.map((col) => col.debouncedFilter);
     const [searchText, setSearchText] = useState("");
     const debouncedSearchText = useDebounce(searchText);
@@ -75,7 +95,7 @@ export default function RunList() {
     const loadRuns = async () => {
         // Prepare list of filters
         const filters = new Map();
-        for (let col of columns) {
+        for (const col of columns) {
             if (col.filter !== "") {
                 filters.set(col.field, col.filter);
             }
@@ -90,9 +110,6 @@ export default function RunList() {
         queryFn: loadRuns,
     });
     let allRuns;
-    if (error) {
-        const modal = document.getElementById("errorModal").showModal();
-    }
     if (isLoading || error) {
 	allRuns = [];
     } else {

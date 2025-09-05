@@ -23,8 +23,8 @@ describe("paginator", () => {
     let user, setPageLimit, setPageOffset;
     beforeEach(() => {
         user = userEvent.setup();
-        setPageLimit = vi.fn((newLimit) => {});
-        setPageOffset = vi.fn((newOffset) => {});
+        setPageLimit = vi.fn(() => {});
+        setPageOffset = vi.fn(() => {});
     });
     it("increments the page", async () => {
 	// Render the component
@@ -49,7 +49,7 @@ describe("paginator", () => {
     it("stops at zero", async () => {
         render(<Paginator runCount={50} pageOffset={15} setPageOffset={setPageOffset} setPageLimit={setPageLimit} />);
         // Change the page
-        let button = screen.getByText("«");
+        const button = screen.getByText("«");
         await user.click(button);
         expect(setPageOffset.mock.calls).toHaveLength(1);
         expect(setPageOffset.mock.calls[0][0](5)).toEqual(0);

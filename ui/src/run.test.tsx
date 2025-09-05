@@ -2,11 +2,10 @@ import * as React from "react";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
 import { render, screen, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { useParams, BrowserRouter } from "react-router";
+import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { getMetadata } from "./tiled_api";
-import Run, { loadRunMetadata} from "./run";
+import Run from "./run";
 
 
 

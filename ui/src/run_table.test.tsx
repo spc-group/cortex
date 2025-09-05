@@ -2,7 +2,7 @@ import * as React from "react";
 import '@testing-library/jest-dom/vitest';
 import {BrowserRouter} from "react-router";
 import { expect, describe, it, beforeEach, afterEach, vi, cleanup } from "vitest";
-import { render, screen, within, cleanup } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'
 import {
     QueryClient,
@@ -10,7 +10,7 @@ import {
 } from  '@tanstack/react-query';
 
 
-import RunTable, {Row, useQuery} from "./run_table";
+import RunTable, {Row} from "./run_table";
 
 
 const queryClient = new QueryClient();
@@ -25,7 +25,7 @@ describe("run table", () => {
     let user, setSortField;
     beforeEach(() => {
         user = userEvent.setup();
-        setSortField = vi.fn((newLimit) => {});
+        setSortField = vi.fn(() => {});
     });
     it("creates rows for each run", () => {
 	const runs = [
@@ -37,7 +37,7 @@ describe("run table", () => {
 	expect(screen.getByText("391c9a55-8dfa-4faa-be49-e60140596b7c")).toBeInTheDocument();
     });
     it("can (de)select a run", async () => {
-	const selectRun = vi.fn((uid, isSelected) => {});
+	const selectRun = vi.fn(() => {});
 	// Prepare the UI
 	const runs = [{"start.uid": "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa"}];
 	render(<BrowserRouter><RunTable runs={runs} selectRun={selectRun} /></BrowserRouter>);
@@ -172,7 +172,7 @@ describe("run table row", () => {
             </table>
             </BrowserRouter>
         );
-	const icon = screen.getByTitle("Data run icon");
+	expect(screen.getByTitle("Data run icon")).toBeInTheDocument();
     });
     it("has the correct columns", () => {
         const run = {
@@ -190,7 +190,7 @@ describe("run table row", () => {
         expect(screen.getByText("rel_scan")).toBeInTheDocument();
         expect(screen.getByText("SrN03")).toBeInTheDocument();
         expect(screen.getByText("success")).toBeInTheDocument();
-        expect(screen.getByText("12/31/1969, 6:00:00 PM")).toBeInTheDocument();
+        expect(screen.getByText("1/1/1970, 12:00:00 AM")).toBeInTheDocument();
         expect(screen.getByText("2")).toBeInTheDocument();
         expect(screen.getByText("13")).toBeInTheDocument();
     });

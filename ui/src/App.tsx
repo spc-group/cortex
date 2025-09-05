@@ -1,5 +1,4 @@
 import './App.css';
-import Navbar from "./navbar.tsx";
 import { Link } from "react-router";
 
 function App() {

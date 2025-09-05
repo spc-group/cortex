@@ -2,12 +2,12 @@ import { CheckIcon, ArrowUpIcon, ArrowDownIcon, ArrowDownTrayIcon } from '@heroi
 import { BeakerIcon } from '@heroicons/react/24/outline';
 import { useQuery } from '@tanstack/react-query';
 
-import { useState } from "react";
 import { Link } from "react-router";
 import { tiledUri, getApiInfo } from "./tiled_api";
+import { allColumns } from "./columns";
 
 
-export const SortIcon = ({fieldName, sortField}) => {
+const SortIcon = ({fieldName, sortField}) => {
     if (sortField == fieldName) {
         return <ArrowDownIcon title="Sort ascending" className="size-4 inline" />;
     } else if (sortField == "-" + fieldName) {
@@ -16,52 +16,6 @@ export const SortIcon = ({fieldName, sortField}) => {
         return (<></>);
     }
 };
-
-
-export const allColumns = [
-    {
-        label:  "Plan",
-        name: "plan",
-        field: "start.plan_name",
-    },
-    {
-        label:  "Scan",
-        name: "scan",
-        field: "start.scan_name",
-    },
-    {
-        label:  "Sample",
-        name: "sample",
-        field: "start.sample_name",
-    },
-    {
-        label:  "Exit Status",
-        name: "exit-status",
-        field: "stop.exit_status",
-    },
-    {
-        label:  "Start",
-        name: "start-time",
-        field: "start.time",
-	filter: null,
-    },
-    {
-        label:  "UID",
-        name: "uid",
-        field: "start.uid",
-    },
-    {
-        label:  "Proposal",
-        name: "proposal",
-        field: "start.proposal",
-    },
-    {
-        label:  "ESAF",
-        name: "esaf",
-        field: "start.esaf",
-    },
-];
-
 
 export const SkeletonRow = ({numColumns}) => {
     return (
@@ -81,7 +35,7 @@ export default function RunTable({runs=[], selectRun, sortField, setSortField, c
     // Includes widgets for sorting, etc
     // Curried version of setSortField for each column
     const sortFieldParser = (field) => {
-        return (event) => {
+        return () => {
             setSortField((prevField) => {
                 if (prevField == field) {
                     // Reverse sort order
@@ -171,7 +125,7 @@ export function Row({ run, onSelect, columns=allColumns, apiUri=tiledUri, catalo
 	    return `${fragments.join('-')}${suffix}`;
 	};
         // Add formats from structure family
-        for (let mimeType of data.formats[run.structure_family] || []) {
+        for (const mimeType of data.formats[run.structure_family] || []) {
             const aliases = data.aliases[run.structure_family][mimeType] || [];
             exportFormats.push({
                 mimeType: mimeType,
@@ -180,8 +134,8 @@ export function Row({ run, onSelect, columns=allColumns, apiUri=tiledUri, catalo
             });
         }
         // Add formats from specs
-        for (let spec of run.specs || []) {
-            for (let mimeType of data.formats[spec.name] || []) {
+        for (const spec of run.specs || []) {
+            for (const mimeType of data.formats[spec.name] || []) {
                 const aliases = data.aliases[spec.name][mimeType] || [];
                 exportFormats.push({
                     mimeType: mimeType,
@@ -192,15 +146,10 @@ export function Row({ run, onSelect, columns=allColumns, apiUri=tiledUri, catalo
         }
     }
     // Prepare additional data
-    let start_time = "";
-    if ( run.hasOwnProperty("start_time") ) {
-        start_time = run.start_time.toLocaleString();
-    }
     const uid = run['start.uid'];
     const runUri = `${apiUri}container/full/${catalog}/${run['start.uid']}`;
     const specs = run.specs === undefined ? [] : run.specs;
     const specNames = specs.map((spec) => spec.name);
-    const isBlueskyRun = specNames.includes("BlueskyRun");
     const dataSpecs = ["XASRun"];
     const isDataRun = specNames.filter((thisSpec) => dataSpecs.includes(thisSpec)).length > 0;
 

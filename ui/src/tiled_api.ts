@@ -1,6 +1,6 @@
 import axios from "axios";
 
-let envHost = import.meta.env.VITE_TILED_URI ;
+const envHost = import.meta.env.VITE_TILED_URI ;
 export const tiledHost = envHost === undefined ? "" : envHost;
 export const tiledUri = tiledHost + "/v1/";
 
@@ -37,8 +37,7 @@ export const getRuns = async ({pageOffset, pageLimit, filters = new Map(), clien
     params.append("fields", "metadata");
     params.append("page[offset]", pageOffset);
     params.append("page[limit]", pageLimit);
-    let value;
-    for (let [field, value] of filters) {
+    for (const [field, value] of filters) {
 	params.append("filter[contains][condition][key]", field);
 	params.append("filter[contains][condition][value]", `"${value}"`);
     }
