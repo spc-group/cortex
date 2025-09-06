@@ -99,10 +99,6 @@ describe("run list", () => {
     });
     it("selects a run", () => {
     });
-    it("selects a catalog", () => {
-        // For now just use a default
-        expect(getRuns.mock.calls[0][0]["catalog"]).toEqual("scans");
-    });
     it("applies column filters", async () => {
         // Find a filter text box
         const textbox = screen.getByPlaceholderText("Filter UID");

@@ -90,7 +90,6 @@ export default function RunList() {
     const [searchText, setSearchText] = useState("");
     const debouncedSearchText = useDebounce(searchText);
     const [standardsOnly, setStandardsOnly] = useState(false);
-    const catalog = "scans";
 
     const loadRuns = async () => {
         // Prepare list of filters
@@ -100,7 +99,7 @@ export default function RunList() {
                 filters.set(col.field, col.filter);
             }
         }
-	const theRuns = await getRuns({filters, pageLimit, pageOffset, sortField, catalog, searchText: debouncedSearchText, standardsOnly});
+	const theRuns = await getRuns({filters, pageLimit, pageOffset, sortField, searchText: debouncedSearchText, standardsOnly});
         return theRuns;
     };
 
@@ -119,7 +118,7 @@ export default function RunList() {
 	}
     }
     return (
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-full">
           <div className="p-4">
             <Paginator runCount={runCount}
                        pageLimit={pageLimit}
@@ -149,7 +148,7 @@ export default function RunList() {
           </div>
 
           <div className="relative overflow-x-auto">
-	    <RunTable runs={allRuns} columns={columns} sortField={sortField} setSortField={setSortField} isLoadingRuns={isLoading} catalog={catalog} />
+	    <RunTable runs={allRuns} columns={columns} sortField={sortField} setSortField={setSortField} isLoadingRuns={isLoading} />
           </div>
           {/* Error reporting */}
           <dialog id="errorModal" className="modal">

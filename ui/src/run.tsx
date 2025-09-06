@@ -11,10 +11,9 @@ import { getMetadata } from "./tiled_api";
 export default function Run() {
     const params = useParams();
     const uid = params.uid;
-    const catalog = "scans";
     // Retrieve metadata and data keys for this dataset
     const {isLoading, data} = useQuery({
-        queryFn: async () => await getMetadata({path: `${catalog}/${uid}`}),
+        queryFn: async () => await getMetadata(uid),
         queryKey: ["metadata", uid],
     });
     const runMetadata = data;

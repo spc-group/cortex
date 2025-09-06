@@ -28,12 +28,11 @@ describe("getRuns() function", () => {
 	    client: client,
 	    filters: filters,
 	    searchText: "super awesome experiment",
-	    catalog: "scans",
 	    standardsOnly: true,
 	});
 	expect(client.get.mock.calls).toHaveLength(1);
 	const url = client.get.mock.calls[0][0];
-	expect(url).toEqual("search/scans");
+	expect(url).toEqual("search/");
 	const params = client.get.mock.calls[0][1].params;
 	const containsKeys = params.getAll("filter[contains][condition][key]");
 	expect(containsKeys).toEqual(["start.uid", "stop.exit_status"]);
@@ -55,7 +54,7 @@ describe("getApiInfo() function", () => {
 	client.get.mockClear();
     });
     it("calls the API", async () => {
-	await getApiInfo({client});
+	await getApiInfo(client);
 	expect(client.get.mock.calls).toHaveLength(1);
     });
 });

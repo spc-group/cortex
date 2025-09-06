@@ -30,7 +30,7 @@ export const SkeletonRow = ({numColumns}) => {
 };
 
 
-export default function RunTable({runs=[], selectRun, sortField, setSortField, columns=allColumns, isLoadingRuns=false, catalog}) {
+export default function RunTable({runs=[], selectRun, sortField, setSortField, columns=allColumns, isLoadingRuns=false}) {
     // A table for displaying a sequence of runs to the user
     // Includes widgets for sorting, etc
     // Curried version of setSortField for each column
@@ -86,7 +86,7 @@ export default function RunTable({runs=[], selectRun, sortField, setSortField, c
                     :
                     // Show actual list of runs in the table
                     runs.map(run => 
-                        <Row run={run} key={run["start.uid"]} onSelect={selectRun} columns={columns} catalog={catalog} />
+                        <Row run={run} key={run["start.uid"]} onSelect={selectRun} columns={columns} />
                     )
             }
           </tbody>
@@ -95,7 +95,7 @@ export default function RunTable({runs=[], selectRun, sortField, setSortField, c
 };
 
 
-export function Row({ run, onSelect, columns=allColumns, apiUri=tiledUri, catalog}) {
+export function Row({ run, onSelect, columns=allColumns, apiUri=tiledUri}) {
     // A row in the run table for a given run
     // Handler for selecting a run
     const handleCheckboxChecked = (event) => {
@@ -108,7 +108,7 @@ export function Row({ run, onSelect, columns=allColumns, apiUri=tiledUri, catalo
     const { isLoading, error, data } = useQuery({
         queryKey: ['api-info'],
         queryFn: async () => {
-            return await getApiInfo({});
+            return await getApiInfo();
         },
     });
     const exportFormats = [];
@@ -147,7 +147,7 @@ export function Row({ run, onSelect, columns=allColumns, apiUri=tiledUri, catalo
     }
     // Prepare additional data
     const uid = run['start.uid'];
-    const runUri = `${apiUri}container/full/${catalog}/${run['start.uid']}`;
+    const runUri = `${apiUri}container/full/${run['start.uid']}`;
     const specs = run.specs === undefined ? [] : run.specs;
     const specNames = specs.map((spec) => spec.name);
     const dataSpecs = ["XASRun"];
