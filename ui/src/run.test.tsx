@@ -1,58 +1,52 @@
 import * as React from "react";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
-import { render, screen, cleanup } from '@testing-library/react';
-import '@testing-library/jest-dom/vitest';
+import { render, screen, cleanup } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Run from "./run";
 
-
-
 // Mock URL parameters
-vi.mock(import("react-router"),  async (importOriginal) => ({
-    ...await importOriginal(),
-    useParams: () => ({
-        uid: 5,
-    }),
+vi.mock(import("react-router"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  useParams: () => ({
+    uid: 5,
+  }),
 }));
-
 
 // Mock API response
 // https://github.com/vitest-dev/vitest/discussions/3589
-vi.mock('@tanstack/react-query', async (importOriginal) => {
-    return {
-        ...await importOriginal(),
-        useQuery: () => ({
-            isLoading: false,
-            error: null,
-            data: {uid: "hello"},
-        })
-    };
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  return {
+    ...(await importOriginal()),
+    useQuery: () => ({
+      isLoading: false,
+      error: null,
+      data: { uid: "hello" },
+    }),
+  };
 });
-
 
 afterEach(() => {
-    vi.restoreAllMocks();
-    cleanup();
+  vi.restoreAllMocks();
+  cleanup();
 });
 
-
 describe("the Run component", () => {
-    beforeEach(async () => {
-        const queryClient = new QueryClient();
-        await React.act(async () => {
-            render(
-                <BrowserRouter>
-                  <QueryClientProvider client={queryClient}>
-                    <Run />
-                  </QueryClientProvider>
-                </BrowserRouter>
-            );
-
-        });
+  beforeEach(async () => {
+    const queryClient = new QueryClient();
+    await React.act(async () => {
+      render(
+        <BrowserRouter>
+          <QueryClientProvider client={queryClient}>
+            <Run />
+          </QueryClientProvider>
+        </BrowserRouter>,
+      );
     });
-    it("shows run details", () => {
-        expect(screen.getByText("hello")).toBeInTheDocument();
-    });
+  });
+  it("shows run details", () => {
+    expect(screen.getByText("hello")).toBeInTheDocument();
+  });
 });
