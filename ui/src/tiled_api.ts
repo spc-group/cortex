@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { AxiosInstance } from "axios";
+import type { SearchParams, APIRun } from "./types";
 
 const envHost = import.meta.env.VITE_TILED_URI;
 export const tiledHost = envHost === undefined ? "" : envHost;
@@ -26,61 +27,16 @@ export const getMetadata = async (
   return response.data;
 };
 
-interface APIRun {
-  id: string;
-  attributes: {
-    ancestor: string[];
-    structure_family: string;
-    specs: Array<{
-      name: string;
-      version: string;
-    }>;
-    metadata: {
-      start: {
-        esaf: string;
-        proposal: string;
-        sample_name: string;
-        scan_name: string;
-        plan_name: string;
-        time: number;
-      };
-      stop: {
-        exit_status: string;
-      };
-    };
-    structure: {
-      data_type: {
-        endianess: string;
-        kind: string;
-        itemsize: number;
-        dt_units: string;
-      };
-      chunks: [[number]];
-      shape: [number];
-      dims: [string];
-      resizable: boolean;
-    };
-  };
-}
 
-// Retrieve set of runs metadata from the API
-export const getRuns = async ({
+// Parse the query parameters needed for a search
+export const prepareQueryParams = ({
   pageOffset,
   pageLimit,
   filters = new Map(),
-  client = v1Client,
   sortField = null,
   searchText = "",
   standardsOnly = false,
-}: {
-  pageOffset: number;
-  pageLimit: number;
-  filters: Map<string, string>;
-  client: AxiosInstance;
-  sortField: string | null;
-  searchText: string;
-  standardsOnly: boolean;
-}) => {
+}: SearchParams) => {
   // Set up query parameters
   const params = new URLSearchParams();
   if (sortField !== null) {
@@ -102,6 +58,13 @@ export const getRuns = async ({
   if (searchText !== "") {
     params.append("filter[fulltext][condition][text]", searchText);
   }
+  return params;
+};
+
+
+// Retrieve set of runs metadata from the API
+export const getRuns = async (searchParams: SearchParams, client: AxiosInstance = v1Client) => {
+  const params = prepareQueryParams(searchParams);
   // retrieve list of runs from the API
   const response = await client.get(`search/`, {
     params: params,

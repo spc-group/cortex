@@ -6,12 +6,14 @@ import {
 } from "@heroicons/react/24/solid";
 import { BeakerIcon } from "@heroicons/react/24/outline";
 import { useQuery } from "@tanstack/react-query";
+import type { ChangeEvent } from "react";
 
 import { Link } from "react-router";
 import { tiledUri, getApiInfo } from "./tiled_api";
 import { allColumns } from "./columns";
+import type { Column, BlueskySpec, Run } from "./types";
 
-const SortIcon = ({ fieldName, sortField }) => {
+const SortIcon = ({ fieldName, sortField }: { fieldName: string, sortField: string}) => {
   if (sortField == fieldName) {
     return <ArrowDownIcon title="Sort ascending" className="size-4 inline" />;
   } else if (sortField == "-" + fieldName) {
@@ -21,7 +23,7 @@ const SortIcon = ({ fieldName, sortField }) => {
   }
 };
 
-export const SkeletonRow = ({ numColumns }) => {
+export const SkeletonRow = ({ numColumns }: {numColumns: number}) => {
   return (
     <tr>
       {/* Empty columns for icons (don't need skeletons) */}
@@ -46,13 +48,20 @@ export default function RunTable({
   setSortField,
   columns = allColumns,
   isLoadingRuns = false,
+}: {
+  runs?: Run[],
+  selectRun: (uid: string, isSelected: boolean) => void,
+  sortField: string,
+  setSortField: null,
+  columns?: Column[],
+  isLoadingRuns?: boolean,
 }) {
   // A table for displaying a sequence of runs to the user
   // Includes widgets for sorting, etc
   // Curried version of setSortField for each column
-  const sortFieldParser = (field) => {
+  const sortFieldParser = (field: string) => {
     return () => {
-      setSortField((prevField) => {
+      setSortField((prevField: string) => {
         if (prevField == field) {
           // Reverse sort order
           return "-" + field;
@@ -83,7 +92,7 @@ export default function RunTable({
           <th className="text-center">
             <BeakerIcon className="size-6 inline" title="Scientific scan" />
           </th>
-          {columns.map((col) => {
+          {columns.map((col: Column) => {
             return (
               <th key={"column-" + col.name}>
                 <div onClick={sortFieldParser(col.field)}>
@@ -133,10 +142,15 @@ export function Row({
   onSelect,
   columns = allColumns,
   apiUri = tiledUri,
+}: {
+  run: Run,
+  onSelect: (uid: string, isSelected: boolean) => void,
+  columns?: Column[],
+  apiUri?: string,
 }) {
   // A row in the run table for a given run
   // Handler for selecting a run
-  const handleCheckboxChecked = (event) => {
+  const handleCheckboxChecked = (event: ChangeEvent<HTMLInputElement>) => {
     if (onSelect !== undefined) {
       onSelect(run["start.uid"], event.target.checked);
     }
@@ -187,10 +201,10 @@ export function Row({
   const uid = run["start.uid"];
   const runUri = `${apiUri}container/full/${run["start.uid"]}`;
   const specs = run.specs === undefined ? [] : run.specs;
-  const specNames = specs.map((spec) => spec.name);
+  const specNames = specs.map((spec: BlueskySpec) => spec.name);
   const dataSpecs = ["XASRun"];
   const isDataRun =
-    specNames.filter((thisSpec) => dataSpecs.includes(thisSpec)).length > 0;
+    specNames.filter((thisSpec: string) => dataSpecs.includes(thisSpec)).length > 0;
 
   return (
     <tr>
@@ -238,12 +252,8 @@ export function Row({
         )}
       </td>
 
-      {columns.map((col) => {
+      {columns.map((col: Column) => {
         let value = run[col.field];
-        // Format dates
-        if (value instanceof Date) {
-          value = value.toLocaleString();
-        }
         return (
           <td key={uid + col.name}>
             <Link to={uid}>{value}</Link>
