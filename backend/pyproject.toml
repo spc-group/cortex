@@ -1,0 +1,47 @@
+[project]
+name = "tiledspc"
+version = "2024.8.0"
+authors = [
+  { name="Mark Wolfman", email="wolfman@anl.gov" },
+]
+description = "Extra bits for running a Tiled server for the Spectroscopy (SPC) group."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: BSD License",
+    "Topic :: Scientific/Engineering",
+    "Topic :: System :: Hardware",
+]
+keywords = ["synchrotron", "xray", "tiled"]
+dependencies = [
+    "tiled[all]==0.1.0",
+    "area-detector-handlers",
+    "bluesky-tiled-plugins==2.0.0b68",
+    "event-model",
+    "suitcase",
+    "suitcase-mongo",
+    "h5py",
+    "pymongo",
+    "hdf5plugin",
+    "pillow",
+    "netCDF4",
+    "exdir",
+    "pandas",
+]
+
+[dependency-groups]
+dev = ["black", "isort", "pytest", "pytest-asyncio", "build", "twine", "flake8", "nexusformat",]
+
+[project.urls]
+"Homepage" = "https://github.com/spc-group/tiled-server"
+"Bug Tracker" = "https://github.com/spc-group/tiled-server/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.isort]
+profile = "black"
