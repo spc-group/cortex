@@ -222,13 +222,12 @@ def xafs_run(tree):
             "configuration": xafs_config,
         }
         primary = streams.create_container("primary", metadata=primary_metadata)
-        internal = primary.write_dataframe(xafs_events, key="internal")
+        internal = primary.write_table(xafs_events, key="internal")
         # Fluorescence data
         primary.write_array(
             np.full(shape=(100, 8, 4096), fill_value=2), key="ge_8element"
         )
         primary.write_array(np.ones(shape=(100,)), key="ge_8element-element0-all_event")
-        # internal.write_dataframe(xafs_events, key="events")
         baseline = streams.create_container(
             "baseline",
             metadata={
@@ -236,5 +235,5 @@ def xafs_run(tree):
                 "data_keys": baseline_data_keys,
             },
         )
-        internal = baseline.write_dataframe(xafs_baseline, key="internal")
+        internal = baseline.write_table(xafs_baseline, key="internal")
         yield tree
