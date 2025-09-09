@@ -1,6 +1,7 @@
 import datetime
 import io
 from typing import IO
+from pathlib import Path
 from unittest import mock
 
 import h5py
@@ -12,6 +13,7 @@ from nexusformat.nexus import NXFile
 from tiledspc.serialization.nexus import (
     serialize_nexus,
     write_stream,
+    nxexternallink,
 )
 
 specification = """
@@ -303,3 +305,14 @@ async def test_external_datasets(nxfile):
     assert ds.shape == (100, 8, 4096)
     assert ds.dtype == np.int64
     assert np.min(ds) == 2
+
+
+def test_nxexternallink_targets():
+    buff = io.BytesIO()
+    with h5py.File(buff, mode='w') as fd:
+        nxexternallink(parent=fd, name="externA", target="/entry/data/", filepath=Path("/dev/null"))
+        nxexternallink(parent=fd, name="externB", target=["entry", "data"], filepath=Path("/dev/null"))
+        linkA = fd.get('externA', getlink=True)
+        linkB = fd.get('externB', getlink=True)
+    assert linkA.path == "/entry/data"
+    assert linkB.path == "/entry/data"    

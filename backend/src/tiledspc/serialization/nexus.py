@@ -3,7 +3,7 @@ import io
 import json
 import logging
 import warnings
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import h5py
@@ -66,14 +66,15 @@ def nxlink(parent: h5py.Group, name: str, target: h5py.Group | str, soft=False):
             raise
 
 
-def nxexternallink(parent: h5py.Group, name: str, target: str, filepath: Path):
+def nxexternallink(parent: h5py.Group, name: str, target: str | Sequence[str], filepath: Path):
     """Create a link between a dataset in an external file."""
     other_file = str(filepath.resolve().expanduser())
+    if not isinstance(target, (str, bytes)):
+        # Must be a list of keys (e.g. `['entry', 'data']` instead of
+        # `"entry/data"`)
+        target = "/".join(["", *target])
     link = h5py.ExternalLink(other_file, target)
-    try:
-        parent[name] = link
-    except TypeError:
-        breakpoint()
+    parent[name] = link
 
 
 async def write_run(
@@ -215,7 +216,7 @@ async def write_stream(
                 dataset = source.parameters["dataset"]
                 fpath = Path(path_from_uri(source.assets[0].data_uri))
                 nxexternallink(
-                    parent=data_group, name="value", target="/".join(dataset), filepath=fpath
+                    parent=data_group, name="value", target=dataset, filepath=fpath
                 )
             else:
                 # Copy the array itself into the new file
