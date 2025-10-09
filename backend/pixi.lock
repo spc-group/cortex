@@ -135,7 +135,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bc/be/86793717d388d46209d6f10947a891a4697d8c24d18a3a715924ec6122c2/suitcase-0.12.0.tar.gz
       - pypi: https://files.pythonhosted.org/packages/e5/30/643397144bfbfec6f6ef821f36f33e57d35946c44a2352d3c9f0ae847619/tenacity-9.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/56/b3/23eec760215910609914dd99aba23ce1c72a3bcbe046ee44f45adf740452/tifffile-2025.8.28-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/a4/e9/d88911c7fd17b31864add4d389d4b4b6d38bc85471480f08967e5c319819/tiled-0.1.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/a4/33a94f5755ec15c49de5f29e7dac3da91943b89e45c44ad6a2431904f987/tiled-0.1.6-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/03/98/eb27cc78ad3af8e302c9d8ff4977f5026676e130d28dd7578132a457170c/toolz-1.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/93/72/6b3e70d32e89a5cbb6a4513726c1ae8762165b027af569289e19ec08edd8/typer-0.17.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/18/67/36e9267722cc04a6b9f15c7f3441c2363321a3ea07da7ae0c0707beb2a9c/typing_extensions-4.15.0-py3-none-any.whl
@@ -315,7 +315,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bc/be/86793717d388d46209d6f10947a891a4697d8c24d18a3a715924ec6122c2/suitcase-0.12.0.tar.gz
       - pypi: https://files.pythonhosted.org/packages/e5/30/643397144bfbfec6f6ef821f36f33e57d35946c44a2352d3c9f0ae847619/tenacity-9.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/56/b3/23eec760215910609914dd99aba23ce1c72a3bcbe046ee44f45adf740452/tifffile-2025.8.28-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/a4/e9/d88911c7fd17b31864add4d389d4b4b6d38bc85471480f08967e5c319819/tiled-0.1.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/a4/33a94f5755ec15c49de5f29e7dac3da91943b89e45c44ad6a2431904f987/tiled-0.1.6-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/03/98/eb27cc78ad3af8e302c9d8ff4977f5026676e130d28dd7578132a457170c/toolz-1.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/7a/882d99539b19b1490cac5d77c67338d126e4122c8276bf640e411650c830/twine-6.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/93/72/6b3e70d32e89a5cbb6a4513726c1ae8762165b027af569289e19ec08edd8/typer-0.17.4-py3-none-any.whl
@@ -2345,10 +2345,10 @@ packages:
   - xarray ; extra == 'test'
   - zarr>=3 ; extra == 'test'
   requires_python: '>=3.11'
-- pypi: https://files.pythonhosted.org/packages/a4/e9/d88911c7fd17b31864add4d389d4b4b6d38bc85471480f08967e5c319819/tiled-0.1.0-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/81/a4/33a94f5755ec15c49de5f29e7dac3da91943b89e45c44ad6a2431904f987/tiled-0.1.6-py3-none-any.whl
   name: tiled
-  version: 0.1.0
-  sha256: 0bde417441fc8204ed6c4f92a3789fb323ed1858dc3f21401a38fdcfbdda5b4d
+  version: 0.1.6
+  sha256: d0421f3413ef6c75ee32c1bfc892b3b822e62ef597c5203870047b6240eaf53f
   requires_dist:
   - httpx>=0.20.0,!=0.23.1
   - json-merge-patch
@@ -2377,7 +2377,7 @@ packages:
   - dask ; extra == 'all'
   - dask[array] ; extra == 'all'
   - dask[dataframe] ; extra == 'all'
-  - duckdb ; extra == 'all'
+  - duckdb<1.4.0 ; extra == 'all'
   - entrypoints ; extra == 'all'
   - fastapi>=0.115.8 ; extra == 'all'
   - h5netcdf ; extra == 'all'
@@ -2507,7 +2507,8 @@ packages:
   - dask ; extra == 'server'
   - dask[array] ; extra == 'server'
   - dask[dataframe] ; extra == 'server'
-  - duckdb ; extra == 'server'
+  - duckdb<1.4.0 ; extra == 'server'
+  - entrypoints ; extra == 'server'
   - fastapi>=0.115.8 ; extra == 'server'
   - h5netcdf ; extra == 'server'
   - h5py ; extra == 'server'
@@ -2531,6 +2532,7 @@ packages:
   - redis ; extra == 'server'
   - sparse>=0.15.5 ; extra == 'server'
   - sqlalchemy[asyncio]>=2 ; extra == 'server'
+  - stamina ; extra == 'server'
   - starlette>=0.38.0 ; extra == 'server'
   - tifffile ; extra == 'server'
   - uvicorn[standard] ; extra == 'server'
@@ -2550,9 +2552,9 @@ packages:
 - pypi: ./
   name: tiledspc
   version: 2024.8.0
-  sha256: 634ed4f138fcc18de5a5fe1c5a5b0ef91c62c85a5aaf1f02c6b3668ab1b14a38
+  sha256: 887d78c5a1d0296ff749f0a9fed52f06890c8cf3a0530d98b13b64296ee59a0d
   requires_dist:
-  - tiled[all]==0.1.0
+  - tiled[all]==0.1.6
   - area-detector-handlers
   - bluesky-tiled-plugins==2.0.0b68
   - event-model
