@@ -1,33 +1,45 @@
 export interface Column {
   label: string;
   name: string;
-  field: "start.uid" | "start.plan_name" | "start.scan_name" | "start.sample_name" | "stop.exit_status" | "start.time" | "start.proposal" | "start.esaf" | "structure_family";
+  field:
+    | "start.uid"
+    | "start.plan_name"
+    | "start.scan_name"
+    | "start.sample_name"
+    | "stop.exit_status"
+    | "start.time"
+    | "start.proposal"
+    | "start.esaf"
+    | "structure_family";
+}
+
+export interface TableColumn extends Column {
   // Added by useState hooks
-  filter?: string;
+  filter: string;
   setFilter: (state: string) => void;
+  debouncedFilter: string;
 }
 
 export interface SearchParams {
   pageOffset: number;
   pageLimit: number;
   filters?: Map<string, string>;
-  sortField?: string | null;
+  sortField?: string;
   searchText?: string;
   standardsOnly?: boolean;
 }
 
-
 export interface Run {
-  "start.uid": string,
-  "start.plan_name": string,
-  "start.scan_name": string,
-  "start.sample_name": string,
-  "stop.exit_status": string,
-  "start.time": string,
-  "start.proposal": string,
-  "start.esaf": string,
+  "start.uid": string;
+  "start.plan_name": string;
+  "start.scan_name": string;
+  "start.sample_name": string;
+  "stop.exit_status": string;
+  "start.time": Date;
+  "start.proposal": string;
+  "start.esaf": string;
   specs: BlueskySpec[];
-  structure_family: string,
+  structure_family: string;
 }
 
 export interface BlueskySpec {

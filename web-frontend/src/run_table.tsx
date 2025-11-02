@@ -10,10 +10,15 @@ import type { ChangeEvent } from "react";
 
 import { Link } from "react-router";
 import { tiledUri, getApiInfo } from "./tiled_api";
-import { allColumns } from "./columns";
-import type { Column, BlueskySpec, Run } from "./types";
+import type { TableColumn, BlueskySpec, Run } from "./types";
 
-const SortIcon = ({ fieldName, sortField }: { fieldName: string, sortField: string}) => {
+const SortIcon = ({
+  fieldName,
+  sortField,
+}: {
+  fieldName: string;
+  sortField: string;
+}) => {
   if (sortField == fieldName) {
     return <ArrowDownIcon title="Sort ascending" className="size-4 inline" />;
   } else if (sortField == "-" + fieldName) {
@@ -23,7 +28,7 @@ const SortIcon = ({ fieldName, sortField }: { fieldName: string, sortField: stri
   }
 };
 
-export const SkeletonRow = ({ numColumns }: {numColumns: number}) => {
+export const SkeletonRow = ({ numColumns }: { numColumns: number }) => {
   return (
     <tr>
       {/* Empty columns for icons (don't need skeletons) */}
@@ -46,15 +51,16 @@ export default function RunTable({
   selectRun,
   sortField,
   setSortField,
-  columns = allColumns,
+  columns = [],
   isLoadingRuns = false,
 }: {
-  runs?: Run[],
-  selectRun: (uid: string, isSelected: boolean) => void,
-  sortField: string,
-  setSortField: null,
-  columns?: Column[],
-  isLoadingRuns?: boolean,
+  runs?: Run[];
+  // *selectRun* isn't doing much until we implement select checkboxes
+  selectRun?: (uid: string, isSelected: boolean) => void;
+  sortField: string;
+  setSortField: (val: (arg0: string) => string) => void;
+  columns?: TableColumn[];
+  isLoadingRuns?: boolean;
 }) {
   // A table for displaying a sequence of runs to the user
   // Includes widgets for sorting, etc
@@ -67,7 +73,7 @@ export default function RunTable({
           return "-" + field;
         } else if (prevField == "-" + field) {
           // Turn off sorting
-          return null;
+          return "";
         } else {
           // Forward sort order
           return field;
@@ -81,7 +87,7 @@ export default function RunTable({
       <thead className="text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
           <th className="text-center">
-            <CheckIcon className="inline size-6" data="Selection checkmark" />
+            <CheckIcon className="inline size-6" />
           </th>
           <th className="text-center">
             <ArrowDownTrayIcon
@@ -92,7 +98,7 @@ export default function RunTable({
           <th className="text-center">
             <BeakerIcon className="size-6 inline" title="Scientific scan" />
           </th>
-          {columns.map((col: Column) => {
+          {columns.map((col: TableColumn) => {
             return (
               <th key={"column-" + col.name}>
                 <div onClick={sortFieldParser(col.field)}>
@@ -140,13 +146,13 @@ export default function RunTable({
 export function Row({
   run,
   onSelect,
-  columns = allColumns,
+  columns,
   apiUri = tiledUri,
 }: {
-  run: Run,
-  onSelect: (uid: string, isSelected: boolean) => void,
-  columns?: Column[],
-  apiUri?: string,
+  run: Run;
+  onSelect?: (uid: string, isSelected: boolean) => void;
+  columns: TableColumn[];
+  apiUri?: string;
 }) {
   // A row in the run table for a given run
   // Handler for selecting a run
@@ -204,7 +210,8 @@ export function Row({
   const specNames = specs.map((spec: BlueskySpec) => spec.name);
   const dataSpecs = ["XASRun"];
   const isDataRun =
-    specNames.filter((thisSpec: string) => dataSpecs.includes(thisSpec)).length > 0;
+    specNames.filter((thisSpec: string) => dataSpecs.includes(thisSpec))
+      .length > 0;
 
   return (
     <tr>
@@ -252,11 +259,17 @@ export function Row({
         )}
       </td>
 
-      {columns.map((col: Column) => {
-        let value = run[col.field];
+      {columns.map((col: TableColumn) => {
+        const value = run[col.field];
+        let text: string;
+        if (value instanceof Date) {
+          text = value.toISOString().split("T").join(" ");
+        } else {
+          text = String(run[col.field]);
+        }
         return (
           <td key={uid + col.name}>
-            <Link to={uid}>{value}</Link>
+            <Link to={uid}>{text}</Link>
           </td>
         );
       })}

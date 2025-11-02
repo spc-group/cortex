@@ -27,19 +27,18 @@ export const getMetadata = async (
   return response.data;
 };
 
-
 // Parse the query parameters needed for a search
 export const prepareQueryParams = ({
   pageOffset,
   pageLimit,
   filters = new Map(),
-  sortField = null,
+  sortField = "",
   searchText = "",
   standardsOnly = false,
 }: SearchParams) => {
   // Set up query parameters
   const params = new URLSearchParams();
-  if (sortField !== null) {
+  if (sortField !== "") {
     params.append("sort", sortField);
   }
   params.append("fields", "metadata");
@@ -61,9 +60,11 @@ export const prepareQueryParams = ({
   return params;
 };
 
-
 // Retrieve set of runs metadata from the API
-export const getRuns = async (searchParams: SearchParams, client: AxiosInstance = v1Client) => {
+export const getRuns = async (
+  searchParams: SearchParams,
+  client: AxiosInstance = v1Client,
+) => {
   const params = prepareQueryParams(searchParams);
   // retrieve list of runs from the API
   const response = await client.get(`search/`, {

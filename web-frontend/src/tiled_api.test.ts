@@ -2,7 +2,6 @@ import { getRuns, getApiInfo, prepareQueryParams } from "./tiled_api";
 import { describe, it, expect } from "vitest";
 import { apiInfoJson } from "./mocks/tiled";
 
-
 describe("getRuns() function", () => {
   it("returns the right number of runs", async () => {
     const filters = new Map([
@@ -17,7 +16,7 @@ describe("getRuns() function", () => {
       searchText: "super awesome experiment",
       standardsOnly: true,
     });
-    expect(runs.runs.length).toEqual(1)
+    expect(runs.runs.length).toEqual(1);
   });
 });
 
@@ -30,7 +29,7 @@ describe("prepareQueryParams() function", () => {
       sortField: "-start.time",
     });
     expect(params.has("fields")).toBeTruthy();
-    expect(params.getAll("fields")).toEqual(['metadata', 'specs', 'count']);
+    expect(params.getAll("fields")).toEqual(["metadata", "specs", "count"]);
   });
   it("applies a sort field", async () => {
     const params = await prepareQueryParams({
@@ -47,6 +46,6 @@ describe("getApiInfo() function", () => {
   // HTTP responses defined in './mocks/tiled.ts'
   it("calls the API", async () => {
     const apiInfo = await getApiInfo();
-    expect(apiInfo).toEqual(apiInfoJson)
+    expect(apiInfo).toEqual(apiInfoJson);
   });
 });

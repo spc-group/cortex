@@ -9,6 +9,7 @@ import RunTable from "./run_table";
 import { allColumns } from "./columns";
 import useDebounce from "./debounce";
 import { getRuns } from "./tiled_api";
+import type { TableColumn, Column } from "./types";
 
 export function Paginator({
   runCount,
@@ -16,10 +17,16 @@ export function Paginator({
   setPageLimit,
   pageOffset,
   setPageOffset,
+}: {
+  runCount: number;
+  pageLimit: number;
+  setPageLimit: (value: number) => void;
+  pageOffset: number;
+  setPageOffset: (value: (arg0: number) => number) => void;
 }) {
   // Handlers for swapping pages
   const previousPage = () => {
-    setPageOffset((prevOffset) => {
+    setPageOffset((prevOffset: number) => {
       const newOffset = Math.max(prevOffset - pageLimit, 0);
       return newOffset;
     });
@@ -79,13 +86,19 @@ export default function RunList() {
   const [runCount, setRunCount] = useState(0);
 
   // State for selecting which field to use for sorting
-  const [sortField, setSortField] = useState(null);
+  const [sortField, setSortField] = useState<string>("");
 
   // State variables to keep track of how to filter the runs
-  const useFilterCol = (col) => {
-    const newCol = structuredClone(col);
-    [newCol.filter, newCol.setFilter] = useState("");
-    newCol.debouncedFilter = useDebounce(newCol.filter);
+  const useFilterCol = (col: Column) => {
+    const [filter, setFilter] = useState("");
+    const newCol: TableColumn = {
+      label: col.label,
+      name: col.name,
+      field: col.field,
+      filter: filter,
+      setFilter: setFilter,
+      debouncedFilter: useDebounce(filter),
+    };
     return newCol;
   };
   if (allColumns.length !== 8) {
@@ -152,9 +165,10 @@ export default function RunList() {
   if (isLoading || error) {
     allRuns = [];
   } else {
-    allRuns = data.runs;
-    if (runCount != data.count) {
-      setRunCount(data.count);
+    allRuns = data?.runs ?? [];
+    const data_count = data?.count ?? 0;
+    if (runCount != data_count) {
+      setRunCount(data_count);
     }
   }
   return (
@@ -206,7 +220,7 @@ export default function RunList() {
       {/* Error reporting */}
       <dialog id="errorModal" className="modal">
         <div className="modal-box">
-          <h3 className="font-bold text-lg">{error ? error.code : null}</h3>
+          <h3 className="font-bold text-lg">{String(error)}</h3>
           <p className="py-4">{error ? error.message : null}</p>
           <div className="modal-action">
             <form method="dialog">

@@ -12,7 +12,7 @@ import { useMatch } from "react-router";
 
 import logoUrl from "./spc-logo.svg";
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 

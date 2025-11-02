@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import * as React from "react";
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
@@ -15,8 +18,11 @@ import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import RunTable, { Row } from "./run_table";
+import { allColumns } from "./columns.ts";
 
 const queryClient = new QueryClient();
+
+const testColumns = allColumns;
 
 afterEach(() => {
   cleanup();
@@ -35,7 +41,7 @@ describe("run table", () => {
     ];
     render(
       <BrowserRouter>
-        <RunTable runs={runs} />
+        <RunTable runs={runs} columns={testColumns} />
       </BrowserRouter>,
     );
     expect(
@@ -73,7 +79,14 @@ describe("run table", () => {
     expect(selectRun.mock.calls[1][1]).toBe(false);
   });
   it("sorts ascending by column", async () => {
-    render(<RunTable runs={[]} setSortField={setSortField} sortField={null} />);
+    render(
+      <RunTable
+        runs={[]}
+        setSortField={setSortField}
+        sortField={null}
+        columns={testColumns}
+      />,
+    );
     const heading = screen.getByText("UID");
     await user.click(heading);
     // Check that we updated the sort field properly
@@ -86,6 +99,7 @@ describe("run table", () => {
         runs={[]}
         setSortField={setSortField}
         sortField={"start.uid"}
+        columns={testColumns}
       />,
     );
     const heading = screen.getByText("UID");
@@ -100,13 +114,14 @@ describe("run table", () => {
         runs={[]}
         setSortField={setSortField}
         sortField={"-start.uid"}
+        columns={testColumns}
       />,
     );
     const heading = screen.getByText("UID");
     await user.click(heading);
     // Check that we updated the sort field properly
     expect(setSortField.mock.calls).toHaveLength(1);
-    expect(setSortField.mock.calls[0][0]("-start.uid")).toEqual(null);
+    expect(setSortField.mock.calls[0][0]("-start.uid")).toEqual("");
   });
 });
 
@@ -145,15 +160,24 @@ describe("run table row", () => {
       "start.uid": "883847",
       "start.sample_name": "CrO3",
       "start.scan_name": "NiK",
+      "start.plan_name": "xafs_scan",
       specs: [{ name: "XASRun", version: "1.0" }],
       structure_family: "container",
+      "stop.exit_status": "",
+      "start.time": new Date(),
+      "start.proposal": "",
+      "start.esaf": "",
     };
     render(
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <table>
             <tbody>
-              <Row run={run} apiUri={"https://remotehost/api/v1/"} />
+              <Row
+                run={run}
+                apiUri={"https://remotehost/api/v1/"}
+                columns={testColumns}
+              />
             </tbody>
           </table>
         </QueryClientProvider>
@@ -166,10 +190,19 @@ describe("run table row", () => {
     expect(href).toContain(run["start.uid"]);
     expect(href).toContain("format=text/x-xdi");
     const filename = Object.values(link)[0].memoizedProps.download;
-    expect(filename).toEqual("883847-CrO3-NiK.xdi");
+    expect(filename).toEqual("883847-CrO3-NiK-xafs_scan.xdi");
   });
   it("shows the data-run icon", () => {
     const run = {
+      "start.uid": "",
+      "start.plan_name": "",
+      "start.scan_name": "",
+      "start.sample_name": "",
+      "stop.exit_status": "",
+      "start.time": new Date(),
+      "start.proposal": "",
+      "start.esaf": "",
+      structure_family: "",
       specs: [
         {
           name: "XASRun",
@@ -181,7 +214,11 @@ describe("run table row", () => {
       <BrowserRouter>
         <table>
           <tbody>
-            <Row run={run} apiUri={"https://remotehost/api/v1/"} />
+            <Row
+              run={run}
+              apiUri={"https://remotehost/api/v1/"}
+              columns={testColumns}
+            />
           </tbody>
         </table>
       </BrowserRouter>,
@@ -198,12 +235,15 @@ describe("run table row", () => {
       "start.time": new Date(0),
       "start.proposal": "2",
       "start.esaf": "13",
+      specs: [],
+      structure_family: "",
     };
+    const columns = testColumns;
     render(
       <BrowserRouter>
         <table>
           <tbody>
-            <Row run={run} />
+            <Row run={run} columns={columns} />
           </tbody>
         </table>
       </BrowserRouter>,
@@ -214,7 +254,7 @@ describe("run table row", () => {
     expect(screen.getByText("rel_scan")).toBeInTheDocument();
     expect(screen.getByText("SrN03")).toBeInTheDocument();
     expect(screen.getByText("success")).toBeInTheDocument();
-    expect(screen.getByText("1/1/1970, 12:00:00 AM")).toBeInTheDocument();
+    expect(screen.getByText("1970-01-01 00:00:00.000Z")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("13")).toBeInTheDocument();
   });

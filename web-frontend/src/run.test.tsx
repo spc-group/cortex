@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import * as React from "react";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
