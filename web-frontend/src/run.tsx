@@ -7,13 +7,13 @@ import { getMetadata } from "./tiled_api";
 
 export default function Run() {
   const params = useParams();
-  const uid = params.uid;
+    const uid = params.uid;
   // Retrieve metadata and data keys for this dataset
-  const { isLoading, data } = useQuery({
+    const { isLoading, data } = useQuery({
     queryFn: async () => await getMetadata(uid ?? ""),
     queryKey: ["metadata", uid],
   });
-  const runMetadata = data;
+    const runMetadata = data;
 
   return (
     <div className="m-4">

@@ -23,7 +23,6 @@ export const getMetadata = async (
   const response = await client.get(`metadata/${encodeURIComponent(path)}`, {
     params: {},
   });
-  console.log(response);
   return response.data;
 };
 
