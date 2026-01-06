@@ -106,8 +106,12 @@ async def load_datasets(
       The node for the internal data frame.
 
     """
-    items = {key: node for key, node in await node.items_range(0, None)}
-    streams = {key: node for key, node in await items["streams"].items_range(0, None)}
+    streams = {key: node for key, node in await node.items_range(0, None)}
+    if "streams" in streams:
+        # Older versions of Tiled have an additional "streams" node here
+        streams = {
+            key: node for key, node in await streams["streams"].items_range(0, None)
+        }
     stream_node = streams["primary"]
     stream_items = {key: node for key, node in await stream_node.items_range(0, None)}
     internal_table = stream_items["internal"]

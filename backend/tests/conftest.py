@@ -215,20 +215,19 @@ def xafs_run(tree):
     with Context.from_app(build_app(tree)) as context:
         client = from_context(context)
         # Write sample data
-        streams = client.create_container("streams")
         primary_metadata = {
             "hints": hints,
             "data_keys": data_keys,
             "configuration": xafs_config,
         }
-        primary = streams.create_container("primary", metadata=primary_metadata)
+        primary = client.create_container("primary", metadata=primary_metadata)
         internal = primary.write_table(xafs_events, key="internal")
         # Fluorescence data
         primary.write_array(
             np.full(shape=(100, 8, 4096), fill_value=2), key="ge_8element"
         )
         primary.write_array(np.ones(shape=(100,)), key="ge_8element-element0-all_event")
-        baseline = streams.create_container(
+        baseline = client.create_container(
             "baseline",
             metadata={
                 "hints": {"aps_current": {"fields": ["aps_current"]}},

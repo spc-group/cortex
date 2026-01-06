@@ -66,7 +66,9 @@ def nxlink(parent: h5py.Group, name: str, target: h5py.Group | str, soft=False):
             raise
 
 
-def nxexternallink(parent: h5py.Group, name: str, target: str | Sequence[str], filepath: Path):
+def nxexternallink(
+    parent: h5py.Group, name: str, target: str | Sequence[str], filepath: Path
+):
     """Create a link between a dataset in an external file."""
     other_file = str(filepath.resolve().expanduser())
     if not isinstance(target, (str, bytes)):
@@ -95,9 +97,13 @@ async def write_run(
     instrument = nxinstrument(entry, "instrument")
     bluesky = nxnote(instrument, "bluesky")
     nxnote(bluesky, "streams")
+    # Older Tiled versions use an additional "streams" branch in the tree
+    if "streams" in (await node.keys_range(offset=0, limit=None)):
+        streams = (await asdict(node))["streams"]
+    else:
+        streams = node
     # Write stream data
     write_metadata(metadata, entry=entry)
-    streams = (await asdict(node))["streams"]
     for stream_name, stream_node in await streams.items_range(0, None):
         await write_stream(
             name=stream_name,
