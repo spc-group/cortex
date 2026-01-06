@@ -7,7 +7,7 @@ import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import Run from "./run";
+import { Run } from "./run.tsx";
 
 // Mock URL parameters
 vi.mock(import("react-router"), async (importOriginal) => ({

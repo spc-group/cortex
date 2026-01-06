@@ -1,10 +1,11 @@
 import axios from "axios";
 import type { AxiosInstance } from "axios";
-import type { SearchParams, APIRun } from "./types";
+import type { SearchParams, APIRun, DataKey } from "./types";
 
 const envHost = import.meta.env.VITE_TILED_URI;
 export const tiledHost = envHost === undefined ? "" : envHost;
 export const tiledUri = tiledHost + "/api/v1/";
+const streamsPrefix = "streams/";  // The streams namespace is gone in Tiled soon
 
 export const v1Client = axios.create({
   baseURL: tiledUri,
@@ -24,6 +25,14 @@ export const getMetadata = async (
     params: {},
   });
   return response.data;
+};
+
+
+// Retrieve the data key descriptions for a given run + stream.
+export const getDataKeys = async (uid: string, stream: string, client: AxiosInstance = v1Client): Promise<DataKey[]> => {
+  const path = `${uid}/${streamsPrefix}${stream}`
+  const response = await client.get(`metadata/${encodeURIComponent(path)}`);
+  return response.data.data.attributes.metadata.data_keys
 };
 
 // Parse the query parameters needed for a search
@@ -58,6 +67,7 @@ export const prepareQueryParams = ({
   }
   return params;
 };
+
 
 // Retrieve set of runs metadata from the API
 export const getRuns = async (

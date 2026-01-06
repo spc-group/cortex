@@ -42,6 +42,27 @@ export interface Run {
   structure_family: string;
 }
 
+export interface DataKey {
+  // Description of a column/signal in a run.
+  "dtype": string,
+  "shape": number[],
+  "units": string,
+  "limits": {
+    "control": {
+      "low": number,
+      "high": number,
+    },
+    "display": {
+      "low": number,
+      "high": number,
+    }
+  },
+  "source": string,
+  "precision": number,
+  "dtype_numpy": string,
+  "object_name": string,
+};
+
 export interface BlueskySpec {
   name: string;
   version: string;

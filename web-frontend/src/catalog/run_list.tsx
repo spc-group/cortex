@@ -7,9 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 
 import RunTable from "./run_table";
 import { allColumns } from "./columns";
-import useDebounce from "./debounce";
-import { getRuns } from "./tiled_api";
-import type { TableColumn, Column } from "./types";
+import useDebounce from "../debounce";
+import { getRuns } from "../tiled_api";
+import type { TableColumn, Column } from "../types";
 
 export function Paginator({
   runCount,
@@ -79,7 +79,7 @@ export function Paginator({
   );
 }
 
-export default function RunList() {
+export function RunList() {
   // State for keeping track of pagination
   const [pageLimit, setPageLimit] = useState(10);
   const [pageOffset, setPageOffset] = useState(0);

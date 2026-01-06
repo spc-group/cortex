@@ -5,12 +5,12 @@ import { expect, vi, describe, beforeEach, afterEach, it } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { getRuns } from "./tiled_api";
+import { getRuns } from "../tiled_api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import RunList, { Paginator } from "./run_list";
+import { RunList, Paginator } from "./run_list.tsx";
 
-vi.mock("./tiled_api", () => ({
+vi.mock("../tiled_api", () => ({
   getRuns: vi.fn(() => Promise.resolve([])),
 }));
 

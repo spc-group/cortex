@@ -1,5 +1,5 @@
 import Plot from 'react-plotly.js';
-// import WebSocket from "ws";
+// import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useLatestRun } from "./latest_run.tsx";
 
 export default function LivePlot({beamlineId}: {beamlineId: string}) {
@@ -10,7 +10,7 @@ export default function LivePlot({beamlineId}: {beamlineId: string}) {
     
     // const { sendMessage, lastMessage, readyState } = useWebSocket(
     //     socketUrl,
-    //     { queryParams: {api_key: "secret"} },
+    //     // { queryParams: {api_key: "secret"} },
     // );
     // console.log(readyState);
     // console.log(lastMessage);

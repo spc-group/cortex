@@ -9,8 +9,8 @@ import { useQuery } from "@tanstack/react-query";
 import type { ChangeEvent } from "react";
 
 import { Link } from "react-router";
-import { tiledUri, getApiInfo } from "./tiled_api";
-import type { TableColumn, BlueskySpec, Run } from "./types";
+import { tiledUri, getApiInfo } from "../tiled_api";
+import type { TableColumn, BlueskySpec, Run } from "../types";
 
 const SortIcon = ({
   fieldName,
