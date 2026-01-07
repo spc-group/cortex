@@ -57,6 +57,20 @@ export function Run() {
   const operations = ["+", "−", "×", "÷"];
   const needsRSignal = rSignal === "---" && operations.includes(operation);
 
+  // Decide on plot annotations based on data processing
+  let ylabel = vSignal;
+  if (operations.includes(operation)) {
+    ylabel = `${ylabel} ${operation} ${rSignal}`;
+  }
+  if (inverted) {
+    ylabel = `( ${ylabel} )⁻`;
+  }
+  if (logarithm) {
+    ylabel = `ln( ${ylabel} )`;
+  }
+  const plotTitle =
+    runMetadata?.start?.sample_name + " " + runMetadata?.start?.scan_name;
+
   let plot;
   if (uid === undefined) {
     plot = (
@@ -88,7 +102,16 @@ export function Run() {
       </div>
     );
   } else if (plotStyle === "lineplot") {
-    plot = <LinePlot xdata={xdata} ydata={ydata} uid={uid} />;
+    plot = (
+      <LinePlot
+        xdata={xdata}
+        ydata={ydata}
+        uid={uid}
+        xlabel={xSignal}
+        ylabel={ylabel}
+        title={plotTitle}
+      />
+    );
   } else {
     plot = null;
   }

@@ -55,6 +55,7 @@ export default function Navbar() {
               <div className="flex space-x-4">
                 {navigation.map((item) => (
                   <NavLink
+                    key={item.name}
                     to={item.href}
                     className={({ isActive }) =>
                       "rounded-md px-3 py-2 text-sm font-medium " +

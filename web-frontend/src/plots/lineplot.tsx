@@ -29,13 +29,15 @@ export const LinePlot = ({
     });
   }
 
+  const xtext = xlabel === "---" ? "Index" : xlabel;
+
   return (
     <>
       <Plot
         data={plotData}
         layout={{
           title: { text: title, subtitle: { text: uid } },
-          xaxis: { title: { text: xlabel } },
+          xaxis: { title: { text: xtext } },
           yaxis: { title: { text: ylabel } },
         }}
         config={{
