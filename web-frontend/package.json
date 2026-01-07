@@ -9,7 +9,8 @@
     "test": "vitest",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "pretty": "prettier src/ --write"
+    "pretty": "prettier src/ --write",
+    "deploy": "rsync -avP dist/ newton:/Public/docroot_cortex/app/"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",

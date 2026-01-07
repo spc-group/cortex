@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  PresentationChartLineIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/solid";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import { useQuery } from "@tanstack/react-query";
 
 import RunTable from "./run_table";
@@ -86,7 +83,7 @@ export function RunList() {
   const [runCount, setRunCount] = useState(0);
 
   // State for selecting which field to use for sorting
-  const [sortField, setSortField] = useState<string>("");
+  const [sortField, setSortField] = useState<string>("-start.time");
 
   // State variables to keep track of how to filter the runs
   const useFilterCol = (col: Column) => {
@@ -202,10 +199,6 @@ export function RunList() {
           />
           Standards only
         </label>
-        <button className="btn btn-primary float-right">
-          <PresentationChartLineIcon className="size-5 inline" />
-          Plot
-        </button>
       </div>
 
       <div className="relative overflow-x-auto">
