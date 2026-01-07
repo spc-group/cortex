@@ -8,7 +8,7 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useMatch } from "react-router";
+import { useMatch, NavLink } from "react-router";
 
 import logoUrl from "./spc-logo.svg";
 
@@ -54,19 +54,17 @@ export default function Navbar() {
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 {navigation.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    aria-current={item.current ? "page" : undefined}
-                    className={classNames(
-                      item.current
+                  <NavLink
+                    to={item.href}
+                    className={({ isActive }) =>
+                      "rounded-md px-3 py-2 text-sm font-medium " +
+                      (isActive
                         ? "bg-gray-900 text-white"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                      "rounded-md px-3 py-2 text-sm font-medium",
-                    )}
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white")
+                    }
                   >
                     {item.name}
-                  </a>
+                  </NavLink>
                 ))}
               </div>
             </div>
