@@ -1,6 +1,10 @@
 import "./App.css";
 import { Link } from "react-router";
-import { RadioIcon, PresentationChartLineIcon, TableCellsIcon } from '@heroicons/react/24/outline'
+import {
+  RadioIcon,
+  PresentationChartLineIcon,
+  TableCellsIcon,
+} from "@heroicons/react/24/outline";
 
 function App() {
   return (
@@ -23,7 +27,7 @@ function App() {
             </p>
             <div className="card-actions">
               <Link to="/catalog" className="btn btn-primary text-white">
-		<PresentationChartLineIcon className="size-6 text-white" />
+                <PresentationChartLineIcon className="size-6 text-white" />
                 Browse
               </Link>
             </div>
@@ -38,10 +42,10 @@ function App() {
               data are being collected.
             </p>
             <div className="card-actions">
-	      <Link to="/beamlines" className="btn btn-primary text-white">
-		<RadioIcon className="size-6 text-white"/>
-		Beamlines
-	      </Link>
+              <Link to="/beamlines" className="btn btn-primary text-white">
+                <RadioIcon className="size-6 text-white" />
+                Beamlines
+              </Link>
             </div>
           </div>
         </div>
@@ -55,7 +59,7 @@ function App() {
             </p>
             <div className="card-actions">
               <a href="/ui/browse" className="btn btn-outline">
-		<TableCellsIcon className="size-6 text-white" />
+                <TableCellsIcon className="size-6 text-white" />
                 Browse
               </a>
             </div>

@@ -108,7 +108,8 @@ export default function RunTable({
                 <div>
                   <input
                     type="text"
-                    placeholder={"Filter " + col.label}
+                    placeholder={"Filter…"}
+                    title={"Filter by " + col.label}
                     className="input input-xs input-ghost align-top w-full max-w-xs"
                     value={col.filter}
                     disabled={col.filter === null}
@@ -269,7 +270,7 @@ export function Row({
         }
         return (
           <td key={uid + col.name}>
-            <Link to={uid}>{text}</Link>
+            <Link to={uid + "/lineplot"}>{text}</Link>
           </td>
         );
       })}

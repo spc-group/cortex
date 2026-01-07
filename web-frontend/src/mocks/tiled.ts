@@ -28,50 +28,39 @@ export const searchJson = {
 };
 
 export const streamMetadataJson = {
-  "data": {
-    "id": "primary",
-    "attributes": {
-      "ancestors": [
-        "b68c7712-cb05-47f4-8e25-11cb05cc2cd5",
-        "streams"
-      ],
-      "structure_family": "container",
-      "specs": [
+  data: {
+    id: "primary",
+    attributes: {
+      ancestors: ["b68c7712-cb05-47f4-8e25-11cb05cc2cd5", "streams"],
+      structure_family: "container",
+      specs: [
         {
-          "name": "BlueskyEventStream",
-          "version": "3.0"
+          name: "BlueskyEventStream",
+          version: "3.0",
         },
         {
-          "name": "composite",
-          "version": null
-        }
+          name: "composite",
+          version: null,
+        },
       ],
-      "metadata": {
-        "uid": "05c7120c-56a0-4ff9-b186-a5886da9706f",
-        "time": 1748375320.52416,
-        "hints": {
-          "It": {
-            "fields": [
-              "It-net_current"
-            ]
+      metadata: {
+        uid: "05c7120c-56a0-4ff9-b186-a5886da9706f",
+        time: 1748375320.52416,
+        hints: {
+          It: {
+            fields: ["It-net_current"],
           },
-          "Iref": {
-            "fields": [
-              "Iref-net_current"
-            ]
+          Iref: {
+            fields: ["Iref-net_current"],
           },
-          "IpreKB": {
-            "fields": [
-              "IpreKB-net_current"
-            ]
+          IpreKB: {
+            fields: ["IpreKB-net_current"],
           },
-          "Ipreslit": {
-            "fields": [
-              "Ipreslit-net_current"
-            ]
+          Ipreslit: {
+            fields: ["Ipreslit-net_current"],
           },
-          "monochromator": {
-            "fields": [
+          monochromator: {
+            fields: [
               "monochromator-pitch2",
               "monochromator-roll2",
               "monochromator-gap",
@@ -79,417 +68,417 @@ export const streamMetadataJson = {
               "monochromator-bragg",
               "monochromator-energy",
               "monochromator-horiz",
-              "monochromator-vert"
-            ]
-          }
+              "monochromator-vert",
+            ],
+          },
         },
-        "data_keys": {
+        data_keys: {
           "It-net_current": {
-            "dtype": "number",
-            "shape": [],
-            "units": "A",
-            "source": "derived://It-net_current",
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "It"
+            dtype: "number",
+            shape: [],
+            units: "A",
+            source: "derived://It-net_current",
+            dtype_numpy: "\u003Cf8",
+            object_name: "It",
           },
           "It-raw_current": {
-            "dtype": "number",
-            "shape": [],
-            "units": "A",
-            "source": "derived://It-raw_current",
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "It"
+            dtype: "number",
+            shape: [],
+            units: "A",
+            source: "derived://It-raw_current",
+            dtype_numpy: "\u003Cf8",
+            object_name: "It",
           },
           "Iref-net_current": {
-            "dtype": "number",
-            "shape": [],
-            "units": "A",
-            "source": "derived://Iref-net_current",
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Iref"
+            dtype: "number",
+            shape: [],
+            units: "A",
+            source: "derived://Iref-net_current",
+            dtype_numpy: "\u003Cf8",
+            object_name: "Iref",
           },
           "Iref-raw_current": {
-            "dtype": "number",
-            "shape": [],
-            "units": "A",
-            "source": "derived://Iref-raw_current",
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Iref"
+            dtype: "number",
+            shape: [],
+            units: "A",
+            source: "derived://Iref-raw_current",
+            dtype_numpy: "\u003Cf8",
+            object_name: "Iref",
           },
           "monochromator-gap": {
-            "dtype": "number",
-            "shape": [],
-            "units": "um",
-            "limits": {
-              "control": {
-                "low": -24105,
-                "high": -24105
+            dtype: "number",
+            shape: [],
+            units: "um",
+            limits: {
+              control: {
+                low: -24105,
+                high: -24105,
               },
-              "display": {
-                "low": -24105,
-                "high": -24105
-              }
+              display: {
+                low: -24105,
+                high: -24105,
+              },
             },
-            "source": "ca://25idbUP:ACS:m4.RBV",
-            "precision": 3,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "monochromator"
+            source: "ca://25idbUP:ACS:m4.RBV",
+            precision: 3,
+            dtype_numpy: "\u003Cf8",
+            object_name: "monochromator",
           },
-            "IpreKB-net_current": {
-            "dtype": "number",
-            "shape": [],
-            "units": "A",
-            "source": "derived://IpreKB-net_current",
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "IpreKB"
+          "IpreKB-net_current": {
+            dtype: "number",
+            shape: [],
+            units: "A",
+            source: "derived://IpreKB-net_current",
+            dtype_numpy: "\u003Cf8",
+            object_name: "IpreKB",
           },
           "IpreKB-raw_current": {
-            "dtype": "number",
-            "shape": [],
-            "units": "A",
-            "source": "derived://IpreKB-raw_current",
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "IpreKB"
+            dtype: "number",
+            shape: [],
+            units: "A",
+            source: "derived://IpreKB-raw_current",
+            dtype_numpy: "\u003Cf8",
+            object_name: "IpreKB",
           },
           "monochromator-vert": {
-            "dtype": "number",
-            "shape": [],
-            "units": "um",
-            "source": "ca://25idbUP:ACS:m2.RBV",
-            "precision": 3,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "monochromator"
+            dtype: "number",
+            shape: [],
+            units: "um",
+            source: "ca://25idbUP:ACS:m2.RBV",
+            precision: 3,
+            dtype_numpy: "\u003Cf8",
+            object_name: "monochromator",
           },
           "monochromator-bragg": {
-            "dtype": "number",
-            "shape": [],
-            "units": "arcsec",
-            "limits": {
-              "control": {
-                "low": -11.4000000000001,
-                "high": 109988.6
+            dtype: "number",
+            shape: [],
+            units: "arcsec",
+            limits: {
+              control: {
+                low: -11.4000000000001,
+                high: 109988.6,
               },
-              "display": {
-                "low": -11.4000000000001,
-                "high": 109988.6
-              }
+              display: {
+                low: -11.4000000000001,
+                high: 109988.6,
+              },
             },
-            "source": "ca://25idbUP:ACS:m3.RBV",
-            "precision": 2,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "monochromator"
+            source: "ca://25idbUP:ACS:m3.RBV",
+            precision: 2,
+            dtype_numpy: "\u003Cf8",
+            object_name: "monochromator",
           },
           "monochromator-horiz": {
-            "dtype": "number",
-            "shape": [],
-            "units": "um",
-            "source": "ca://25idbUP:ACS:m1.RBV",
-            "precision": 3,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "monochromator"
+            dtype: "number",
+            shape: [],
+            units: "um",
+            source: "ca://25idbUP:ACS:m1.RBV",
+            precision: 3,
+            dtype_numpy: "\u003Cf8",
+            object_name: "monochromator",
           },
           "monochromator-roll2": {
-            "dtype": "number",
-            "shape": [],
-            "units": "urad",
-            "source": "ca://25idbUP:ACS:m5.RBV",
-            "precision": 3,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "monochromator"
+            dtype: "number",
+            shape: [],
+            units: "urad",
+            source: "ca://25idbUP:ACS:m5.RBV",
+            precision: 3,
+            dtype_numpy: "\u003Cf8",
+            object_name: "monochromator",
           },
           "Ipreslit-net_current": {
-            "dtype": "number",
-            "shape": [],
-            "units": "A",
-            "source": "derived://Ipreslit-net_current",
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Ipreslit"
+            dtype: "number",
+            shape: [],
+            units: "A",
+            source: "derived://Ipreslit-net_current",
+            dtype_numpy: "\u003Cf8",
+            object_name: "Ipreslit",
           },
           "Ipreslit-raw_current": {
-            "dtype": "number",
-            "shape": [],
-            "units": "A",
-            "source": "derived://Ipreslit-raw_current",
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Ipreslit"
+            dtype: "number",
+            shape: [],
+            units: "A",
+            source: "derived://Ipreslit-raw_current",
+            dtype_numpy: "\u003Cf8",
+            object_name: "Ipreslit",
           },
           "monochromator-energy": {
-            "dtype": "number",
-            "shape": [],
-            "units": "eV",
-            "limits": {
-              "control": {
-                "low": 0,
-                "high": 35000
+            dtype: "number",
+            shape: [],
+            units: "eV",
+            limits: {
+              control: {
+                low: 0,
+                high: 35000,
               },
-              "display": {
-                "low": 0,
-                "high": 35000
-              }
+              display: {
+                low: 0,
+                high: 35000,
+              },
             },
-            "source": "ca://25idbUP:Energy.RBV",
-            "precision": 6,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "monochromator"
+            source: "ca://25idbUP:Energy.RBV",
+            precision: 6,
+            dtype_numpy: "\u003Cf8",
+            object_name: "monochromator",
           },
           "monochromator-offset": {
-            "dtype": "number",
-            "shape": [],
-            "units": "um",
-            "limits": {
-              "control": {
-                "low": 5000,
-                "high": 12000
+            dtype: "number",
+            shape: [],
+            units: "um",
+            limits: {
+              control: {
+                low: 5000,
+                high: 12000,
               },
-              "display": {
-                "low": 5000,
-                "high": 12000
-              }
+              display: {
+                low: 5000,
+                high: 12000,
+              },
             },
-            "source": "ca://25idbUP:Offset.RBV",
-            "precision": 6,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "monochromator"
+            source: "ca://25idbUP:Offset.RBV",
+            precision: 6,
+            dtype_numpy: "\u003Cf8",
+            object_name: "monochromator",
           },
           "monochromator-pitch2": {
-            "dtype": "number",
-            "shape": [],
-            "units": "urad",
-            "limits": {
-              "control": {
-                "low": 5000,
-                "high": 120000
+            dtype: "number",
+            shape: [],
+            units: "urad",
+            limits: {
+              control: {
+                low: 5000,
+                high: 120000,
               },
-              "display": {
-                "low": 5000,
-                "high": 120000
-              }
+              display: {
+                low: 5000,
+                high: 120000,
+              },
             },
-            "source": "ca://25idbUP:ACS:m6.RBV",
-            "precision": 3,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "monochromator"
+            source: "ca://25idbUP:ACS:m6.RBV",
+            precision: 3,
+            dtype_numpy: "\u003Cf8",
+            object_name: "monochromator",
           },
           "It-mcs-scaler-elapsed_time": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.T",
-            "precision": 3,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "It"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.T",
+            precision: 3,
+            dtype_numpy: "\u003Cf8",
+            object_name: "It",
           },
           "Iref-mcs-scaler-elapsed_time": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.T",
-            "precision": 3,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Iref"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.T",
+            precision: 3,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Iref",
           },
           "IpreKB-mcs-scaler-elapsed_time": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.T",
-            "precision": 3,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "IpreKB"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.T",
+            precision: 3,
+            dtype_numpy: "\u003Cf8",
+            object_name: "IpreKB",
           },
           "Ipreslit-mcs-scaler-elapsed_time": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.T",
-            "precision": 3,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Ipreslit"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.T",
+            precision: 3,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Ipreslit",
           },
           "It-mcs-scaler-channels-0-net_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1_netA.A",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "It"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1_netA.A",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "It",
           },
           "It-mcs-scaler-channels-0-raw_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.S1",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "It"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.S1",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "It",
           },
           "It-mcs-scaler-channels-4-net_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1_netA.E",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "It"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1_netA.E",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "It",
           },
           "It-mcs-scaler-channels-4-raw_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.S5",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "It"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.S5",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "It",
           },
           "Iref-mcs-scaler-channels-0-net_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1_netA.A",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Iref"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1_netA.A",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Iref",
           },
           "Iref-mcs-scaler-channels-0-raw_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.S1",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Iref"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.S1",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Iref",
           },
           "Iref-mcs-scaler-channels-5-net_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1_netA.F",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Iref"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1_netA.F",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Iref",
           },
           "Iref-mcs-scaler-channels-5-raw_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.S6",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Iref"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.S6",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Iref",
           },
           "IpreKB-mcs-scaler-channels-0-net_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1_netA.A",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "IpreKB"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1_netA.A",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "IpreKB",
           },
           "IpreKB-mcs-scaler-channels-0-raw_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.S1",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "IpreKB"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.S1",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "IpreKB",
           },
           "IpreKB-mcs-scaler-channels-2-net_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1_netA.C",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "IpreKB"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1_netA.C",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "IpreKB",
           },
           "IpreKB-mcs-scaler-channels-2-raw_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.S3",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "IpreKB"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.S3",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "IpreKB",
           },
           "Ipreslit-mcs-scaler-channels-0-net_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1_netA.A",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Ipreslit"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1_netA.A",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Ipreslit",
           },
           "Ipreslit-mcs-scaler-channels-0-raw_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.S1",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Ipreslit"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.S1",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Ipreslit",
           },
           "Ipreslit-mcs-scaler-channels-1-net_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1_netA.B",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Ipreslit"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1_netA.B",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Ipreslit",
           },
           "Ipreslit-mcs-scaler-channels-1-raw_count": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idcVME:3820:scaler1.S2",
-            "precision": 0,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Ipreslit"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idcVME:3820:scaler1.S2",
+            precision: 0,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Ipreslit",
           },
           "It-voltmeter-analog_inputs-3-final_value": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idc:LJT7Voltmeter_0:Ai3.VAL",
-            "precision": 2,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "It"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idc:LJT7Voltmeter_0:Ai3.VAL",
+            precision: 2,
+            dtype_numpy: "\u003Cf8",
+            object_name: "It",
           },
           "Iref-voltmeter-analog_inputs-4-final_value": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idc:LJT7Voltmeter_0:Ai4.VAL",
-            "precision": 2,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Iref"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idc:LJT7Voltmeter_0:Ai4.VAL",
+            precision: 2,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Iref",
           },
           "IpreKB-voltmeter-analog_inputs-1-final_value": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idc:LJT7Voltmeter_0:Ai1.VAL",
-            "precision": 2,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "IpreKB"
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idc:LJT7Voltmeter_0:Ai1.VAL",
+            precision: 2,
+            dtype_numpy: "\u003Cf8",
+            object_name: "IpreKB",
           },
           "Ipreslit-voltmeter-analog_inputs-0-final_value": {
-            "dtype": "number",
-            "shape": [],
-            "units": "",
-            "source": "ca://25idc:LJT7Voltmeter_0:Ai0.VAL",
-            "precision": 2,
-            "dtype_numpy": "\u003Cf8",
-            "object_name": "Ipreslit"
-          }
+            dtype: "number",
+            shape: [],
+            units: "",
+            source: "ca://25idc:LJT7Voltmeter_0:Ai0.VAL",
+            precision: 2,
+            dtype_numpy: "\u003Cf8",
+            object_name: "Ipreslit",
+          },
         },
-        "configuration": {
-          "It": {
-            "data": {
+        configuration: {
+          It: {
+            data: {
               "It-mcs-model": "SIS3820",
               "It-mcs-firmware": 273,
               "It-mcs-prescale": 1,
@@ -539,336 +528,303 @@ export const streamMetadataJson = {
               "It-mcs-scaler-channels-0-preset_count": 9600000,
               "It-mcs-scaler-channels-4-preset_count": 0,
               "It-voltmeter-analog_in_resolution_all": "8",
-              "It-voltmeter-analog_inputs-3-input_link": "@asyn(LJT7V_0 3)ANALOG_IN_VALUE",
+              "It-voltmeter-analog_inputs-3-input_link":
+                "@asyn(LJT7V_0 3)ANALOG_IN_VALUE",
               "It-voltmeter-analog_inputs-3-resolution": "Default",
               "It-voltmeter-analog_in_settling_time_all": 0,
               "It-voltmeter-analog_inputs-3-description": "It",
               "It-voltmeter-analog_inputs-3-device_type": "asynFloat64Average",
               "It-voltmeter-analog_inputs-3-differential": "Single-Ended",
               "It-voltmeter-analog_inputs-3-scanning_rate": ".2 second",
-              "It-voltmeter-analog_inputs-3-temperature_units": "K"
+              "It-voltmeter-analog_inputs-3-temperature_units": "K",
             },
-            "data_keys": {
+            data_keys: {
               "It-mcs-model": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:Model",
-                "choices": [
-                  "SIS3801",
-                  "SIS3820"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:Model",
+                choices: ["SIS3801", "SIS3820"],
+                dtype_numpy: "|S40",
               },
               "It-mcs-firmware": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Firmware",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Firmware",
+                dtype_numpy: "\u003Ci8",
               },
               "It-mcs-prescale": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Prescale",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Prescale",
+                dtype_numpy: "\u003Ci8",
               },
               "It-mcs-dwell_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Dwell",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Dwell",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-input_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:InputMode",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:InputMode",
+                choices: [
                   "Mode 0",
                   "Mode 1",
                   "Mode 2",
                   "Mode 3",
                   "Mode 4",
                   "Mode 5",
-                  "Mode 6"
+                  "Mode 6",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "It-mcs-mux_output": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "limits": {
-                  "display": {
-                    "low": 0,
-                    "high": 32
-                  }
+                dtype: "number",
+                shape: [],
+                units: "",
+                limits: {
+                  display: {
+                    low: 0,
+                    high: 32,
+                  },
                 },
-                "source": "ca://25idcVME:3820:MUXOutput",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idcVME:3820:MUXOutput",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-output_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:OutputMode",
-                "choices": [
-                  "Mode 0",
-                  "Mode 1",
-                  "Mode 2",
-                  "Mode 3"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:OutputMode",
+                choices: ["Mode 0", "Mode 1", "Mode 2", "Mode 3"],
+                dtype_numpy: "|S40",
               },
               "It-mcs-preset_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:PresetReal",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:PresetReal",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-acquire_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:AcquireMode",
-                "choices": [
-                  "MCS",
-                  "Scaler"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:AcquireMode",
+                choices: ["MCS", "Scaler"],
+                dtype_numpy: "|S40",
               },
               "It-mcs-num_channels": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:NuseAll",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:NuseAll",
+                dtype_numpy: "\u003Ci8",
               },
               "It-mcs-scaler-delay": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.DLY",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.DLY",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-snl_connected": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:SNL_Connected",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:SNL_Connected",
+                dtype_numpy: "|b1",
               },
               "It-mcs-count_on_start": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:CountOnStart",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:CountOnStart",
+                dtype_numpy: "|b1",
               },
               "It-mcs-input_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:InputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:InputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "It-mcs-output_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:OutputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:OutputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "It-mcs-channel_1_source": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:Channel1Source",
-                "choices": [
-                  "Int. clock",
-                  "External"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:Channel1Source",
+                choices: ["Int. clock", "External"],
+                dtype_numpy: "|S40",
               },
               "It-mcs-lne_output_delay": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:LNEOutputDelay",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:LNEOutputDelay",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-lne_output_width": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:LNEOutputWidth",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:LNEOutputWidth",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-num_channels_max": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:MaxChannels",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:MaxChannels",
+                dtype_numpy: "\u003Ci8",
               },
               "It-voltmeter-model_name": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:ModelName",
-                "choices": [
-                  "T4",
-                  "T7",
-                  "T7-Pro",
-                  "T8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:ModelName",
+                choices: ["T4", "T7", "T7-Pro", "T8"],
+                dtype_numpy: "|S40",
               },
               "It-mcs-scaler-count_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.CONT",
-                "choices": [
-                  "OneShot",
-                  "AutoCount"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.CONT",
+                choices: ["OneShot", "AutoCount"],
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-ljm_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:LJMVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:LJMVersion",
+                dtype_numpy: "|S40",
               },
               "It-counts_per_volt_second": {
-                "dtype": "number",
-                "shape": [],
-                "source": "soft://It-counts_per_volt_second",
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                source: "soft://It-counts_per_volt_second",
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-scaler-preset_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.TP",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.TP",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-lne_output_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:LNEOutputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:LNEOutputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-poll_sleep_ms": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:PollSleepMS",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:PollSleepMS",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "It-voltmeter-serial_number": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:SerialNumber",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:SerialNumber",
+                dtype_numpy: "|S40",
               },
               "It-mcs-lne_output_stretcher": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:LNEStretcherEnable",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:LNEStretcherEnable",
+                dtype_numpy: "|b1",
               },
               "It-voltmeter-driver_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:DriverVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:DriverVersion",
+                dtype_numpy: "|S40",
               },
               "It-mcs-channel_advance_source": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:ChannelAdvance",
-                "choices": [
-                  "Internal",
-                  "External"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:ChannelAdvance",
+                choices: ["Internal", "External"],
+                dtype_numpy: "|S40",
               },
               "It-mcs-scaler-clock_frequency": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.FREQ",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.FREQ",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "It-voltmeter-firmware_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:FirmwareVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:FirmwareVersion",
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-device_temperature": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:DeviceTemperature",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:DeviceTemperature",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "It-voltmeter-last_error_message": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:LastErrorMessage",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:LastErrorMessage",
+                dtype_numpy: "|S40",
               },
               "It-mcs-scaler-channels-0-is_gate": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.G1",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.G1",
+                dtype_numpy: "|b1",
               },
               "It-mcs-scaler-channels-4-is_gate": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.G5",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.G5",
+                dtype_numpy: "|b1",
               },
               "It-voltmeter-analog_inputs-3-low": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiLOPR3",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiLOPR3",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "It-voltmeter-analog_inputs-3-high": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiHOPR3",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiHOPR3",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "It-voltmeter-analog_inputs-3-mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiMode3",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiMode3",
+                choices: [
                   "Volts",
                   "Type B TC",
                   "Type C TC",
@@ -878,139 +834,114 @@ export const streamMetadataJson = {
                   "Type N TC",
                   "Type R TC",
                   "Type S TC",
-                  "Type T TC"
+                  "Type T TC",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-analog_inputs-3-range": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiRange3",
-                "choices": [
-                  "+= 10V",
-                  "+= 1V",
-                  "+= 0.1V",
-                  "+= 0.01V"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiRange3",
+                choices: ["+= 10V", "+= 1V", "+= 0.1V", "+= 0.01V"],
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-analog_inputs-3-enable": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiEnable3",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiEnable3",
+                dtype_numpy: "|b1",
               },
               "It-mcs-scaler-channels-0-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.NM1",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.NM1",
+                dtype_numpy: "|S40",
               },
               "It-mcs-scaler-channels-0-offset_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1_offset0.A",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1_offset0.A",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-scaler-channels-4-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.NM5",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.NM5",
+                dtype_numpy: "|S40",
               },
               "It-mcs-scaler-channels-4-offset_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1_offset1.A",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1_offset1.A",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "It-voltmeter-analog_in_sampling_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiSamplingRate_RBV",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiSamplingRate_RBV",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-scaler-channels-0-preset_count": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.PR1",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.PR1",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "It-mcs-scaler-channels-4-preset_count": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.PR5",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.PR5",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "It-voltmeter-analog_in_resolution_all": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiAllResolution",
-                "choices": [
-                  "Default",
-                  "1",
-                  "2",
-                  "3",
-                  "4",
-                  "5",
-                  "6",
-                  "7",
-                  "8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiAllResolution",
+                choices: ["Default", "1", "2", "3", "4", "5", "6", "7", "8"],
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-analog_inputs-3-input_link": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai3.INP",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai3.INP",
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-analog_inputs-3-resolution": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiResolution3",
-                "choices": [
-                  "Default",
-                  "1",
-                  "2",
-                  "3",
-                  "4",
-                  "5",
-                  "6",
-                  "7",
-                  "8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiResolution3",
+                choices: ["Default", "1", "2", "3", "4", "5", "6", "7", "8"],
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-analog_in_settling_time_all": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiAllSettlingUS",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiAllSettlingUS",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "It-voltmeter-analog_inputs-3-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai3.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai3.DESC",
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-analog_inputs-3-device_type": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai3.DTYP",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai3.DTYP",
+                choices: [
                   "Soft Channel",
                   "Raw Soft Channel",
                   "Async Soft Channel",
@@ -1026,25 +957,22 @@ export const streamMetadataJson = {
                   "GPIB init/report",
                   "Sec Past Epoch",
                   "asyn ai stringParm",
-                  "asyn ai HeidND261"
+                  "asyn ai HeidND261",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-analog_inputs-3-differential": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiDiff3",
-                "choices": [
-                  "Single-Ended",
-                  "Differential"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiDiff3",
+                choices: ["Single-Ended", "Differential"],
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-analog_inputs-3-scanning_rate": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai3.SCAN",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai3.SCAN",
+                choices: [
                   "Passive",
                   "Event",
                   "I/O Intr",
@@ -1054,23 +982,19 @@ export const streamMetadataJson = {
                   "1 second",
                   ".5 second",
                   ".2 second",
-                  ".1 second"
+                  ".1 second",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "It-voltmeter-analog_inputs-3-temperature_units": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiTempUnits3",
-                "choices": [
-                  "K",
-                  "C",
-                  "F"
-                ],
-                "dtype_numpy": "|S40"
-              }
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiTempUnits3",
+                choices: ["K", "C", "F"],
+                dtype_numpy: "|S40",
+              },
             },
-            "timestamps": {
+            timestamps: {
               "It-mcs-model": 1747157934.63704,
               "It-mcs-firmware": 1747157934.60371,
               "It-mcs-prescale": 1747157934.60371,
@@ -1127,11 +1051,11 @@ export const streamMetadataJson = {
               "It-voltmeter-analog_inputs-3-device_type": 1748375320.43765,
               "It-voltmeter-analog_inputs-3-differential": 1748009688.74302,
               "It-voltmeter-analog_inputs-3-scanning_rate": 1748375320.43765,
-              "It-voltmeter-analog_inputs-3-temperature_units": 1748009688.74261
-            }
+              "It-voltmeter-analog_inputs-3-temperature_units": 1748009688.74261,
+            },
           },
-          "Iref": {
-            "data": {
+          Iref: {
+            data: {
               "Iref-mcs-model": "SIS3820",
               "Iref-mcs-firmware": 273,
               "Iref-mcs-prescale": 1,
@@ -1181,336 +1105,304 @@ export const streamMetadataJson = {
               "Iref-mcs-scaler-channels-0-preset_count": 9600000,
               "Iref-mcs-scaler-channels-5-preset_count": 0,
               "Iref-voltmeter-analog_in_resolution_all": "8",
-              "Iref-voltmeter-analog_inputs-4-input_link": "@asyn(LJT7V_0 4)ANALOG_IN_VALUE",
+              "Iref-voltmeter-analog_inputs-4-input_link":
+                "@asyn(LJT7V_0 4)ANALOG_IN_VALUE",
               "Iref-voltmeter-analog_inputs-4-resolution": "Default",
               "Iref-voltmeter-analog_in_settling_time_all": 0,
               "Iref-voltmeter-analog_inputs-4-description": "Iref",
-              "Iref-voltmeter-analog_inputs-4-device_type": "asynFloat64Average",
+              "Iref-voltmeter-analog_inputs-4-device_type":
+                "asynFloat64Average",
               "Iref-voltmeter-analog_inputs-4-differential": "Single-Ended",
               "Iref-voltmeter-analog_inputs-4-scanning_rate": ".2 second",
-              "Iref-voltmeter-analog_inputs-4-temperature_units": "K"
+              "Iref-voltmeter-analog_inputs-4-temperature_units": "K",
             },
-            "data_keys": {
+            data_keys: {
               "Iref-mcs-model": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:Model",
-                "choices": [
-                  "SIS3801",
-                  "SIS3820"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:Model",
+                choices: ["SIS3801", "SIS3820"],
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-firmware": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Firmware",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Firmware",
+                dtype_numpy: "\u003Ci8",
               },
               "Iref-mcs-prescale": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Prescale",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Prescale",
+                dtype_numpy: "\u003Ci8",
               },
               "Iref-mcs-dwell_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Dwell",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Dwell",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-input_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:InputMode",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:InputMode",
+                choices: [
                   "Mode 0",
                   "Mode 1",
                   "Mode 2",
                   "Mode 3",
                   "Mode 4",
                   "Mode 5",
-                  "Mode 6"
+                  "Mode 6",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-mux_output": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "limits": {
-                  "display": {
-                    "low": 0,
-                    "high": 32
-                  }
+                dtype: "number",
+                shape: [],
+                units: "",
+                limits: {
+                  display: {
+                    low: 0,
+                    high: 32,
+                  },
                 },
-                "source": "ca://25idcVME:3820:MUXOutput",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idcVME:3820:MUXOutput",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-output_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:OutputMode",
-                "choices": [
-                  "Mode 0",
-                  "Mode 1",
-                  "Mode 2",
-                  "Mode 3"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:OutputMode",
+                choices: ["Mode 0", "Mode 1", "Mode 2", "Mode 3"],
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-preset_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:PresetReal",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:PresetReal",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-acquire_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:AcquireMode",
-                "choices": [
-                  "MCS",
-                  "Scaler"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:AcquireMode",
+                choices: ["MCS", "Scaler"],
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-num_channels": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:NuseAll",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:NuseAll",
+                dtype_numpy: "\u003Ci8",
               },
               "Iref-mcs-scaler-delay": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.DLY",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.DLY",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-snl_connected": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:SNL_Connected",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:SNL_Connected",
+                dtype_numpy: "|b1",
               },
               "Iref-mcs-count_on_start": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:CountOnStart",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:CountOnStart",
+                dtype_numpy: "|b1",
               },
               "Iref-mcs-input_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:InputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:InputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-output_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:OutputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:OutputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-channel_1_source": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:Channel1Source",
-                "choices": [
-                  "Int. clock",
-                  "External"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:Channel1Source",
+                choices: ["Int. clock", "External"],
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-lne_output_delay": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:LNEOutputDelay",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:LNEOutputDelay",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-lne_output_width": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:LNEOutputWidth",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:LNEOutputWidth",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-num_channels_max": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:MaxChannels",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:MaxChannels",
+                dtype_numpy: "\u003Ci8",
               },
               "Iref-voltmeter-model_name": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:ModelName",
-                "choices": [
-                  "T4",
-                  "T7",
-                  "T7-Pro",
-                  "T8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:ModelName",
+                choices: ["T4", "T7", "T7-Pro", "T8"],
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-scaler-count_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.CONT",
-                "choices": [
-                  "OneShot",
-                  "AutoCount"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.CONT",
+                choices: ["OneShot", "AutoCount"],
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-ljm_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:LJMVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:LJMVersion",
+                dtype_numpy: "|S40",
               },
               "Iref-counts_per_volt_second": {
-                "dtype": "number",
-                "shape": [],
-                "source": "soft://Iref-counts_per_volt_second",
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                source: "soft://Iref-counts_per_volt_second",
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-scaler-preset_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.TP",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.TP",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-lne_output_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:LNEOutputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:LNEOutputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-poll_sleep_ms": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:PollSleepMS",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:PollSleepMS",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-voltmeter-serial_number": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:SerialNumber",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:SerialNumber",
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-lne_output_stretcher": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:LNEStretcherEnable",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:LNEStretcherEnable",
+                dtype_numpy: "|b1",
               },
               "Iref-voltmeter-driver_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:DriverVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:DriverVersion",
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-channel_advance_source": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:ChannelAdvance",
-                "choices": [
-                  "Internal",
-                  "External"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:ChannelAdvance",
+                choices: ["Internal", "External"],
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-scaler-clock_frequency": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.FREQ",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.FREQ",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-voltmeter-firmware_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:FirmwareVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:FirmwareVersion",
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-device_temperature": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:DeviceTemperature",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:DeviceTemperature",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-voltmeter-last_error_message": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:LastErrorMessage",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:LastErrorMessage",
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-scaler-channels-0-is_gate": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.G1",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.G1",
+                dtype_numpy: "|b1",
               },
               "Iref-mcs-scaler-channels-5-is_gate": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.G6",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.G6",
+                dtype_numpy: "|b1",
               },
               "Iref-voltmeter-analog_inputs-4-low": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiLOPR4",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiLOPR4",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-voltmeter-analog_inputs-4-high": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiHOPR4",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiHOPR4",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-voltmeter-analog_inputs-4-mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiMode4",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiMode4",
+                choices: [
                   "Volts",
                   "Type B TC",
                   "Type C TC",
@@ -1520,139 +1412,114 @@ export const streamMetadataJson = {
                   "Type N TC",
                   "Type R TC",
                   "Type S TC",
-                  "Type T TC"
+                  "Type T TC",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-analog_inputs-4-range": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiRange4",
-                "choices": [
-                  "+= 10V",
-                  "+= 1V",
-                  "+= 0.1V",
-                  "+= 0.01V"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiRange4",
+                choices: ["+= 10V", "+= 1V", "+= 0.1V", "+= 0.01V"],
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-analog_inputs-4-enable": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiEnable4",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiEnable4",
+                dtype_numpy: "|b1",
               },
               "Iref-mcs-scaler-channels-0-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.NM1",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.NM1",
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-scaler-channels-0-offset_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1_offset0.A",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1_offset0.A",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-scaler-channels-5-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.NM6",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.NM6",
+                dtype_numpy: "|S40",
               },
               "Iref-mcs-scaler-channels-5-offset_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1_offset1.B",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1_offset1.B",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-voltmeter-analog_in_sampling_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiSamplingRate_RBV",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiSamplingRate_RBV",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-scaler-channels-0-preset_count": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.PR1",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.PR1",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-mcs-scaler-channels-5-preset_count": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.PR6",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.PR6",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-voltmeter-analog_in_resolution_all": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiAllResolution",
-                "choices": [
-                  "Default",
-                  "1",
-                  "2",
-                  "3",
-                  "4",
-                  "5",
-                  "6",
-                  "7",
-                  "8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiAllResolution",
+                choices: ["Default", "1", "2", "3", "4", "5", "6", "7", "8"],
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-analog_inputs-4-input_link": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai4.INP",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai4.INP",
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-analog_inputs-4-resolution": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiResolution4",
-                "choices": [
-                  "Default",
-                  "1",
-                  "2",
-                  "3",
-                  "4",
-                  "5",
-                  "6",
-                  "7",
-                  "8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiResolution4",
+                choices: ["Default", "1", "2", "3", "4", "5", "6", "7", "8"],
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-analog_in_settling_time_all": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiAllSettlingUS",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiAllSettlingUS",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "Iref-voltmeter-analog_inputs-4-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai4.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai4.DESC",
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-analog_inputs-4-device_type": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai4.DTYP",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai4.DTYP",
+                choices: [
                   "Soft Channel",
                   "Raw Soft Channel",
                   "Async Soft Channel",
@@ -1668,25 +1535,22 @@ export const streamMetadataJson = {
                   "GPIB init/report",
                   "Sec Past Epoch",
                   "asyn ai stringParm",
-                  "asyn ai HeidND261"
+                  "asyn ai HeidND261",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-analog_inputs-4-differential": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiDiff4",
-                "choices": [
-                  "Single-Ended",
-                  "Differential"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiDiff4",
+                choices: ["Single-Ended", "Differential"],
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-analog_inputs-4-scanning_rate": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai4.SCAN",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai4.SCAN",
+                choices: [
                   "Passive",
                   "Event",
                   "I/O Intr",
@@ -1696,23 +1560,19 @@ export const streamMetadataJson = {
                   "1 second",
                   ".5 second",
                   ".2 second",
-                  ".1 second"
+                  ".1 second",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "Iref-voltmeter-analog_inputs-4-temperature_units": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiTempUnits4",
-                "choices": [
-                  "K",
-                  "C",
-                  "F"
-                ],
-                "dtype_numpy": "|S40"
-              }
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiTempUnits4",
+                choices: ["K", "C", "F"],
+                dtype_numpy: "|S40",
+              },
             },
-            "timestamps": {
+            timestamps: {
               "Iref-mcs-model": 1747157934.63704,
               "Iref-mcs-firmware": 1747157934.60371,
               "Iref-mcs-prescale": 1747157934.60371,
@@ -1769,11 +1629,11 @@ export const streamMetadataJson = {
               "Iref-voltmeter-analog_inputs-4-device_type": 1748375320.43765,
               "Iref-voltmeter-analog_inputs-4-differential": 1748009688.74396,
               "Iref-voltmeter-analog_inputs-4-scanning_rate": 1748375320.43765,
-              "Iref-voltmeter-analog_inputs-4-temperature_units": 1748009688.74371
-            }
+              "Iref-voltmeter-analog_inputs-4-temperature_units": 1748009688.74371,
+            },
           },
-          "IpreKB": {
-            "data": {
+          IpreKB: {
+            data: {
               "IpreKB-mcs-model": "SIS3820",
               "IpreKB-mcs-firmware": 273,
               "IpreKB-mcs-prescale": 1,
@@ -1823,336 +1683,304 @@ export const streamMetadataJson = {
               "IpreKB-mcs-scaler-channels-0-preset_count": 9600000,
               "IpreKB-mcs-scaler-channels-2-preset_count": 0,
               "IpreKB-voltmeter-analog_in_resolution_all": "8",
-              "IpreKB-voltmeter-analog_inputs-1-input_link": "@asyn(LJT7V_0 1)ANALOG_IN_VALUE",
+              "IpreKB-voltmeter-analog_inputs-1-input_link":
+                "@asyn(LJT7V_0 1)ANALOG_IN_VALUE",
               "IpreKB-voltmeter-analog_inputs-1-resolution": "Default",
               "IpreKB-voltmeter-analog_in_settling_time_all": 0,
               "IpreKB-voltmeter-analog_inputs-1-description": "IpreKB",
-              "IpreKB-voltmeter-analog_inputs-1-device_type": "asynFloat64Average",
+              "IpreKB-voltmeter-analog_inputs-1-device_type":
+                "asynFloat64Average",
               "IpreKB-voltmeter-analog_inputs-1-differential": "Single-Ended",
               "IpreKB-voltmeter-analog_inputs-1-scanning_rate": ".2 second",
-              "IpreKB-voltmeter-analog_inputs-1-temperature_units": "K"
+              "IpreKB-voltmeter-analog_inputs-1-temperature_units": "K",
             },
-            "data_keys": {
+            data_keys: {
               "IpreKB-mcs-model": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:Model",
-                "choices": [
-                  "SIS3801",
-                  "SIS3820"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:Model",
+                choices: ["SIS3801", "SIS3820"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-firmware": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Firmware",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Firmware",
+                dtype_numpy: "\u003Ci8",
               },
               "IpreKB-mcs-prescale": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Prescale",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Prescale",
+                dtype_numpy: "\u003Ci8",
               },
               "IpreKB-mcs-dwell_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Dwell",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Dwell",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-input_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:InputMode",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:InputMode",
+                choices: [
                   "Mode 0",
                   "Mode 1",
                   "Mode 2",
                   "Mode 3",
                   "Mode 4",
                   "Mode 5",
-                  "Mode 6"
+                  "Mode 6",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-mux_output": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "limits": {
-                  "display": {
-                    "low": 0,
-                    "high": 32
-                  }
+                dtype: "number",
+                shape: [],
+                units: "",
+                limits: {
+                  display: {
+                    low: 0,
+                    high: 32,
+                  },
                 },
-                "source": "ca://25idcVME:3820:MUXOutput",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idcVME:3820:MUXOutput",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-output_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:OutputMode",
-                "choices": [
-                  "Mode 0",
-                  "Mode 1",
-                  "Mode 2",
-                  "Mode 3"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:OutputMode",
+                choices: ["Mode 0", "Mode 1", "Mode 2", "Mode 3"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-preset_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:PresetReal",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:PresetReal",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-acquire_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:AcquireMode",
-                "choices": [
-                  "MCS",
-                  "Scaler"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:AcquireMode",
+                choices: ["MCS", "Scaler"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-num_channels": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:NuseAll",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:NuseAll",
+                dtype_numpy: "\u003Ci8",
               },
               "IpreKB-mcs-scaler-delay": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.DLY",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.DLY",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-snl_connected": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:SNL_Connected",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:SNL_Connected",
+                dtype_numpy: "|b1",
               },
               "IpreKB-mcs-count_on_start": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:CountOnStart",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:CountOnStart",
+                dtype_numpy: "|b1",
               },
               "IpreKB-mcs-input_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:InputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:InputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-output_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:OutputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:OutputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-channel_1_source": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:Channel1Source",
-                "choices": [
-                  "Int. clock",
-                  "External"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:Channel1Source",
+                choices: ["Int. clock", "External"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-lne_output_delay": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:LNEOutputDelay",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:LNEOutputDelay",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-lne_output_width": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:LNEOutputWidth",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:LNEOutputWidth",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-num_channels_max": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:MaxChannels",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:MaxChannels",
+                dtype_numpy: "\u003Ci8",
               },
               "IpreKB-voltmeter-model_name": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:ModelName",
-                "choices": [
-                  "T4",
-                  "T7",
-                  "T7-Pro",
-                  "T8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:ModelName",
+                choices: ["T4", "T7", "T7-Pro", "T8"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-scaler-count_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.CONT",
-                "choices": [
-                  "OneShot",
-                  "AutoCount"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.CONT",
+                choices: ["OneShot", "AutoCount"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-ljm_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:LJMVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:LJMVersion",
+                dtype_numpy: "|S40",
               },
               "IpreKB-counts_per_volt_second": {
-                "dtype": "number",
-                "shape": [],
-                "source": "soft://IpreKB-counts_per_volt_second",
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                source: "soft://IpreKB-counts_per_volt_second",
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-scaler-preset_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.TP",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.TP",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-lne_output_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:LNEOutputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:LNEOutputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-poll_sleep_ms": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:PollSleepMS",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:PollSleepMS",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-voltmeter-serial_number": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:SerialNumber",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:SerialNumber",
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-lne_output_stretcher": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:LNEStretcherEnable",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:LNEStretcherEnable",
+                dtype_numpy: "|b1",
               },
               "IpreKB-voltmeter-driver_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:DriverVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:DriverVersion",
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-channel_advance_source": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:ChannelAdvance",
-                "choices": [
-                  "Internal",
-                  "External"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:ChannelAdvance",
+                choices: ["Internal", "External"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-scaler-clock_frequency": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.FREQ",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.FREQ",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-voltmeter-firmware_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:FirmwareVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:FirmwareVersion",
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-device_temperature": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:DeviceTemperature",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:DeviceTemperature",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-voltmeter-last_error_message": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:LastErrorMessage",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:LastErrorMessage",
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-scaler-channels-0-is_gate": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.G1",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.G1",
+                dtype_numpy: "|b1",
               },
               "IpreKB-mcs-scaler-channels-2-is_gate": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.G3",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.G3",
+                dtype_numpy: "|b1",
               },
               "IpreKB-voltmeter-analog_inputs-1-low": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiLOPR1",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiLOPR1",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-voltmeter-analog_inputs-1-high": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiHOPR1",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiHOPR1",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-voltmeter-analog_inputs-1-mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiMode1",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiMode1",
+                choices: [
                   "Volts",
                   "Type B TC",
                   "Type C TC",
@@ -2162,139 +1990,114 @@ export const streamMetadataJson = {
                   "Type N TC",
                   "Type R TC",
                   "Type S TC",
-                  "Type T TC"
+                  "Type T TC",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-analog_inputs-1-range": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiRange1",
-                "choices": [
-                  "+= 10V",
-                  "+= 1V",
-                  "+= 0.1V",
-                  "+= 0.01V"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiRange1",
+                choices: ["+= 10V", "+= 1V", "+= 0.1V", "+= 0.01V"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-analog_inputs-1-enable": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiEnable1",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiEnable1",
+                dtype_numpy: "|b1",
               },
               "IpreKB-mcs-scaler-channels-0-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.NM1",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.NM1",
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-scaler-channels-0-offset_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1_offset0.A",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1_offset0.A",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-scaler-channels-2-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.NM3",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.NM3",
+                dtype_numpy: "|S40",
               },
               "IpreKB-mcs-scaler-channels-2-offset_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1_offset0.C",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1_offset0.C",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-voltmeter-analog_in_sampling_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiSamplingRate_RBV",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiSamplingRate_RBV",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-scaler-channels-0-preset_count": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.PR1",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.PR1",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-mcs-scaler-channels-2-preset_count": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.PR3",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.PR3",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-voltmeter-analog_in_resolution_all": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiAllResolution",
-                "choices": [
-                  "Default",
-                  "1",
-                  "2",
-                  "3",
-                  "4",
-                  "5",
-                  "6",
-                  "7",
-                  "8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiAllResolution",
+                choices: ["Default", "1", "2", "3", "4", "5", "6", "7", "8"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-analog_inputs-1-input_link": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai1.INP",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai1.INP",
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-analog_inputs-1-resolution": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiResolution1",
-                "choices": [
-                  "Default",
-                  "1",
-                  "2",
-                  "3",
-                  "4",
-                  "5",
-                  "6",
-                  "7",
-                  "8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiResolution1",
+                choices: ["Default", "1", "2", "3", "4", "5", "6", "7", "8"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-analog_in_settling_time_all": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiAllSettlingUS",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiAllSettlingUS",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "IpreKB-voltmeter-analog_inputs-1-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai1.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai1.DESC",
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-analog_inputs-1-device_type": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai1.DTYP",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai1.DTYP",
+                choices: [
                   "Soft Channel",
                   "Raw Soft Channel",
                   "Async Soft Channel",
@@ -2310,25 +2113,22 @@ export const streamMetadataJson = {
                   "GPIB init/report",
                   "Sec Past Epoch",
                   "asyn ai stringParm",
-                  "asyn ai HeidND261"
+                  "asyn ai HeidND261",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-analog_inputs-1-differential": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiDiff1",
-                "choices": [
-                  "Single-Ended",
-                  "Differential"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiDiff1",
+                choices: ["Single-Ended", "Differential"],
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-analog_inputs-1-scanning_rate": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai1.SCAN",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai1.SCAN",
+                choices: [
                   "Passive",
                   "Event",
                   "I/O Intr",
@@ -2338,23 +2138,19 @@ export const streamMetadataJson = {
                   "1 second",
                   ".5 second",
                   ".2 second",
-                  ".1 second"
+                  ".1 second",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "IpreKB-voltmeter-analog_inputs-1-temperature_units": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiTempUnits1",
-                "choices": [
-                  "K",
-                  "C",
-                  "F"
-                ],
-                "dtype_numpy": "|S40"
-              }
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiTempUnits1",
+                choices: ["K", "C", "F"],
+                dtype_numpy: "|S40",
+              },
             },
-            "timestamps": {
+            timestamps: {
               "IpreKB-mcs-model": 1747157934.63704,
               "IpreKB-mcs-firmware": 1747157934.60371,
               "IpreKB-mcs-prescale": 1747157934.60371,
@@ -2411,11 +2207,11 @@ export const streamMetadataJson = {
               "IpreKB-voltmeter-analog_inputs-1-device_type": 1748375320.43765,
               "IpreKB-voltmeter-analog_inputs-1-differential": 1748009688.74135,
               "IpreKB-voltmeter-analog_inputs-1-scanning_rate": 1748375320.43765,
-              "IpreKB-voltmeter-analog_inputs-1-temperature_units": 1748009688.74099
-            }
+              "IpreKB-voltmeter-analog_inputs-1-temperature_units": 1748009688.74099,
+            },
           },
-          "Ipreslit": {
-            "data": {
+          Ipreslit: {
+            data: {
               "Ipreslit-mcs-model": "SIS3820",
               "Ipreslit-mcs-firmware": 273,
               "Ipreslit-mcs-prescale": 1,
@@ -2465,336 +2261,304 @@ export const streamMetadataJson = {
               "Ipreslit-mcs-scaler-channels-0-preset_count": 9600000,
               "Ipreslit-mcs-scaler-channels-1-preset_count": 0,
               "Ipreslit-voltmeter-analog_in_resolution_all": "8",
-              "Ipreslit-voltmeter-analog_inputs-0-input_link": "@asyn(LJT7V_0 0)ANALOG_IN_VALUE",
+              "Ipreslit-voltmeter-analog_inputs-0-input_link":
+                "@asyn(LJT7V_0 0)ANALOG_IN_VALUE",
               "Ipreslit-voltmeter-analog_inputs-0-resolution": "Default",
               "Ipreslit-voltmeter-analog_in_settling_time_all": 0,
               "Ipreslit-voltmeter-analog_inputs-0-description": "Ipreslit",
-              "Ipreslit-voltmeter-analog_inputs-0-device_type": "asynFloat64Average",
+              "Ipreslit-voltmeter-analog_inputs-0-device_type":
+                "asynFloat64Average",
               "Ipreslit-voltmeter-analog_inputs-0-differential": "Single-Ended",
               "Ipreslit-voltmeter-analog_inputs-0-scanning_rate": ".2 second",
-              "Ipreslit-voltmeter-analog_inputs-0-temperature_units": "K"
+              "Ipreslit-voltmeter-analog_inputs-0-temperature_units": "K",
             },
-            "data_keys": {
+            data_keys: {
               "Ipreslit-mcs-model": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:Model",
-                "choices": [
-                  "SIS3801",
-                  "SIS3820"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:Model",
+                choices: ["SIS3801", "SIS3820"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-firmware": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Firmware",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Firmware",
+                dtype_numpy: "\u003Ci8",
               },
               "Ipreslit-mcs-prescale": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Prescale",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Prescale",
+                dtype_numpy: "\u003Ci8",
               },
               "Ipreslit-mcs-dwell_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:Dwell",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:Dwell",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-input_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:InputMode",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:InputMode",
+                choices: [
                   "Mode 0",
                   "Mode 1",
                   "Mode 2",
                   "Mode 3",
                   "Mode 4",
                   "Mode 5",
-                  "Mode 6"
+                  "Mode 6",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-mux_output": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "limits": {
-                  "display": {
-                    "low": 0,
-                    "high": 32
-                  }
+                dtype: "number",
+                shape: [],
+                units: "",
+                limits: {
+                  display: {
+                    low: 0,
+                    high: 32,
+                  },
                 },
-                "source": "ca://25idcVME:3820:MUXOutput",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idcVME:3820:MUXOutput",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-output_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:OutputMode",
-                "choices": [
-                  "Mode 0",
-                  "Mode 1",
-                  "Mode 2",
-                  "Mode 3"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:OutputMode",
+                choices: ["Mode 0", "Mode 1", "Mode 2", "Mode 3"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-preset_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:PresetReal",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:PresetReal",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-acquire_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:AcquireMode",
-                "choices": [
-                  "MCS",
-                  "Scaler"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:AcquireMode",
+                choices: ["MCS", "Scaler"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-num_channels": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:NuseAll",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:NuseAll",
+                dtype_numpy: "\u003Ci8",
               },
               "Ipreslit-mcs-scaler-delay": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.DLY",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.DLY",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-snl_connected": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:SNL_Connected",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:SNL_Connected",
+                dtype_numpy: "|b1",
               },
               "Ipreslit-mcs-count_on_start": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:CountOnStart",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:CountOnStart",
+                dtype_numpy: "|b1",
               },
               "Ipreslit-mcs-input_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:InputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:InputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-output_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:OutputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:OutputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-channel_1_source": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:Channel1Source",
-                "choices": [
-                  "Int. clock",
-                  "External"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:Channel1Source",
+                choices: ["Int. clock", "External"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-lne_output_delay": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:LNEOutputDelay",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:LNEOutputDelay",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-lne_output_width": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:LNEOutputWidth",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:LNEOutputWidth",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-num_channels_max": {
-                "dtype": "integer",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:MaxChannels",
-                "dtype_numpy": "\u003Ci8"
+                dtype: "integer",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:MaxChannels",
+                dtype_numpy: "\u003Ci8",
               },
               "Ipreslit-voltmeter-model_name": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:ModelName",
-                "choices": [
-                  "T4",
-                  "T7",
-                  "T7-Pro",
-                  "T8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:ModelName",
+                choices: ["T4", "T7", "T7-Pro", "T8"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-scaler-count_mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.CONT",
-                "choices": [
-                  "OneShot",
-                  "AutoCount"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.CONT",
+                choices: ["OneShot", "AutoCount"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-ljm_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:LJMVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:LJMVersion",
+                dtype_numpy: "|S40",
               },
               "Ipreslit-counts_per_volt_second": {
-                "dtype": "number",
-                "shape": [],
-                "source": "soft://Ipreslit-counts_per_volt_second",
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                source: "soft://Ipreslit-counts_per_volt_second",
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-scaler-preset_time": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.TP",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.TP",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-lne_output_polarity": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:LNEOutputPolarity",
-                "choices": [
-                  "Normal",
-                  "Inverted"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:LNEOutputPolarity",
+                choices: ["Normal", "Inverted"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-poll_sleep_ms": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:PollSleepMS",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:PollSleepMS",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-voltmeter-serial_number": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:SerialNumber",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:SerialNumber",
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-lne_output_stretcher": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:LNEStretcherEnable",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:LNEStretcherEnable",
+                dtype_numpy: "|b1",
               },
               "Ipreslit-voltmeter-driver_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:DriverVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:DriverVersion",
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-channel_advance_source": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:ChannelAdvance",
-                "choices": [
-                  "Internal",
-                  "External"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:ChannelAdvance",
+                choices: ["Internal", "External"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-scaler-clock_frequency": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.FREQ",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.FREQ",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-voltmeter-firmware_version": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:FirmwareVersion",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:FirmwareVersion",
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-device_temperature": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:DeviceTemperature",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:DeviceTemperature",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-voltmeter-last_error_message": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:LastErrorMessage",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:LastErrorMessage",
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-scaler-channels-0-is_gate": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.G1",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.G1",
+                dtype_numpy: "|b1",
               },
               "Ipreslit-mcs-scaler-channels-1-is_gate": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.G2",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.G2",
+                dtype_numpy: "|b1",
               },
               "Ipreslit-voltmeter-analog_inputs-0-low": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiLOPR0",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiLOPR0",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-voltmeter-analog_inputs-0-high": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiHOPR0",
-                "precision": 4,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiHOPR0",
+                precision: 4,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-voltmeter-analog_inputs-0-mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiMode0",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiMode0",
+                choices: [
                   "Volts",
                   "Type B TC",
                   "Type C TC",
@@ -2804,139 +2568,115 @@ export const streamMetadataJson = {
                   "Type N TC",
                   "Type R TC",
                   "Type S TC",
-                  "Type T TC"
+                  "Type T TC",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-analog_inputs-0-range": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiRange0",
-                "choices": [
-                  "+= 10V",
-                  "+= 1V",
-                  "+= 0.1V",
-                  "+= 0.01V"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiRange0",
+                choices: ["+= 10V", "+= 1V", "+= 0.1V", "+= 0.01V"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-analog_inputs-0-enable": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiEnable0",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiEnable0",
+                dtype_numpy: "|b1",
               },
               "Ipreslit-mcs-scaler-channels-0-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.NM1",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.NM1",
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-scaler-channels-0-offset_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1_offset0.A",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1_offset0.A",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-scaler-channels-1-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idcVME:3820:scaler1.NM2",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idcVME:3820:scaler1.NM2",
+                dtype_numpy: "|S40",
               },
               "Ipreslit-mcs-scaler-channels-1-offset_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1_offset0.B",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1_offset0.B",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-voltmeter-analog_in_sampling_rate": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiSamplingRate_RBV",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idc:LJT7Voltmeter_0:AiSamplingRate_RBV",
+                precision: 1,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-scaler-channels-0-preset_count": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.PR1",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.PR1",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-mcs-scaler-channels-1-preset_count": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idcVME:3820:scaler1.PR2",
-                "precision": 0,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "",
+                source: "ca://25idcVME:3820:scaler1.PR2",
+                precision: 0,
+                dtype_numpy: "\u003Cf8",
               },
               "Ipreslit-voltmeter-analog_in_resolution_all": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiAllResolution",
-                "choices": [
-                  "Default",
-                  "1",
-                  "2",
-                  "3",
-                  "4",
-                  "5",
-                  "6",
-                  "7",
-                  "8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiAllResolution",
+                choices: ["Default", "1", "2", "3", "4", "5", "6", "7", "8"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-analog_inputs-0-input_link": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai0.INP",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai0.INP",
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-analog_inputs-0-resolution": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiResolution0",
-                "choices": [
-                  "Default",
-                  "1",
-                  "2",
-                  "3",
-                  "4",
-                  "5",
-                  "6",
-                  "7",
-                  "8"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiResolution0",
+                choices: ["Default", "1", "2", "3", "4", "5", "6", "7", "8"],
+                dtype_numpy: "|S40",
               },
-              "Ipreslit-voltmeter-analog_in_settling_time_all": {
-                "dtype": "number",
-                "shape": [],
-                "units": "",
-                "source": "ca://25idc:LJT7Voltmeter_0:AiAllSettlingUS",
-                "precision": 1,
-                "dtype_numpy": "\u003Cf8"
-              },
+              "Ipreslit-voltm/v1/table/partition/primary/streams/b68c7712-cb05-47f4-8e25-11cb05cc2cd5eter-analog_in_settling_time_all":
+                {
+                  dtype: "number",
+                  shape: [],
+                  units: "",
+                  source: "ca://25idc:LJT7Voltmeter_0:AiAllSettlingUS",
+                  precision: 1,
+                  dtype_numpy: "\u003Cf8",
+                },
               "Ipreslit-voltmeter-analog_inputs-0-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai0.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai0.DESC",
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-analog_inputs-0-device_type": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai0.DTYP",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai0.DTYP",
+                choices: [
                   "Soft Channel",
                   "Raw Soft Channel",
                   "Async Soft Channel",
@@ -2952,25 +2692,22 @@ export const streamMetadataJson = {
                   "GPIB init/report",
                   "Sec Past Epoch",
                   "asyn ai stringParm",
-                  "asyn ai HeidND261"
+                  "asyn ai HeidND261",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-analog_inputs-0-differential": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiDiff0",
-                "choices": [
-                  "Single-Ended",
-                  "Differential"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiDiff0",
+                choices: ["Single-Ended", "Differential"],
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-analog_inputs-0-scanning_rate": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:Ai0.SCAN",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:Ai0.SCAN",
+                choices: [
                   "Passive",
                   "Event",
                   "I/O Intr",
@@ -2980,23 +2717,19 @@ export const streamMetadataJson = {
                   "1 second",
                   ".5 second",
                   ".2 second",
-                  ".1 second"
+                  ".1 second",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "Ipreslit-voltmeter-analog_inputs-0-temperature_units": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idc:LJT7Voltmeter_0:AiTempUnits0",
-                "choices": [
-                  "K",
-                  "C",
-                  "F"
-                ],
-                "dtype_numpy": "|S40"
-              }
+                dtype: "string",
+                shape: [],
+                source: "ca://25idc:LJT7Voltmeter_0:AiTempUnits0",
+                choices: ["K", "C", "F"],
+                dtype_numpy: "|S40",
+              },
             },
-            "timestamps": {
+            timestamps: {
               "Ipreslit-mcs-model": 1747157934.63704,
               "Ipreslit-mcs-firmware": 1747157934.60371,
               "Ipreslit-mcs-prescale": 1747157934.60371,
@@ -3053,11 +2786,11 @@ export const streamMetadataJson = {
               "Ipreslit-voltmeter-analog_inputs-0-device_type": 1748375320.43764,
               "Ipreslit-voltmeter-analog_inputs-0-differential": 1748009688.74043,
               "Ipreslit-voltmeter-analog_inputs-0-scanning_rate": 1748375320.43764,
-              "Ipreslit-voltmeter-analog_inputs-0-temperature_units": 1748009688.74016
-            }
+              "Ipreslit-voltmeter-analog_inputs-0-temperature_units": 1748009688.74016,
+            },
           },
-          "monochromator": {
-            "data": {
+          monochromator: {
+            data: {
               "monochromator-mode": "Si(111) Fixed Offset",
               "monochromator-d_spacing": 3.13560086,
               "monochromator-id_offset": 0,
@@ -3105,539 +2838,515 @@ export const streamMetadataJson = {
               "monochromator-offset-description": "monochromator-offset",
               "monochromator-pitch2-description": "monochromator-pitch2",
               "monochromator-transform_d_spacing": 3.13560086,
-              "monochromator-transform_direction": 1
+              "monochromator-transform_direction": 1,
             },
-            "data_keys": {
+            data_keys: {
               "monochromator-mode": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:mode",
-                "choices": [
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:mode",
+                choices: [
                   "Si(111) Fixed Offset",
                   "Si(111) Channel-cut",
                   "Multi-layer 4.8nm",
-                  "Multi-layer 2.4nm"
+                  "Multi-layer 2.4nm",
                 ],
-                "dtype_numpy": "|S40"
+                dtype_numpy: "|S40",
               },
               "monochromator-d_spacing": {
-                "dtype": "number",
-                "shape": [],
-                "units": "Angstro",
-                "source": "ca://25idbUP:dspacing",
-                "precision": 6,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "Angstro",
+                source: "ca://25idbUP:dspacing",
+                precision: 6,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-id_offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "eV",
-                "source": "ca://25idbUP:ID_offset",
-                "precision": 6,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "eV",
+                source: "ca://25idbUP:ID_offset",
+                precision: 6,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-gap-offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "um",
-                "limits": {
-                  "control": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
+                dtype: "number",
+                shape: [],
+                units: "um",
+                limits: {
+                  control: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
                   },
-                  "display": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
-                  }
+                  display: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m4.OFF",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m4.OFF",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-id_tracking": {
-                "dtype": "boolean",
-                "shape": [],
-                "source": "ca://25idbUP:ID_tracking",
-                "dtype_numpy": "|b1"
+                dtype: "boolean",
+                shape: [],
+                source: "ca://25idbUP:ID_tracking",
+                dtype_numpy: "|b1",
               },
               "monochromator-vert-offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "um",
-                "limits": {
-                  "control": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
+                dtype: "number",
+                shape: [],
+                units: "um",
+                limits: {
+                  control: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
                   },
-                  "display": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
-                  }
+                  display: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m2.OFF",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m2.OFF",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-bragg-offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "arcsec",
-                "limits": {
-                  "control": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
+                dtype: "number",
+                shape: [],
+                units: "arcsec",
+                limits: {
+                  control: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
                   },
-                  "display": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
-                  }
+                  display: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m3.OFF",
-                "precision": 2,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m3.OFF",
+                precision: 2,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-gap-velocity": {
-                "dtype": "number",
-                "shape": [],
-                "units": "um/sec",
-                "limits": {
-                  "control": {
-                    "low": 10,
-                    "high": 0
+                dtype: "number",
+                shape: [],
+                units: "um/sec",
+                limits: {
+                  control: {
+                    low: 10,
+                    high: 0,
                   },
-                  "display": {
-                    "low": 10,
-                    "high": 0
-                  }
+                  display: {
+                    low: 10,
+                    high: 0,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m4.VELO",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m4.VELO",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-horiz-offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "um",
-                "limits": {
-                  "control": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
+                dtype: "number",
+                shape: [],
+                units: "um",
+                limits: {
+                  control: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
                   },
-                  "display": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
-                  }
+                  display: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m1.OFF",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m1.OFF",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-roll2-offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "urad",
-                "limits": {
-                  "control": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
+                dtype: "number",
+                shape: [],
+                units: "urad",
+                limits: {
+                  control: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
                   },
-                  "display": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
-                  }
+                  display: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m5.OFF",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m5.OFF",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-energy-offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "eV",
-                "limits": {
-                  "control": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
+                dtype: "number",
+                shape: [],
+                units: "eV",
+                limits: {
+                  control: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
                   },
-                  "display": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
-                  }
+                  display: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
+                  },
                 },
-                "source": "ca://25idbUP:Energy.OFF",
-                "precision": 6,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:Energy.OFF",
+                precision: 6,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-gap-motor_egu": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m4.EGU",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m4.EGU",
+                dtype_numpy: "|S40",
               },
               "monochromator-offset-offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "um",
-                "limits": {
-                  "control": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
+                dtype: "number",
+                shape: [],
+                units: "um",
+                limits: {
+                  control: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
                   },
-                  "display": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
-                  }
+                  display: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
+                  },
                 },
-                "source": "ca://25idbUP:Offset.OFF",
-                "precision": 6,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:Offset.OFF",
+                precision: 6,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-pitch2-offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "urad",
-                "limits": {
-                  "control": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
+                dtype: "number",
+                shape: [],
+                units: "urad",
+                limits: {
+                  control: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
                   },
-                  "display": {
-                    "low": -9007199254740991,
-                    "high": 9007199254740991
-                  }
+                  display: {
+                    low: -9007199254740991,
+                    high: 9007199254740991,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m6.OFF",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m6.OFF",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-vert-velocity": {
-                "dtype": "number",
-                "shape": [],
-                "units": "um/sec",
-                "limits": {
-                  "control": {
-                    "low": 10,
-                    "high": 0
+                dtype: "number",
+                shape: [],
+                units: "um/sec",
+                limits: {
+                  control: {
+                    low: 10,
+                    high: 0,
                   },
-                  "display": {
-                    "low": 10,
-                    "high": 0
-                  }
+                  display: {
+                    low: 10,
+                    high: 0,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m2.VELO",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m2.VELO",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-bragg-velocity": {
-                "dtype": "number",
-                "shape": [],
-                "units": "arcsec/",
-                "limits": {
-                  "control": {
-                    "low": 10,
-                    "high": 0
+                dtype: "number",
+                shape: [],
+                units: "arcsec/",
+                limits: {
+                  control: {
+                    low: 10,
+                    high: 0,
                   },
-                  "display": {
-                    "low": 10,
-                    "high": 0
-                  }
+                  display: {
+                    low: 10,
+                    high: 0,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m3.VELO",
-                "precision": 2,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m3.VELO",
+                precision: 2,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-d_spacing_unit": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:dspacing.EGU",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:dspacing.EGU",
+                dtype_numpy: "|S40",
               },
               "monochromator-gap-offset_dir": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m4.DIR",
-                "choices": [
-                  "Pos",
-                  "Neg"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m4.DIR",
+                choices: ["Pos", "Neg"],
+                dtype_numpy: "|S40",
               },
               "monochromator-horiz-velocity": {
-                "dtype": "number",
-                "shape": [],
-                "units": "um/sec",
-                "limits": {
-                  "control": {
-                    "low": 10,
-                    "high": 0
+                dtype: "number",
+                shape: [],
+                units: "um/sec",
+                limits: {
+                  control: {
+                    low: 10,
+                    high: 0,
                   },
-                  "display": {
-                    "low": 10,
-                    "high": 0
-                  }
+                  display: {
+                    low: 10,
+                    high: 0,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m1.VELO",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m1.VELO",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-roll2-velocity": {
-                "dtype": "number",
-                "shape": [],
-                "units": "urad/se",
-                "limits": {
-                  "control": {
-                    "low": 10,
-                    "high": 0
+                dtype: "number",
+                shape: [],
+                units: "urad/se",
+                limits: {
+                  control: {
+                    low: 10,
+                    high: 0,
                   },
-                  "display": {
-                    "low": 10,
-                    "high": 0
-                  }
+                  display: {
+                    low: 10,
+                    high: 0,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m5.VELO",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m5.VELO",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-vert-motor_egu": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m2.EGU",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m2.EGU",
+                dtype_numpy: "|S40",
               },
               "monochromator-bragg-motor_egu": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m3.EGU",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m3.EGU",
+                dtype_numpy: "|S40",
               },
               "monochromator-energy-velocity": {
-                "dtype": "number",
-                "shape": [],
-                "units": "eV/sec",
-                "limits": {
-                  "control": {
-                    "low": 0.1,
-                    "high": 1
+                dtype: "number",
+                shape: [],
+                units: "eV/sec",
+                limits: {
+                  control: {
+                    low: 0.1,
+                    high: 1,
                   },
-                  "display": {
-                    "low": 0.1,
-                    "high": 1
-                  }
+                  display: {
+                    low: 0.1,
+                    high: 1,
+                  },
                 },
-                "source": "ca://25idbUP:Energy.VELO",
-                "precision": 6,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:Energy.VELO",
+                precision: 6,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-gap-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m4.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m4.DESC",
+                dtype_numpy: "|S40",
               },
               "monochromator-horiz-motor_egu": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m1.EGU",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m1.EGU",
+                dtype_numpy: "|S40",
               },
               "monochromator-offset-velocity": {
-                "dtype": "number",
-                "shape": [],
-                "units": "um/sec",
-                "limits": {
-                  "control": {
-                    "low": 0.1,
-                    "high": 1
+                dtype: "number",
+                shape: [],
+                units: "um/sec",
+                limits: {
+                  control: {
+                    low: 0.1,
+                    high: 1,
                   },
-                  "display": {
-                    "low": 0.1,
-                    "high": 1
-                  }
+                  display: {
+                    low: 0.1,
+                    high: 1,
+                  },
                 },
-                "source": "ca://25idbUP:Offset.VELO",
-                "precision": 6,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:Offset.VELO",
+                precision: 6,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-pitch2-velocity": {
-                "dtype": "number",
-                "shape": [],
-                "units": "urad/se",
-                "limits": {
-                  "control": {
-                    "low": 3.808,
-                    "high": 0
+                dtype: "number",
+                shape: [],
+                units: "urad/se",
+                limits: {
+                  control: {
+                    low: 3.808,
+                    high: 0,
                   },
-                  "display": {
-                    "low": 3.808,
-                    "high": 0
-                  }
+                  display: {
+                    low: 3.808,
+                    high: 0,
+                  },
                 },
-                "source": "ca://25idbUP:ACS:m6.VELO",
-                "precision": 3,
-                "dtype_numpy": "\u003Cf8"
+                source: "ca://25idbUP:ACS:m6.VELO",
+                precision: 3,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-roll2-motor_egu": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m5.EGU",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m5.EGU",
+                dtype_numpy: "|S40",
               },
               "monochromator-vert-offset_dir": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m2.DIR",
-                "choices": [
-                  "Pos",
-                  "Neg"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m2.DIR",
+                choices: ["Pos", "Neg"],
+                dtype_numpy: "|S40",
               },
               "monochromator-bragg-offset_dir": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m3.DIR",
-                "choices": [
-                  "Pos",
-                  "Neg"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m3.DIR",
+                choices: ["Pos", "Neg"],
+                dtype_numpy: "|S40",
               },
               "monochromator-energy-motor_egu": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:Energy.EGU",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:Energy.EGU",
+                dtype_numpy: "|S40",
               },
               "monochromator-horiz-offset_dir": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m1.DIR",
-                "choices": [
-                  "Pos",
-                  "Neg"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m1.DIR",
+                choices: ["Pos", "Neg"],
+                dtype_numpy: "|S40",
               },
               "monochromator-offset-motor_egu": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:Offset.EGU",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:Offset.EGU",
+                dtype_numpy: "|S40",
               },
               "monochromator-pitch2-motor_egu": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m6.EGU",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m6.EGU",
+                dtype_numpy: "|S40",
               },
               "monochromator-roll2-offset_dir": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m5.DIR",
-                "choices": [
-                  "Pos",
-                  "Neg"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m5.DIR",
+                choices: ["Pos", "Neg"],
+                dtype_numpy: "|S40",
               },
               "monochromator-transform_offset": {
-                "dtype": "number",
-                "shape": [],
-                "units": "eV",
-                "source": "ca://25idbUP:EnergyC3.VAL",
-                "precision": 6,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "eV",
+                source: "ca://25idbUP:EnergyC3.VAL",
+                precision: 6,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-vert-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m2.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m2.DESC",
+                dtype_numpy: "|S40",
               },
               "monochromator-bragg-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m3.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m3.DESC",
+                dtype_numpy: "|S40",
               },
               "monochromator-energy-offset_dir": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:Energy.DIR",
-                "choices": [
-                  "Pos",
-                  "Neg"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:Energy.DIR",
+                choices: ["Pos", "Neg"],
+                dtype_numpy: "|S40",
               },
               "monochromator-horiz-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m1.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m1.DESC",
+                dtype_numpy: "|S40",
               },
               "monochromator-offset-offset_dir": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:Offset.DIR",
-                "choices": [
-                  "Pos",
-                  "Neg"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:Offset.DIR",
+                choices: ["Pos", "Neg"],
+                dtype_numpy: "|S40",
               },
               "monochromator-pitch2-offset_dir": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m6.DIR",
-                "choices": [
-                  "Pos",
-                  "Neg"
-                ],
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m6.DIR",
+                choices: ["Pos", "Neg"],
+                dtype_numpy: "|S40",
               },
               "monochromator-roll2-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m5.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m5.DESC",
+                dtype_numpy: "|S40",
               },
               "monochromator-energy-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:Energy.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:Energy.DESC",
+                dtype_numpy: "|S40",
               },
               "monochromator-offset-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:Offset.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:Offset.DESC",
+                dtype_numpy: "|S40",
               },
               "monochromator-pitch2-description": {
-                "dtype": "string",
-                "shape": [],
-                "source": "ca://25idbUP:ACS:m6.DESC",
-                "dtype_numpy": "|S40"
+                dtype: "string",
+                shape: [],
+                source: "ca://25idbUP:ACS:m6.DESC",
+                dtype_numpy: "|S40",
               },
               "monochromator-transform_d_spacing": {
-                "dtype": "number",
-                "shape": [],
-                "units": "eV",
-                "source": "ca://25idbUP:EnergyC1.VAL",
-                "precision": 6,
-                "dtype_numpy": "\u003Cf8"
+                dtype: "number",
+                shape: [],
+                units: "eV",
+                source: "ca://25idbUP:EnergyC1.VAL",
+                precision: 6,
+                dtype_numpy: "\u003Cf8",
               },
               "monochromator-transform_direction": {
-                "dtype": "number",
-                "shape": [],
-                "units": "eV",
-                "source": "ca://25idbUP:EnergyC2.VAL",
-                "precision": 6,
-                "dtype_numpy": "\u003Cf8"
-              }
+                dtype: "number",
+                shape: [],
+                units: "eV",
+                source: "ca://25idbUP:EnergyC2.VAL",
+                precision: 6,
+                dtype_numpy: "\u003Cf8",
+              },
             },
-            "timestamps": {
+            timestamps: {
               "monochromator-mode": 1747685699.5036,
               "monochromator-d_spacing": 1747685699.95998,
               "monochromator-id_offset": 631152000,
@@ -3685,34 +3394,36 @@ export const streamMetadataJson = {
               "monochromator-offset-description": 1748375319.57693,
               "monochromator-pitch2-description": 1748375319.57693,
               "monochromator-transform_d_spacing": 1747685699.95998,
-              "monochromator-transform_direction": 1747685699.50369
-            }
-          }
-        }
+              "monochromator-transform_direction": 1747685699.50369,
+            },
+          },
+        },
       },
-      "structure": {
-        "contents": null,
-        "count": 1
+      structure: {
+        contents: null,
+        count: 1,
       },
-      "access_blob": {
-
-      },
-      "sorting": [
+      access_blob: {},
+      sorting: [
         {
-          "key": "",
-          "direction": 1
-        }
+          key: "",
+          direction: 1,
+        },
       ],
-      "data_sources": null
+      data_sources: null,
     },
-    "links": {
-    },
+    links: {},
   },
-  "error": null,
-  "links": null,
-  "meta": {
+  error: null,
+  links: null,
+  meta: {},
+};
 
-  }
+const tableData = {
+  seq_num: [1, 2],
+  time: [1747085782.057788, 1747085783.246987],
+  sim_motor_2: [-100, 100],
+  ts_sim_motor_2: [1747085782.032349, 1747085783.233922],
 };
 
 export const handlers = [
@@ -3722,9 +3433,25 @@ export const handlers = [
   http.get("/api/v1", () => {
     return HttpResponse.json(apiInfoJson);
   }),
-  http.get("/api/v1/metadata/b68c7712-cb05-47f4-8e25-11cb05cc2cd5%2Fstreams%2Fprimary", () => {
-    return HttpResponse.json(streamMetadataJson);
-  }),
+  http.get(
+    "/api/v1/metadata/b68c7712-cb05-47f4-8e25-11cb05cc2cd5/streams/primary",
+    () => {
+      return HttpResponse.json(streamMetadataJson);
+    },
+  ),
+  http.get(
+    "/api/v1/table/full/b68c7712-cb05-47f4-8e25-11cb05cc2cd5/streams/primary/internal",
+    ({ request }) => {
+      const url = new URL(request.url);
+      // Filter by request column in the search parameters
+      const columns = url.searchParams.getAll("column");
+      const newEntries = Object.entries(tableData).filter(
+        ([key]) => columns.length === 0 || columns.includes(key),
+      );
+      const newData = Object.fromEntries(newEntries);
+      return HttpResponse.json(newData);
+    },
+  ),
 ];
 
 export const server = setupServer(...handlers);

@@ -1,11 +1,12 @@
 import axios from "axios";
 import type { AxiosInstance } from "axios";
 import type { SearchParams, APIRun, DataKey } from "./types";
+import qs from "qs";
 
 const envHost = import.meta.env.VITE_TILED_URI;
 export const tiledHost = envHost === undefined ? "" : envHost;
 export const tiledUri = tiledHost + "/api/v1/";
-const streamsPrefix = "streams/";  // The streams namespace is gone in Tiled soon
+const streamsPrefix = "streams/"; // The streams namespace is gone in Tiled soon
 
 export const v1Client = axios.create({
   baseURL: tiledUri,
@@ -24,15 +25,20 @@ export const getMetadata = async (
   const response = await client.get(`metadata/${encodeURIComponent(path)}`, {
     params: {},
   });
-  return response.data;
+  return response.data.data.attributes.metadata;
 };
 
-
 // Retrieve the data key descriptions for a given run + stream.
-export const getDataKeys = async (uid: string, stream: string, client: AxiosInstance = v1Client): Promise<DataKey[]> => {
-  const path = `${uid}/${streamsPrefix}${stream}`
-  const response = await client.get(`metadata/${encodeURIComponent(path)}`);
-  return response.data.data.attributes.metadata.data_keys
+export const getDataKeys = async (
+  uid: string,
+  stream: string,
+  client: AxiosInstance = v1Client,
+): Promise<{ [key: string]: DataKey }> => {
+  const path = `${uid}/${streamsPrefix}${stream}`;
+  // const response = await client.get(`metadata/${encodeURIComponent(path)}`);
+
+  const response = await client.get(`metadata/${path}`);
+  return response.data.data.attributes.metadata.data_keys;
 };
 
 // Parse the query parameters needed for a search
@@ -68,7 +74,6 @@ export const prepareQueryParams = ({
   return params;
 };
 
-
 // Retrieve set of runs metadata from the API
 export const getRuns = async (
   searchParams: SearchParams,
@@ -102,4 +107,29 @@ export const getRuns = async (
     runs: runs,
     count: response.data.meta.count,
   };
+};
+
+export const getTableData = async (
+  stream: string,
+  uid?: string,
+  columns?: string[],
+  partition?: number,
+) => {
+  const client = v1Client;
+  const endpoint = partition === undefined ? "/table/full" : "/table/partition";
+  const queryParams: { column?: string[]; partition?: number } = {};
+  if (columns !== undefined) {
+    queryParams.column = columns;
+  }
+  if (endpoint !== undefined) {
+    queryParams.partition = partition;
+  }
+  const uri = `${endpoint}/${uid}/${streamsPrefix}${stream}/internal`;
+  const response = await client.get(uri, {
+    params: queryParams,
+    paramsSerializer: (params) => {
+      return qs.stringify(params, { indices: false });
+    },
+  });
+  return response.data;
 };

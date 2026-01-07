@@ -19,7 +19,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/" element={<App />} />
           <Route path="/catalog" element={<RunList />} />
           <Route path="/catalog/:uid/:plotStyle?" element={<Run />} />
-	  <Route path="/beamlines" element={<BeamlinePanels />} />
+          <Route path="/beamlines" element={<BeamlinePanels />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

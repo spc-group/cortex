@@ -140,7 +140,7 @@ describe("run list", () => {
   it("selects a run", () => {});
   it("applies column filters", async () => {
     // Find a filter text box
-    const textbox = screen.getByPlaceholderText("Filter UID");
+    const textbox = screen.getByTitle("Filter by UID");
     getRuns.mockClear();
     await user.type(textbox, "8675309");
     await new Promise((r) => setTimeout(r, 620)); // Wait for debounce
