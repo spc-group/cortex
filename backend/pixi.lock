@@ -46,7 +46,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/ef/5b/133b785acf8339a31de5d5d90f90934c64f7441d57961261269c747ddf2d/awkward-2.8.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8d/f5/1412f1d3e06c4103add0d105a060e22054c13be4bf21de7974c50ae20005/awkward_cpp-49-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/25/70/020cc09340973f361fcfbcfa2933fdb6301170edbe17215e24a5351d4c72/blosc2-3.7.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/4c/bc/2a699600e9fc722ef6c7f846c503793831caaa4b4e109cca3571a6b7597a/bluesky_tiled_plugins-2.0.0b68-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/4a/6acb1dba5e6301739048490263777af29f79302fe8ea3c536a16267ee0cd/bluesky_tiled_plugins-2.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/6c/56/3124f61d37a7a4e7cc96afc5492c78ba0cb551151e530b54669ddd1436ef/cachetools-6.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e5/54/346f681c24a9c3a08e2e74dcee2555ccd1081705b46f791f7b228e177d06/canonicaljson-2.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e5/48/1549795ba7742c948d2ad169c1c8cdbae65bc450d6cd753d124b17c8cd32/certifi-2025.8.3-py3-none-any.whl
@@ -65,7 +65,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/fb/32/e31e3363bf48ad2ba80b644b01ad9676ce154f1b755950de81eb4ed5b6bd/event_model-1.23.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/2e/0b42c31d703583bf35ce1ad36e74f274bac7eeb89aab84b09343aa045f5f/exdir-0.5.0.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/ed/47/14a76b926edc3957c8a8258423db789d3fa925d2fed800102fce58959413/fastapi-0.120.4-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/5c/05/5cbb59154b093548acd0f4c7c474a118eda06da25aa75c616b72d8fcd92a/fastapi-0.128.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/71/70db47e4f6ce3e5c37a607355f80da8860a33226be640226ac52cb05ef2e/fsspec-2025.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ee/43/3cecdc0349359e1a527cbf2e3e28e5f8f06d3343aaf82ca13437a9aa290f/greenlet-3.2.4-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl
@@ -141,7 +141,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bc/be/86793717d388d46209d6f10947a891a4697d8c24d18a3a715924ec6122c2/suitcase-0.12.0.tar.gz
       - pypi: https://files.pythonhosted.org/packages/e5/30/643397144bfbfec6f6ef821f36f33e57d35946c44a2352d3c9f0ae847619/tenacity-9.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/56/b3/23eec760215910609914dd99aba23ce1c72a3bcbe046ee44f45adf740452/tifffile-2025.8.28-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/ba/1d/1cb39a116ab11a42657d81cd0d6ef8d084da02ed6f61d5844909b9e0292b/tiled-0.2.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/76/3c/5098fb82017078cd7324b78c34f136d389e44251719f6332abbad455815d/tiled-0.2.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/03/98/eb27cc78ad3af8e302c9d8ff4977f5026676e130d28dd7578132a457170c/toolz-1.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/93/72/6b3e70d32e89a5cbb6a4513726c1ae8762165b027af569289e19ec08edd8/typer-0.17.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/18/67/36e9267722cc04a6b9f15c7f3441c2363321a3ea07da7ae0c0707beb2a9c/typing_extensions-4.15.0-py3-none-any.whl
@@ -204,7 +204,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/8d/f5/1412f1d3e06c4103add0d105a060e22054c13be4bf21de7974c50ae20005/awkward_cpp-49-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/e3/ee/adda3d46d4a9120772fae6de454c8495603c37c4c3b9c60f25b1ab6401fe/black-25.1.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/25/70/020cc09340973f361fcfbcfa2933fdb6301170edbe17215e24a5351d4c72/blosc2-3.7.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/4c/bc/2a699600e9fc722ef6c7f846c503793831caaa4b4e109cca3571a6b7597a/bluesky_tiled_plugins-2.0.0b68-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/4a/6acb1dba5e6301739048490263777af29f79302fe8ea3c536a16267ee0cd/bluesky_tiled_plugins-2.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/cb/8c/2b30c12155ad8de0cf641d76a8b396a16d2c36bc6d50b621a62b7c4567c1/build-1.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/6c/56/3124f61d37a7a4e7cc96afc5492c78ba0cb551151e530b54669ddd1436ef/cachetools-6.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e5/54/346f681c24a9c3a08e2e74dcee2555ccd1081705b46f791f7b228e177d06/canonicaljson-2.0.0-py3-none-any.whl
@@ -225,7 +225,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/fb/32/e31e3363bf48ad2ba80b644b01ad9676ce154f1b755950de81eb4ed5b6bd/event_model-1.23.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/2e/0b42c31d703583bf35ce1ad36e74f274bac7eeb89aab84b09343aa045f5f/exdir-0.5.0.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/ed/47/14a76b926edc3957c8a8258423db789d3fa925d2fed800102fce58959413/fastapi-0.120.4-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/5c/05/5cbb59154b093548acd0f4c7c474a118eda06da25aa75c616b72d8fcd92a/fastapi-0.128.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9f/56/13ab06b4f93ca7cac71078fbe37fcea175d3216f31f85c3168a6bbd0bb9a/flake8-7.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/71/70db47e4f6ce3e5c37a607355f80da8860a33226be640226ac52cb05ef2e/fsspec-2025.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ee/43/3cecdc0349359e1a527cbf2e3e28e5f8f06d3343aaf82ca13437a9aa290f/greenlet-3.2.4-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
@@ -327,7 +327,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bc/be/86793717d388d46209d6f10947a891a4697d8c24d18a3a715924ec6122c2/suitcase-0.12.0.tar.gz
       - pypi: https://files.pythonhosted.org/packages/e5/30/643397144bfbfec6f6ef821f36f33e57d35946c44a2352d3c9f0ae847619/tenacity-9.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/56/b3/23eec760215910609914dd99aba23ce1c72a3bcbe046ee44f45adf740452/tifffile-2025.8.28-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/ba/1d/1cb39a116ab11a42657d81cd0d6ef8d084da02ed6f61d5844909b9e0292b/tiled-0.2.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/76/3c/5098fb82017078cd7324b78c34f136d389e44251719f6332abbad455815d/tiled-0.2.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/03/98/eb27cc78ad3af8e302c9d8ff4977f5026676e130d28dd7578132a457170c/toolz-1.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/7a/882d99539b19b1490cac5d77c67338d126e4122c8276bf640e411650c830/twine-6.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/93/72/6b3e70d32e89a5cbb6a4513726c1ae8762165b027af569289e19ec08edd8/typer-0.17.4-py3-none-any.whl
@@ -640,17 +640,18 @@ packages:
   - furo ; extra == 'doc'
   - numba ; extra == 'doc'
   requires_python: '>=3.10'
-- pypi: https://files.pythonhosted.org/packages/4c/bc/2a699600e9fc722ef6c7f846c503793831caaa4b4e109cca3571a6b7597a/bluesky_tiled_plugins-2.0.0b68-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/24/4a/6acb1dba5e6301739048490263777af29f79302fe8ea3c536a16267ee0cd/bluesky_tiled_plugins-2.0.0-py3-none-any.whl
   name: bluesky-tiled-plugins
-  version: 2.0.0b68
-  sha256: 8b538572982655ef46970e3d3b5ed7d78c34b7486ff89fb92335a70f443a6ec6
+  version: 2.0.0
+  sha256: 08b414601e3d9f3d8b8d10609fd93f92d75d3b4beddde34b169a67f5784b5c55
   requires_dist:
   - dask
+  - event-model
   - mongoquery
   - pytz
-  - tiled[client]>=0.1.0b23
+  - tiled[client]>=0.2.0
   - tzlocal
-  requires_python: '>=3.7'
+  requires_python: '>=3.10'
 - pypi: https://files.pythonhosted.org/packages/cb/8c/2b30c12155ad8de0cf641d76a8b396a16d2c36bc6d50b621a62b7c4567c1/build-1.3.0-py3-none-any.whl
   name: build
   version: 1.3.0
@@ -878,13 +879,13 @@ packages:
   - numpy>=1.20
   - ruamel-yaml==0.17.21
   - six>=1.15
-- pypi: https://files.pythonhosted.org/packages/ed/47/14a76b926edc3957c8a8258423db789d3fa925d2fed800102fce58959413/fastapi-0.120.4-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/5c/05/5cbb59154b093548acd0f4c7c474a118eda06da25aa75c616b72d8fcd92a/fastapi-0.128.0-py3-none-any.whl
   name: fastapi
-  version: 0.120.4
-  sha256: 9bdf192308676480d3593e10fd05094e56d6fdc7d9283db26053d8104d5f82a0
+  version: 0.128.0
+  sha256: aebd93f9716ee3b4f4fcfe13ffb7cf308d99c9f3ab5622d8877441072561582d
   requires_dist:
-  - starlette>=0.40.0,<0.50.0
-  - pydantic>=1.7.4,!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0
+  - starlette>=0.40.0,<0.51.0
+  - pydantic>=2.7.0
   - typing-extensions>=4.8.0
   - annotated-doc>=0.0.2
   - fastapi-cli[standard]>=0.0.8 ; extra == 'standard'
@@ -893,12 +894,16 @@ packages:
   - python-multipart>=0.0.18 ; extra == 'standard'
   - email-validator>=2.0.0 ; extra == 'standard'
   - uvicorn[standard]>=0.12.0 ; extra == 'standard'
+  - pydantic-settings>=2.0.0 ; extra == 'standard'
+  - pydantic-extra-types>=2.0.0 ; extra == 'standard'
   - fastapi-cli[standard-no-fastapi-cloud-cli]>=0.0.8 ; extra == 'standard-no-fastapi-cloud-cli'
   - httpx>=0.23.0,<1.0.0 ; extra == 'standard-no-fastapi-cloud-cli'
   - jinja2>=3.1.5 ; extra == 'standard-no-fastapi-cloud-cli'
   - python-multipart>=0.0.18 ; extra == 'standard-no-fastapi-cloud-cli'
   - email-validator>=2.0.0 ; extra == 'standard-no-fastapi-cloud-cli'
   - uvicorn[standard]>=0.12.0 ; extra == 'standard-no-fastapi-cloud-cli'
+  - pydantic-settings>=2.0.0 ; extra == 'standard-no-fastapi-cloud-cli'
+  - pydantic-extra-types>=2.0.0 ; extra == 'standard-no-fastapi-cloud-cli'
   - fastapi-cli[standard]>=0.0.8 ; extra == 'all'
   - httpx>=0.23.0,<1.0.0 ; extra == 'all'
   - jinja2>=3.1.5 ; extra == 'all'
@@ -911,7 +916,7 @@ packages:
   - uvicorn[standard]>=0.12.0 ; extra == 'all'
   - pydantic-settings>=2.0.0 ; extra == 'all'
   - pydantic-extra-types>=2.0.0 ; extra == 'all'
-  requires_python: '>=3.8'
+  requires_python: '>=3.9'
 - pypi: https://files.pythonhosted.org/packages/9f/56/13ab06b4f93ca7cac71078fbe37fcea175d3216f31f85c3168a6bbd0bb9a/flake8-7.3.0-py2.py3-none-any.whl
   name: flake8
   version: 7.3.0
@@ -2401,10 +2406,10 @@ packages:
   - xarray ; extra == 'test'
   - zarr>=3 ; extra == 'test'
   requires_python: '>=3.11'
-- pypi: https://files.pythonhosted.org/packages/ba/1d/1cb39a116ab11a42657d81cd0d6ef8d084da02ed6f61d5844909b9e0292b/tiled-0.2.0-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/76/3c/5098fb82017078cd7324b78c34f136d389e44251719f6332abbad455815d/tiled-0.2.3-py3-none-any.whl
   name: tiled
-  version: 0.2.0
-  sha256: e228fcd96ca7551b664096948853f8461bfcc0e9289f3b6d25d6fabc91e2f2f7
+  version: 0.2.3
+  sha256: f926cd097a430739ad0baddb45540aaeeb868eba9650100e9ec0200ddb866ba5
   requires_dist:
   - httpx>=0.20.0,!=0.23.1
   - json-merge-patch
@@ -2413,7 +2418,7 @@ packages:
   - msgpack>=1.0.0
   - orjson
   - platformdirs
-  - pydantic-settings>=2,<3
+  - pydantic-settings>=2,<2.12.0
   - pydantic>=2,<3
   - pyyaml
   - typer
@@ -2435,7 +2440,7 @@ packages:
   - dask[dataframe] ; extra == 'all'
   - duckdb<1.4.0 ; extra == 'all'
   - entrypoints ; extra == 'all'
-  - fastapi>=0.115.8 ; extra == 'all'
+  - fastapi>=0.122.0 ; extra == 'all'
   - h5netcdf ; extra == 'all'
   - h5py ; extra == 'all'
   - hdf5plugin ; extra == 'all'
@@ -2539,7 +2544,7 @@ packages:
   - cachetools ; extra == 'minimal-server'
   - canonicaljson ; extra == 'minimal-server'
   - dask ; extra == 'minimal-server'
-  - fastapi>=0.115.8 ; extra == 'minimal-server'
+  - fastapi>=0.122.0 ; extra == 'minimal-server'
   - jinja2 ; extra == 'minimal-server'
   - jmespath ; extra == 'minimal-server'
   - numcodecs ; extra == 'minimal-server'
@@ -2571,7 +2576,7 @@ packages:
   - dask[dataframe] ; extra == 'server'
   - duckdb<1.4.0 ; extra == 'server'
   - entrypoints ; extra == 'server'
-  - fastapi>=0.115.8 ; extra == 'server'
+  - fastapi>=0.122.0 ; extra == 'server'
   - h5netcdf ; extra == 'server'
   - h5py ; extra == 'server'
   - hdf5plugin ; extra == 'server'
@@ -2616,11 +2621,11 @@ packages:
 - pypi: ./
   name: tiledspc
   version: 2024.8.0
-  sha256: 789edf98c1a253eb73c2033dfa935f5ce7411c464dff0ffde98b7c9d331641a5
+  sha256: ecb8a47749517d020ce7a34cab976d3849a6d53c5db98c63f1d3cabec6b292ad
   requires_dist:
-  - tiled[all]==0.2.0
+  - tiled[all]==0.2.3
   - area-detector-handlers
-  - bluesky-tiled-plugins==2.0.0b68
+  - bluesky-tiled-plugins==2.0.0
   - event-model
   - suitcase
   - h5py
