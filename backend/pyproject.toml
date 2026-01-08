@@ -6,7 +6,7 @@ authors = [
 ]
 description = "Extra bits for running a Tiled server for the Spectroscopy (SPC) group."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
