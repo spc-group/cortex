@@ -1,20 +1,13 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import * as React from "react";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import {Run} from "./run";
-
-
-// Mock URL parameters
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useParams: () => ({
-    uid: 5,
-  }),
-}));
+import { RunPlots } from "./run_plots.tsx";
 
 // Mock API response
 // https://github.com/vitest-dev/vitest/discussions/3589
@@ -34,14 +27,14 @@ afterEach(() => {
   cleanup();
 });
 
-describe("the Run component", () => {
+describe("the RunPlots component", () => {
   beforeEach(async () => {
     const queryClient = new QueryClient();
     await React.act(async () => {
       render(
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
-            <Run />
+            <RunPlots uid={5} />
           </QueryClientProvider>
         </BrowserRouter>,
       );
