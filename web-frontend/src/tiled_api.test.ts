@@ -10,10 +10,10 @@ import { apiInfoJson } from "./mocks/tiled";
 
 describe("getRuns() function", () => {
   it("returns the right number of runs", async () => {
-    const filters = new Map([
-      ["start.uid", "58839482"],
-      ["stop.exit_status", "success"],
-    ]);
+    const filters = {
+      "start.uid": "58839482",
+      "stop.exit_status": "success",
+    };
     const runs = await getRuns({
       pageOffset: 10,
       pageLimit: 20,

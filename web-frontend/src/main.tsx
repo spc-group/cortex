@@ -5,7 +5,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { RunList, Run } from "./catalog";
 import Navbar from "./navbar.tsx";
-import BeamlinePanels from "./beamlines.tsx";
+import BeamlinePanels from "./beamlines/panels.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();

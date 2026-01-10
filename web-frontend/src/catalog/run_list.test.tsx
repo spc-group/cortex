@@ -128,7 +128,7 @@ describe("run list", () => {
   beforeEach(async () => {
     getRuns.mockClear();
     const queryClient = new QueryClient();
-    await React.act(async () => {
+    await React.act(() => {
       render(
         <QueryClientProvider client={queryClient}>
           <RunList />
@@ -145,9 +145,9 @@ describe("run list", () => {
     await user.type(textbox, "8675309");
     await new Promise((r) => setTimeout(r, 620)); // Wait for debounce
     expect(getRuns.mock.calls).toHaveLength(1);
-    expect(getRuns.mock.calls[0][0]["filters"]).toEqual(
-      new Map([["start.uid", "8675309"]]),
-    );
+    expect(getRuns.mock.calls[0][0]["filters"]).toEqual({
+      "start.uid": "8675309",
+    });
   });
   it("applies generic filters", async () => {
     const textbox = screen.getByPlaceholderText("Search (full words)…");

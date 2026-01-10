@@ -4,9 +4,9 @@ import type { SearchParams, APIRun, DataKey } from "./types";
 import qs from "qs";
 
 const envHost = import.meta.env.VITE_TILED_URI;
-export const tiledHost = envHost === undefined ? "" : envHost;
+export const tiledHost = envHost ?? "http://127.0.0.1:0";
 export const tiledUri = tiledHost + "/api/v1/";
-const streamsPrefix = "streams/"; // The streams namespace is gone in Tiled soon
+export const streamsPrefix = "streams/"; // The streams namespace is gone in Tiled soon
 
 export const v1Client = axios.create({
   baseURL: tiledUri,
@@ -22,6 +22,9 @@ export const getMetadata = async (
   path: string,
   client: AxiosInstance = v1Client,
 ) => {
+  if (path === null) {
+    return {};
+  }
   const response = await client.get(`metadata/${encodeURIComponent(path)}`, {
     params: {},
   });
@@ -42,10 +45,11 @@ export const getDataKeys = async (
 };
 
 // Parse the query parameters needed for a search
+// @params filters: An object of the form {"start.beamline_id": "25-ID-C"}
 export const prepareQueryParams = ({
   pageOffset,
   pageLimit,
-  filters = new Map(),
+  filters,
   sortField = "",
   searchText = "",
   standardsOnly = false,
@@ -58,9 +62,9 @@ export const prepareQueryParams = ({
   params.append("fields", "metadata");
   params.append("fields", "specs");
   params.append("fields", "count");
-  params.append("page[offset]", String(pageOffset));
-  params.append("page[limit]", String(pageLimit));
-  for (const [field, value] of filters) {
+  params.append("page[offset]", String(pageOffset ?? 0));
+  params.append("page[limit]", String(pageLimit ?? 100));
+  for (const [field, value] of Object.entries(filters ?? {})) {
     params.append("filter[contains][condition][key]", field);
     params.append("filter[contains][condition][value]", `"${value}"`);
   }
@@ -115,6 +119,9 @@ export const getTableData = async (
   columns?: string[],
   partition?: number,
 ) => {
+  if (uid === null) {
+    return {};
+  }
   const client = v1Client;
   const endpoint = partition === undefined ? "/table/full" : "/table/partition";
   const queryParams: { column?: string[]; partition?: number } = {};

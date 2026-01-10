@@ -3426,21 +3426,26 @@ const tableData = {
   ts_sim_motor_2: [1747085782.032349, 1747085783.233922],
 };
 
+const mockUrl = "http://127.0.0.1:0/api/v1";
+
 export const handlers = [
-  http.get("/api/v1/search/", () => {
+  http.get(`${mockUrl}/search/`, () => {
     return HttpResponse.json(searchJson);
   }),
-  http.get("/api/v1", () => {
+  http.get(`${mockUrl}`, () => {
     return HttpResponse.json(apiInfoJson);
   }),
+  http.get(`${mockUrl}/metadata/b68c7712-cb05-47f4-8e25-11cb05cc2cd5`, () => {
+    return HttpResponse.json({});
+  }),
   http.get(
-    "/api/v1/metadata/b68c7712-cb05-47f4-8e25-11cb05cc2cd5/streams/primary",
+    `${mockUrl}/metadata/b68c7712-cb05-47f4-8e25-11cb05cc2cd5/streams/primary`,
     () => {
       return HttpResponse.json(streamMetadataJson);
     },
   ),
   http.get(
-    "/api/v1/table/full/b68c7712-cb05-47f4-8e25-11cb05cc2cd5/streams/primary/internal",
+    `${mockUrl}/table/full/b68c7712-cb05-47f4-8e25-11cb05cc2cd5/streams/primary/internal`,
     ({ request }) => {
       const url = new URL(request.url);
       // Filter by request column in the search parameters

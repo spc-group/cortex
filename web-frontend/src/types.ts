@@ -1,3 +1,5 @@
+import { ReadyState } from "react-use-websocket";
+
 export interface Column {
   label: string;
   name: string;
@@ -21,9 +23,9 @@ export interface TableColumn extends Column {
 }
 
 export interface SearchParams {
-  pageOffset: number;
-  pageLimit: number;
-  filters?: Map<string, string>;
+  pageOffset?: number;
+  pageLimit?: number;
+  filters?: { [key: string]: string };
   sortField?: string;
   searchText?: string;
   standardsOnly?: boolean;
@@ -100,4 +102,9 @@ export interface APIRun {
       resizable: boolean;
     };
   };
+}
+
+export interface webSocketMessage {
+  lastMessage: { data: Blob };
+  readyState: ReadyState;
 }

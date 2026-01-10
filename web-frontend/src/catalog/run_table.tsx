@@ -266,11 +266,11 @@ export function Row({
         if (value instanceof Date) {
           text = value.toISOString().split("T").join(" ");
         } else {
-          text = String(run[col.field]);
+          text = String(run[col.field] ?? "");
         }
         return (
           <td key={uid + col.name}>
-            <Link to={uid + "/lineplot"}>{text}</Link>
+            <Link to={uid + "/lineplot"}>{text ?? ""}</Link>
           </td>
         );
       })}

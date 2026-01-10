@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
-import { useQuery } from "@tanstack/react-query";
 
 import RunTable from "./run_table";
 import { allColumns } from "./columns";
 import useDebounce from "../debounce";
-import { getRuns } from "../tiled_api";
+import { useRuns } from "../runs_hook";
 import type { TableColumn, Column } from "../types";
 
 export function Paginator({
@@ -80,7 +79,7 @@ export function RunList() {
   // State for keeping track of pagination
   const [pageLimit, setPageLimit] = useState(10);
   const [pageOffset, setPageOffset] = useState(0);
-  const [runCount, setRunCount] = useState(0);
+  // const [runCount, setRunCount] = useState(0);
 
   // State for selecting which field to use for sorting
   const [sortField, setSortField] = useState<string>("-start.time");
@@ -111,63 +110,29 @@ export function RunList() {
     useFilterCol(allColumns[6]),
     useFilterCol(allColumns[7]),
   ];
-  // const columns = allColumns.map((col) => {
-  // 	[col.filter, col.setFilter] = useState("");
-  // 	col.debouncedFilter = useDebouce(col.filter);
-  // 	return col
-  // });
-  // const columns = [...allColumns];
-  // for (const col of columns) {
-  //     [ col.filter, col.setFilter ] = useState("");
-  // 	col.debouncedFilter = useDebounce(col.filter);
-  // }
-  const filterStates = columns.map((col) => col.debouncedFilter);
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText);
   const [standardsOnly, setStandardsOnly] = useState(false);
 
-  const loadRuns = async () => {
-    // Prepare list of filters
-    const filters = new Map();
-    for (const col of columns) {
-      if (col.filter !== "") {
-        filters.set(col.field, col.filter);
-      }
-    }
-    const theRuns = await getRuns({
-      filters,
-      pageLimit,
-      pageOffset,
-      sortField,
-      searchText: debouncedSearchText,
-      standardsOnly,
-    });
-    return theRuns;
-  };
+  let filterEntries = columns.map((col) => [col.field, col.debouncedFilter]);
+  filterEntries = filterEntries.filter(([, text]) => text !== "");
+  const filters = Object.fromEntries(filterEntries);
 
-  // Query for retrieving data for the list of runs
-  const { isLoading, error, data } = useQuery({
-    queryKey: [
-      "all-runs",
-      sortField,
-      pageLimit,
-      pageOffset,
-      debouncedSearchText,
-      standardsOnly,
-      ...filterStates,
-    ],
-    queryFn: loadRuns,
+  // Load data from the database
+  const {
+    runs: allRuns,
+    error,
+    isLoading,
+    runCount,
+  } = useRuns({
+    sortField: sortField,
+    pageLimit: pageLimit,
+    pageOffset: pageOffset,
+    searchText: debouncedSearchText,
+    standardsOnly: standardsOnly,
+    filters: filters,
   });
-  let allRuns;
-  if (isLoading || error) {
-    allRuns = [];
-  } else {
-    allRuns = data?.runs ?? [];
-    const data_count = data?.count ?? 0;
-    if (runCount != data_count) {
-      setRunCount(data_count);
-    }
-  }
+
   return (
     <div className="mx-auto max-w-full">
       <div className="p-4">
