@@ -4,7 +4,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import RunTable from "./run_table";
 import { allColumns } from "./columns";
 import useDebounce from "../debounce";
-import { useRuns } from "../runs_hook";
+import { useRuns } from "../tiled/use_runs";
 import type { TableColumn, Column } from "../types";
 
 export function Paginator({

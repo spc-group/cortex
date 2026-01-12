@@ -8,26 +8,47 @@ import { BrowserRouter } from "react-router";
 
 import { LivePlot } from "./liveplot";
 
-describe("the livePlot component", () => {
-  const socket = vi.fn();
-  const mockWebSocket = (payload: object) => {
-    const encoded: Uint8Array = encode(payload);
-    const blob = new Blob([encoded]);
-    const wsResponse = {
-      data: blob,
+beforeEach(() => {
+  vi.mock(import("../tiled/streaming"), async(importOriginal) => {
+    return {
+      ...(await importOriginal()),
+      useLatestRun: () => {
+	return {latestUID: "b68c7712-cb05-47f4-8e25-11cb05cc2cd5"}
+      },
     };
-    socket.mockReturnValue({ lastMessage: wsResponse, readyState: 1 });
-  };
+  });
+  vi.mock(import("../tiled/use_data_keys"), () => {
+    return {
+      useDataKeys: () => {
+	return {streams: ["primary"]};
+      },
+    };
+  });
+  vi.mock(import("../tiled/use_streams"), () => {
+    return {
+      useStreams: () => {
+	return {streams: ["primary"]};
+      },
+    };
+  });
+    vi.mock(import("../tiled/use_metadata"), () => {
+    return {
+      useMetadata: () => {
+	return {data: {"start.scan_name": "my run"}};
+      },
+    };
+  });  
+});
+
+describe("the livePlot component", () => {
   beforeEach(async () => {
-    // Mock the websocket connection
-    mockWebSocket({ key: "b68c7712-cb05-47f4-8e25-11cb05cc2cd5", sequence: 1 });
     // Render the component
     const queryClient = new QueryClient();
     await act(() => {
       render(
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
-            <LivePlot webSocketHook={socket} beamlineId="25-ID-C" />
+            <LivePlot beamlineId="25-ID-C" />
           </QueryClientProvider>
         </BrowserRouter>,
       );

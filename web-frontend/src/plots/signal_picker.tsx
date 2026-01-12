@@ -1,22 +1,9 @@
 // import { useState } from "react";
 import type { ChangeEventHandler } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getDataKeys } from "../tiled_api.ts";
+import { getDataKeys } from "../tiled/tiled_api.ts";
+import { useDataKeys } from "../tiled/use_data_keys";
 
-const useDataKeys = (uid?: string, stream?: string) => {
-  // Guard clause for partially-loaded things
-  const loadDataKeys = async () => {
-    if (uid == null || stream == null) {
-      return { data: null };
-    }
-    return await getDataKeys(uid, stream);
-  };
-  const response = useQuery({
-    queryKey: ["signal-picker-datakeys", uid, stream],
-    queryFn: loadDataKeys,
-  });
-  return response;
-};
 
 export const SignalPicker = ({
   uid,

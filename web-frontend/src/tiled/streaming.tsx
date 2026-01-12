@@ -2,13 +2,13 @@ import { decode, decodeAsync } from "@msgpack/msgpack";
 import { useState, useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 
-import { useRuns } from "./runs_hook";
-import { tiledUri, streamsPrefix } from "./tiled_api";
+import { useRuns } from "./use_runs";
+import { tiledUri } from "./tiled_api";
 import type { webSocketMessage } from "./types";
 
 // Decode a msgpack formatted blob into a javascript object
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const useDecodeBlob = (blob: Blob | null, setDecoded: (a: any) => void) => {
+export const useDecodeBlob = (blob: Blob | null, setDecoded: (a: any) => void) => {
   useEffect(() => {
     const decodeFromBlob = async () => {
       let decoded: unknown;
@@ -27,12 +27,31 @@ const useDecodeBlob = (blob: Blob | null, setDecoded: (a: any) => void) => {
   }, [blob, setDecoded]);
 };
 
+export const useTiledWebSocket = (url) => {
+  const wsUrl = makeWebsocketUrl(url);
+  const { lastMessage, readyState } = useWebSocket(wsUrl);
+  // Hacky useEffect to decode the blob asynchronously
+  const [blob, setBlob] = useState<Blob>(new Blob());
+  const [payload, setPayload] = useState<{ sequence?: number; key?: string }>(
+    {},
+  );
+  if (lastMessage?.data !== blob) {
+    setBlob(lastMessage?.data);
+  }
+  useDecodeBlob(blob, setPayload);
+  return {
+    lastMessage,
+    payload,
+    readyState,
+  };
+}
+
 // Convert a (maybe) http URL for the tiled server into a websocket
 // url.
 // @param httpUrl: The HTTP equivalent url that will be parsed
 // @returns A similar URL but formatted to be a websocket (i.e. ws:// or wss://)
 
-const makeWebsocketUrl = (httpUrl: string): string => {
+export const makeWebsocketUrl = (httpUrl: string): string => {
   const url = new URL(httpUrl);
   url.protocol = "ws";
   return url.href;
@@ -45,22 +64,9 @@ export const useLatestRun = ({
   beamlineId: string;
   webSocketHook?: (a: string) => webSocketMessage;
 }) => {
-  const webSocket = webSocketHook ?? useWebSocket;
-  // Watch for new runs coming from websockets
-  const url = makeWebsocketUrl(
-    `${tiledUri}stream/single/?envelope_format=msgpack`,
-  );
-  const { lastMessage, readyState } = webSocket(url);
-  // Decode the msgpack response
-  const [blob, setBlob] = useState<Blob>(new Blob());
-  const [message, setMessage] = useState<{ sequence?: number; key?: string }>(
-    {},
-  );
-  if (lastMessage?.data !== blob) {
-    setBlob(lastMessage?.data);
-  }
-  useDecodeBlob(blob, setMessage);
-  const wsUID = message?.key ?? null;
+  const url = `${tiledUri}stream/single/?envelope_format=msgpack`;
+  const {payload, readyState} = useTiledWebSocket(url);
+  const wsUID = payload?.key ?? null;
   // Get the latest run through a regular query as a fallback
   const {
     runs,
@@ -84,7 +90,7 @@ export const useLatestRun = ({
   return {
     latestUID: wsUID ?? fetchedUID,
     readyState: readyState,
-    sequence: message?.sequence,
+    sequence: payload?.sequence,
   };
 };
 
@@ -95,9 +101,8 @@ export const useLatestData = (
 ) => {
   const useSocket = webSocketHook ?? useWebSocket;
   const url = makeWebsocketUrl(
-    `${tiledUri}stream/single/${uid}/${streamsPrefix}${stream}?envelope_format=msgpack`,
+    `${tiledUri}stream/single/${uid}/${stream}/internal?envelope_format=msgpack`,
   );
-  // console.log(webSocketHook._isMockFunction);
   const { lastMessage, readyState } = useSocket(url);
   // Decode the msgpack response
   const [blob, setBlob] = useState<Blob>(new Blob());

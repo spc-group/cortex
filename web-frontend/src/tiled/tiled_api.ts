@@ -6,15 +6,15 @@ import qs from "qs";
 const envHost = import.meta.env.VITE_TILED_URI;
 export const tiledHost = envHost ?? "http://127.0.0.1:0";
 export const tiledUri = tiledHost + "/api/v1/";
-export const streamsPrefix = "streams/"; // The streams namespace is gone in Tiled soon
 
 export const v1Client = axios.create({
   baseURL: tiledUri,
 });
 
 // Retrieve the info about API accepted formats, etc.
-export const getApiInfo = async (client: AxiosInstance = v1Client) => {
-  const response = await client.get("");
+export const getApiInfo = async ({client}: {client: AxiosInstance} = {}) => {
+  const client_ = client ?? v1Client;
+  const response = await client_.get("");
   return response.data;
 };
 
@@ -35,12 +35,11 @@ export const getMetadata = async (
 export const getDataKeys = async (
   uid: string,
   stream: string,
-  client: AxiosInstance = v1Client,
+  {client}: {client?: AxiosInstance} = {},
 ): Promise<{ [key: string]: DataKey }> => {
-  const path = `${uid}/${streamsPrefix}${stream}`;
-  // const response = await client.get(`metadata/${encodeURIComponent(path)}`);
-
-  const response = await client.get(`metadata/${path}`);
+  const path = `${uid}/${stream}`;
+  const client_ = client ?? v1Client;
+  const response = await client_.get(`metadata/${path}`);
   return response.data.data.attributes.metadata.data_keys;
 };
 
@@ -81,11 +80,12 @@ export const prepareQueryParams = ({
 // Retrieve set of runs metadata from the API
 export const getRuns = async (
   searchParams: SearchParams,
-  client: AxiosInstance = v1Client,
+  {client}: {client: AxiosInstance} = {},
 ) => {
+  const client_ = client ?? v1Client;
   const params = prepareQueryParams(searchParams);
   // retrieve list of runs from the API
-  const response = await client.get(`search/`, {
+  const response = await client_.get(`search/`, {
     params: params,
   });
   // Parse into a sensible list defintion
@@ -114,25 +114,26 @@ export const getRuns = async (
 };
 
 export const getTableData = async (
-  stream: string,
+  stream?: string,
   uid?: string,
   columns?: string[],
   partition?: number,
+  {client} = {},
 ) => {
-  if (uid === null) {
+  if (uid == null || stream == null) {
     return {};
   }
-  const client = v1Client;
-  const endpoint = partition === undefined ? "/table/full" : "/table/partition";
+  const client_ = client ?? v1Client;
+  const endpoint = (partition == null) ? "/table/full" : "/table/partition";
   const queryParams: { column?: string[]; partition?: number } = {};
-  if (columns !== undefined) {
+  if (columns != null) {
     queryParams.column = columns;
   }
-  if (endpoint !== undefined) {
+  if (partition != null) {
     queryParams.partition = partition;
   }
-  const uri = `${endpoint}/${uid}/${streamsPrefix}${stream}/internal`;
-  const response = await client.get(uri, {
+  const uri = `${endpoint}/${uid}/${stream}/internal`;
+  const response = await client_.get(uri, {
     params: queryParams,
     paramsSerializer: (params) => {
       return qs.stringify(params, { indices: false });
@@ -140,3 +141,22 @@ export const getTableData = async (
   });
   return response.data;
 };
+
+
+export const getStreams = async (uid: string, {client}={}): string[] => {
+  const client_ = client ?? v1Client;
+  const searchParams = {};
+  const {data, status} = await client_.get(`search/${uid}`, {
+    params: searchParams,
+  });
+  // Check if we are reading a legacy run with the old "streams" namespace
+  let streamNames = data.data.map((child) => child.id);
+  const hasStreamsNamespace = (JSON.stringify(streamNames) === '["streams"]');
+  if (hasStreamsNamespace) {
+    const {data, status} = await client_.get(`search/${uid}/streams`, {
+      params: searchParams,
+    });
+    streamNames = data.data.map((child) => `streams/${child.id}`);
+  }
+  return streamNames;
+}

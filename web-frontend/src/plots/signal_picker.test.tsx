@@ -6,19 +6,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { SignalPicker } from "./signal_picker.tsx";
 
-afterEach(() => {
-  cleanup();
-});
-
-describe("the signal picker widget", () => {
-  beforeEach(() => {
-    vi.mock("@tanstack/react-query", async (importOriginal) => {
-      return {
-        ...(await importOriginal()),
-        useQuery: () => ({
-          isLoading: false,
-          error: null,
-          data: {
+beforeEach(() => {
+  vi.mock("../tiled/use_data_keys", async(importOriginal) => {
+    return {
+      useDataKeys: () => {
+	return {
+	  data: {
             "It-net_current": {
               dtype: "number",
               shape: [],
@@ -46,13 +39,20 @@ describe("the signal picker widget", () => {
               dtype_numpy: "\u003Cf8",
               object_name: "monochromator",
             },
-          },
-        }),
-      };
-    });
+	  }
+	};
+      },
+    };
   });
+});
+
+
+afterEach(() => {
+  cleanup();
+});
+
+describe("the signal picker widget", () => {
   beforeEach(async () => {
-    // getRuns.mockClear();
     const queryClient = new QueryClient();
     await React.act(async () => {
       render(
