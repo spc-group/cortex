@@ -1,3 +1,5 @@
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 import {
   ExclamationTriangleIcon,
   SignalIcon,
@@ -112,6 +114,7 @@ export const StreamPlots = ({uid, stream, plotStyle}: {uid: string, stream: Stre
   const [rSignal, setRSignal] = useState(NULL_SIGNAL);
   const [inverted, setInverted] = useState(false);
   const [logarithm, setLogarithm] = useState(false);
+  const [gradient, setGradient] = useState(false);
   const [operation, setOperation] = useState("");
   const referenceDisabled = operation === "";
 
@@ -206,6 +209,20 @@ export const StreamPlots = ({uid, stream, plotStyle}: {uid: string, stream: Stre
             </tbody>
           </table>
         </div>
+        <div className="space-x-2">
+          <span>Presets: </span>
+          <button className="btn btn-soft" onClick={normalMode}>
+            <InlineMath math="V"/>
+          </button>
+          <button className="btn btn-soft" onClick={fluoroMode}>
+            <InlineMath math="\frac{V}{R}"/>
+          </button>
+          <button className="btn btn-soft" onClick={transMode}>
+            <InlineMath math="\ln \frac{R}{V}"/>
+          </button>
+
+        </div>
+
         <div className="space-x-4">
           <label className="label">
             <input
@@ -214,7 +231,7 @@ export const StreamPlots = ({uid, stream, plotStyle}: {uid: string, stream: Stre
               checked={inverted}
               onChange={(e) => setInverted(e.target.checked)}
             />
-            Invert
+            Inverted <InlineMath math="\big(\frac{1}{y}\big)"/>
           </label>
           <label className="label">
             <input
@@ -223,25 +240,13 @@ export const StreamPlots = ({uid, stream, plotStyle}: {uid: string, stream: Stre
               checked={logarithm}
               onChange={(e) => setLogarithm(e.target.checked)}
             />
-            Natural log
+            Logarithm <InlineMath math="\big(\ln y\big)"/>
           </label>
           {/* Need to get a good gradient function. */}
-          {/* <label className="label"> */}
-          {/*   <input type="checkbox" className="checkbox" checked={gradient} onChange={(e) => setGradient(e.target.checked)} /> */}
-          {/*   Gradient */}
-          {/* </label> */}
-        </div>
-        <div className="space-x-2">
-          <span>Presets: </span>
-          <button className="btn btn-soft" onClick={normalMode}>
-            Simple
-          </button>
-          <button className="btn btn-soft" onClick={transMode}>
-            Transmission
-          </button>
-          <button className="btn btn-soft" onClick={fluoroMode}>
-            Fluorescence
-          </button>
+          <label className="label disabled">
+            <input type="checkbox" className="checkbox" checked={gradient} onChange={(e) => setGradient(e.target.checked)} />
+            Gradient <InlineMath math="\big(\frac{dy}{dx}\big)"/>
+          </label>
         </div>
         {plot}
   
