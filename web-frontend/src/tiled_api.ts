@@ -95,8 +95,14 @@ export const getRuns = async (
     const date = new Date(start_doc.time * 1000);
     const specs = run.attributes.specs;
     return {
-      metadata: run.attributes.metadata,
-      key: run.id,
+      "start.uid": run.id,
+      "start.plan_name": start_doc.plan_name,
+      "start.scan_name": start_doc.scan_name ?? null,
+      "start.sample_name": start_doc.sample_name ?? null,
+      "stop.exit_status": stop_doc.exit_status ?? null,
+      "start.time": date.toLocaleString(),
+      "start.proposal": start_doc.proposal ?? null,
+      "start.esaf": start_doc.esaf ?? null,
       specs: specs === null ? [] : specs,
       structure_family: run.attributes.structure_family,
     };
@@ -140,32 +146,15 @@ export const getTableData = async (
 export const getStreams = async (uid: string, {client}={}): string[] => {
   const client_ = client ?? v1Client;
   const {data, status} = await client_.get(`search/${uid}`);
+  console.log(data);
   // Check if we are reading a legacy run with the old "streams" namespace
-  let streamData = data.data;
-  let streamPrefix = "";
-  const streamNames = streamData.map((child) => child.id);
+  let streamNames = data.data.map((child) => child.id);
   const hasStreamsNamespace = (JSON.stringify(streamNames) === '["streams"]');
   if (hasStreamsNamespace) {
-    const {data, status} = await client_.get(`search/${uid}/streams`);
-    streamData = data.data;
-    streamPrefix = "streams/";
+    const {data, status} = await client_.get(`search/${uid}/streams`, {
+      params: searchParams,
+    });
+    streamNames = data.data.map((child) => `streams/${child.id}`);
   }
-  // Convert to the internal Stream interface
-  const streamEntries = streamData.map((datum) => {
-    const attrs = datum.attributes;
-    const key = `${streamPrefix}${datum.id}`
-    return [key, {
-      key: key,
-      ancestors: attrs.ancestors,
-      structure_family: attrs.structure_family,
-      specs: attrs.specs,
-      data_keys: attrs.metadata.data_keys,
-      configuration: attrs.metadata.configuration,
-      hints: attrs.metadata.hints,
-      time: attrs.metadata.time,
-      uid: attrs.metadata.uid,
-    }]
-  });
-  const streams = Object.fromEntries(streamEntries);
-  return streams;
+  return new Set(streamNames);
 }

@@ -28,7 +28,7 @@ export const useDecodeBlob = (blob: Blob | null, setDecoded: (a: any) => void) =
 };
 
 export const useTiledWebSocket = (url) => {
-  const wsUrl = makeWebsocketUrl(url);
+  const wsUrl = makeWebsocketUrl(`${tiledUri}${url}`);
   const { lastMessage, readyState } = useWebSocket(wsUrl);
   // Hacky useEffect to decode the blob asynchronously
   const [blob, setBlob] = useState<Blob>(new Blob());
@@ -39,11 +39,12 @@ export const useTiledWebSocket = (url) => {
     setBlob(lastMessage?.data);
   }
   useDecodeBlob(blob, setPayload);
-  return {
+  const result = {
     lastMessage,
     payload,
     readyState,
   };
+  return result
 }
 
 // Convert a (maybe) http URL for the tiled server into a websocket
@@ -57,53 +58,13 @@ export const makeWebsocketUrl = (httpUrl: string): string => {
   return url.href;
 };
 
-export const useLatestRun = ({
-  webSocketHook,
-  beamlineId,
-}: {
-  beamlineId: string;
-  webSocketHook?: (a: string) => webSocketMessage;
-}) => {
-  const url = `${tiledUri}stream/single/?envelope_format=msgpack`;
-  const {payload, readyState} = useTiledWebSocket(url);
-  const wsUID = payload?.key ?? null;
-  // Get the latest run through a regular query as a fallback
-  const {
-    runs,
-    runCount,
-    isLoading: isLoadingRuns,
-  } = useRuns({
-    sortField: "-start.time",
-    filters: {
-      "start.beamline_id": beamlineId,
-    },
-    pageLimit: 1,
-    pageOffset: 0,
-  });
-  let fetchedUID;
-  if (isLoadingRuns || runCount === 0) {
-    fetchedUID = null;
-  } else {
-    fetchedUID = runs[0]?.["start.uid"] ?? null;
-  }
-  // Return the results, preferring websocket results over fetch
-  return {
-    latestUID: wsUID ?? fetchedUID,
-    readyState: readyState,
-    sequence: payload?.sequence,
-  };
-};
 
 export const useLatestData = (
   uid: string,
   stream: string,
-  { webSocketHook }: { webSocketHook?: (a: string) => webSocketMessage },
 ) => {
-  const useSocket = webSocketHook ?? useWebSocket;
-  const url = makeWebsocketUrl(
-    `${tiledUri}stream/single/${uid}/${stream}/internal?envelope_format=msgpack`,
-  );
-  const { lastMessage, readyState } = useSocket(url);
+  const url = `stream/single/${uid}/${stream}/internal?envelope_format=msgpack`;
+  const { lastMessage, readyState } = useTiledWebSocket(url);
   // Decode the msgpack response
   const [blob, setBlob] = useState<Blob>(new Blob());
   const [message, setMessage] = useState<{ sequence?: number } | null>(null);

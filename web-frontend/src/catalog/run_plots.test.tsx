@@ -9,7 +9,7 @@ import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { RunPlots, RunDataPlots } from "./run_plots.tsx";
+import { RunPlots, StreamPlots, DataPlots } from "./run_plots.tsx";
 
 // Mock API response
 // https://github.com/vitest-dev/vitest/discussions/3589
@@ -27,14 +27,14 @@ beforeEach(() => {
   vi.mock(import("../tiled/use_streams"), () => {
     return {
       useStreams: () => {
-	return {streams: ["primary"]};
+	return {streams: {primary: {}}};
       },
     };
   });
   vi.mock(import("../tiled/use_data_keys"), () => {
     return {
       useDataKeys: () => {
-	return {streams: ["primary"]};
+	return {sim_motor_2: {}};
       },
     };
   });
@@ -70,18 +70,36 @@ describe("the RunPlots component", () => {
   });
 });
 
-describe("the RunDataPlots component", () => {
+describe("the StreamPlots component", () => {
+  const stream: Stream = {
+    key: "primary",
+    data_keys: {"sim_motor_2": {}},
+  }
   beforeEach(async () => {
+    await renderRouter(<StreamPlots uid={5} stream={stream} />);
+  });
+  it("populates signal pickers", () => {
+    expect(screen.getAllByText("sim_motor_2").length).toEqual(3);
+  });
+});
+
+const renderRouter = async(element) => {
     const queryClient = new QueryClient();
     await React.act(async () => {
       render(
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
-            <RunDataPlots uid={5} />
+            {element}
           </QueryClientProvider>
         </BrowserRouter>,
       );
     });    
+  
+};
+
+describe("the RunDataPlots component", () => {
+  beforeEach(async () => {
+    await renderRouter(<DataPlots uid={5} />);
   })
   it("shows the 'live' badge", () => {
     expect(screen.getByText("Live")).toBeInTheDocument();

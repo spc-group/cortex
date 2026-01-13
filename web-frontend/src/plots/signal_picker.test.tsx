@@ -6,46 +6,38 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { SignalPicker } from "./signal_picker.tsx";
 
-beforeEach(() => {
-  vi.mock("../tiled/use_data_keys", async(importOriginal) => {
-    return {
-      useDataKeys: () => {
-	return {
-	  data: {
-            "It-net_current": {
-              dtype: "number",
-              shape: [],
-              units: "A",
-              source: "derived://It-net_current",
-              dtype_numpy: "\u003Cf8",
-              object_name: "It",
-            },
-            "monochromator-gap": {
-              dtype: "number",
-              shape: [],
-              units: "um",
-              limits: {
-                control: {
-                  low: -24105,
-                  high: -24105,
-                },
-                display: {
-                  low: -24105,
-                  high: -24105,
-                },
-              },
-              source: "ca://25idbUP:ACS:m4.RBV",
-              precision: 3,
-              dtype_numpy: "\u003Cf8",
-              object_name: "monochromator",
-            },
-	  }
-	};
-      },
-    };
-  });
-});
 
+const stream = {
+  data_keys: {
+  "It-net_current": {
+    dtype: "number",
+    shape: [],
+    units: "A",
+    source: "derived://It-net_current",
+    dtype_numpy: "\u003Cf8",
+    object_name: "It",
+  },
+  "monochromator-gap": {
+    dtype: "number",
+    shape: [],
+    units: "um",
+    limits: {
+      control: {
+        low: -24105,
+        high: -24105,
+      },
+      display: {
+        low: -24105,
+        high: -24105,
+      },
+    },
+    source: "ca://25idbUP:ACS:m4.RBV",
+    precision: 3,
+    dtype_numpy: "\u003Cf8",
+    object_name: "monochromator",
+  },
+  }
+};
 
 afterEach(() => {
   cleanup();
@@ -57,7 +49,7 @@ describe("the signal picker widget", () => {
     await React.act(async () => {
       render(
         <QueryClientProvider client={queryClient}>
-          <SignalPicker uid="93b837d" stream="primary" />
+          <SignalPicker uid="93b837d" stream={stream} />
         </QueryClientProvider>,
       );
     });

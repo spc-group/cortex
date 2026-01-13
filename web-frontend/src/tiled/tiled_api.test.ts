@@ -20,7 +20,7 @@ describe("getRuns() function", () => {
       "start.uid": "58839482",
       "stop.exit_status": "success",
     };
-    const runs = await getRuns({
+    const { runs, count } = await getRuns({
       pageOffset: 10,
       pageLimit: 20,
       // client: client,
@@ -28,7 +28,9 @@ describe("getRuns() function", () => {
       searchText: "super awesome experiment",
       standardsOnly: true,
     }, {client});
-    expect(runs.runs.length).toEqual(1);
+    expect(runs.length).toEqual(1);
+    expect(runs[0].metadata.start.uid).toEqual("58839482");
+    expect(runs[0].key).toEqual("58839482");
   });
 });
 
@@ -107,12 +109,31 @@ describe("getTableData() function", () => {
 });
 
 describe("getStreams()", () => {
-  it("gets top level streams name", async () => {
+  it("gets top level streams data", async () => {
     const streams = await getStreams("new_run", {client});
-    expect(streams).toEqual(['primary']);
+    expect(Object.keys(streams)).toEqual(['primary']);
+    expect(streams['primary'].key).toEqual('primary');
+    expect(streams['primary'].key).toEqual('primary');
+  });
+  it("includes stream metadata", async () => {
+    const streams = await getStreams("new_run", {client});
+    const stream = streams.primary;
+    expect(stream.key).toEqual('primary');
+    expect(Object.keys(stream.data_keys)).toContain("sim_motor_2");
+    expect(Object.keys(stream.hints)).toContain("sim_motor_2");
+    expect(stream.time).toEqual(1767998299.2170787);
+    expect(stream.uid).toEqual("3bea507b-c00f-4a84-82ba-be08dc0eb9cf");
+    expect(Object.keys(stream.configuration)).toContain("sim_motor_2");
+    expect(stream.ancestors).toEqual([
+          "6bc6d326-d288-42c8-98d4-0f20f715fca1",
+          "streams"
+    ]);
+    expect(stream.structure_family).toEqual("container");
+    expect(stream.specs.length).toEqual(2);
   });
   it("navigates the legacy 'streams' namespace", async () => {
     const streams = await getStreams("legacy_run", {client});
-    expect(streams).toEqual(['streams/primary']);
+    expect(Object.keys(streams)).toEqual(['streams/primary']);
+    expect(streams['streams/primary'].key).toEqual('streams/primary');
   });
 });

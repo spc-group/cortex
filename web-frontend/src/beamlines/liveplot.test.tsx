@@ -9,11 +9,14 @@ import { BrowserRouter } from "react-router";
 import { LivePlot } from "./liveplot";
 
 beforeEach(() => {
-  vi.mock(import("../tiled/streaming"), async(importOriginal) => {
+  vi.mock(import("../tiled/use_latest_run"), async(importOriginal) => {
     return {
       ...(await importOriginal()),
       useLatestRun: () => {
-	return {latestUID: "b68c7712-cb05-47f4-8e25-11cb05cc2cd5"}
+	return {
+	  key: "b68c7712-cb05-47f4-8e25-11cb05cc2cd5",
+	  metadata: {'start': {'uid': 'b68c7712-cb05-47f4-8e25-11cb05cc2cd5'}},
+	}
       },
     };
   });
@@ -31,7 +34,7 @@ beforeEach(() => {
       },
     };
   });
-    vi.mock(import("../tiled/use_metadata"), () => {
+  vi.mock(import("../tiled/use_metadata"), () => {
     return {
       useMetadata: () => {
 	return {data: {"start.scan_name": "my run"}};

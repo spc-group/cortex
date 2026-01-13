@@ -32,29 +32,93 @@ export const RunPlots = ({
   uid: string;
   plotStyle?: string;
 }) => {
+  // Get the valid streams for this run
+  const [streamName, setStream] = useState(NULL_SIGNAL);
+  const needsStream = streamName === NULL_SIGNAL;
+  const { streams, isLoading: isLoadingStreams } = useStreams(uid);
+  const streamNames = Object.keys(streams);
+  const stream = streams?.[streamName];
+
+  // Select the primary stream by default
+  if (streamName === NULL_SIGNAL && !isLoadingStreams && streamNames.length > 0) {
+    setStream(streamNames[0]);
+  }
+
+  // Retrieve metadata and data keys for this dataset
+  const { isLoading: isLoadingMetadata, data: runMetadata } = useMetadata(uid);
+
+  let plot;
+  if (uid === undefined) {
+    plot = (
+      <div role="alert" className="m-2 alert alert-error alert-soft">
+        <span>
+          <ExclamationTriangleIcon className="size-4 inline" /> No UID was
+          provided.
+        </span>
+      </div>
+    );
+  } else if (needsStream) {
+    plot = (
+      <div role="alert" className="m-2 alert alert-warning alert-soft">
+        <span>
+          <ExclamationTriangleIcon className="size-4 inline" /> Select signals
+          above to plot.
+        </span>
+      </div>
+    );
+  } else {
+    plot = (
+      <StreamPlots uid={uid} stream={streams?.[streamName] ?? {}} plotStyle={plotStyle} />
+    );
+  }
+  
+  return (
+    <div className="m-4">
+      {/* Header for the run as a whole */}
+      <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+        {isLoadingMetadata ? (
+          <div className="skeleton" />
+        ) : (
+          runMetadata["start.scan_name"]
+        )}
+      </h2>
+      <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+        <div className="mt-2 flex items-center text-sm text-gray-500">
+          {isLoadingMetadata ? <div className="skeleton" /> : runMetadata.uid}
+        </div>
+      </div>
+
+      <div>
+        Stream:
+        <select className="select" value={streamName} onChange={(e) => {setStream(e.target.value)}}>
+          {streamNames.map( (stream) => {
+            return <option key={stream}>{stream}</option>
+          })}
+        </select>
+      </div>
+
+      {plot}
+    </div>
+  );
+};
+
+
+// A react component to plot data for a given Bluesky run stream
+// @param uid - The unique ID for this run
+// @param stream - The stream name within this run to plot.
+export const StreamPlots = ({uid, stream, plotStyle}: {uid: string, stream: Stream, plotStyle: string}) => {
   const [xSignal, setXSignal] = useState(NULL_SIGNAL);
   const [vSignal, setVSignal] = useState(NULL_SIGNAL);
   const [rSignal, setRSignal] = useState(NULL_SIGNAL);
   const [inverted, setInverted] = useState(false);
   const [logarithm, setLogarithm] = useState(false);
   const [operation, setOperation] = useState("");
-  const [stream, setStream] = useState(NULL_SIGNAL);
-  const { streams, isLoading: isLoadingStreams } = useStreams(uid);
-
-  // Select the primary stream by default
-  if (stream === NULL_SIGNAL && !isLoadingStreams && streams.length > 0) {
-    setStream(streams[0]);
-  }
   const referenceDisabled = operation === "";
 
-  // Retrieve metadata and data keys for this dataset
-  const { isLoading: isLoadingMetadata, data: runMetadata } = useMetadata(uid);
-
-  // Check for error conditions due to missing data signals
+    // Check for error conditions due to missing data signals
   const needsVSignal = vSignal === NULL_SIGNAL;
   const needsRSignal = rSignal === NULL_SIGNAL && OPERATIONS.includes(operation);
-  const needsStream = stream === NULL_SIGNAL;
-  
+
   // Handlers for preset configuration
   const normalMode = () => {
     setInverted(false);
@@ -73,16 +137,7 @@ export const RunPlots = ({
   };
 
   let plot;
-  if (uid === undefined) {
-    plot = (
-      <div role="alert" className="m-2 alert alert-error alert-soft">
-        <span>
-          <ExclamationTriangleIcon className="size-4 inline" /> No UID was
-          provided.
-        </span>
-      </div>
-    );
-  } else if (needsVSignal || needsRSignal || needsStream) {
+  if (needsVSignal || needsRSignal) {
     plot = (
       <div role="alert" className="m-2 alert alert-warning alert-soft">
         <span>
@@ -92,14 +147,10 @@ export const RunPlots = ({
       </div>
     );
   } else {
-    plot = (<RunDataPlots uid={uid} stream={stream} xSignal={xSignal} vSignal={vSignal} rSignal={rSignal} plotStyle={plotStyle} />);
+    plot = (<DataPlots uid={uid} stream={stream} xSignal={xSignal} vSignal={vSignal} rSignal={rSignal} plotStyle={plotStyle} operation={operation} inverted={inverted} logarithm={logarithm} />);
   }
 
-  let signalPickers;
-  if (stream === NULL_SIGNAL) {
-    signalPickers = (<></>);
-  } else {
-    signalPickers = (
+  return (
       <>
         <div className="overflow-x-auto">
           <table className="table table-sm max-w-md">
@@ -192,46 +243,14 @@ export const RunPlots = ({
             Fluorescence
           </button>
         </div>
-      </>    
-    );
-  }
-
+        {plot}
   
-  return (
-    <div className="m-4">
-      {/* Header for the run as a whole */}
-      <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-        {isLoadingMetadata ? (
-          <div className="skeleton" />
-        ) : (
-          runMetadata["start.scan_name"]
-        )}
-      </h2>
-      <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-        <div className="mt-2 flex items-center text-sm text-gray-500">
-          {isLoadingMetadata ? <div className="skeleton" /> : runMetadata.uid}
-        </div>
-      </div>
-
-      <div>
-        Stream:
-        <select className="select" value={stream} onChange={(e) => {setStream(e.target.value)}}>
-          {(streams ?? []).map( (stream) => {
-            return <option key={stream}>{stream}</option>
-          })}
-        </select>
-      </div>
-
-      {signalPickers}
-
-      {plot}
-    </div>
+    </>
   );
 };
 
 
-export function RunDataPlots({
-  uid,
+export function DataPlots({
   stream,
   xSignal,
   vSignal,
@@ -240,10 +259,8 @@ export function RunDataPlots({
   inverted,
   logarithm,
   plotStyle,
-  webSocketHook,
 }: {
-  uid: string;
-  stream: string;
+  stream: Stream;
   xSignal: string,
   vSignal: string,
   rSignal: string,
@@ -251,20 +268,15 @@ export function RunDataPlots({
   inverted: boolean,
   logarithm: boolean,
   plotStyle?: string;
-  webSocketHook?: (a: string) => webSocketMessage;
 }) {
-  // For new runs: WebSocket /api/v1/stream/single/?envelope_format=msgpack"
-  // For new data: WebSocket /api/v1/stream/single/05cb2ba3-5ce1-4b86-bf37-629ceadea73b/streams/primary/internal?envelope_format=msgpack
-  // const { lastMessage, readyState } = useWebSocket(socketUrl)
-
   // Open a websocket connection to listen for data updates
-  const { sequence, readyState } = useLatestData(uid, stream, {
-    webSocketHook: webSocketHook,
-  });
+  const uid = stream.ancestors[0];
+  const streamKey = [...stream.ancestors.slice(1), stream.key].join('/');
+  const { sequence, readyState } = useLatestData(uid, streamKey);
 
   const { isLoading: isLoadingData, data } = useQuery({
-    queryFn: async () => await getTableData(stream, uid, [xSignal, vSignal, rSignal]),
-    queryKey: ["table", stream, uid, xSignal, vSignal, rSignal, sequence],
+    queryFn: async () => await getTableData(streamKey, uid, [xSignal, vSignal, rSignal]),
+    queryKey: ["table", streamKey, uid, xSignal, vSignal, rSignal, sequence],
   });
   const { isLoading: isLoadingMetadata, data: runMetadata } = useQuery({
     queryFn: async () => await getMetadata(uid),

@@ -2,60 +2,60 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 // import useWebSocket from "react-use-websocket";
 
-import { useTiledWebSocket as useWebSocket } from "./streaming";
+import { useTiledWebSocket } from "./streaming";
 import { getStreams, tiledUri } from "./tiled_api.ts";
 import { makeWebsocketUrl, useDecodeBlob } from "./streaming";
 
 
-function compareArrays(a1, a2) {
-    const s1 = new Set(a1);
-    const s2 = new Set(a2);
-
-    if (s1.size !== s2.size) {
-        return false;
+export function streamsAreEqual(a, b) {
+  // Check for stream keys
+  const aKeys = new Set(Object.keys(a));
+  const bKeys = new Set(Object.keys(b));
+  if (!compareSets(aKeys, bKeys)) return false;
+  // Check for stream ancestors
+  for (const [key, stream] of Object.entries(a)) {
+    if (JSON.stringify(stream?.ancestors) !== JSON.stringify(b[key]?.ancestors)) {
+      return false;
     }
+  }
+  return true
+}
 
-    for (const item of s1) {
-        if (!s2.has(item)) {
-            return false;
-        }
-    }
-    return true;
+function compareSets(a, b) {
+  return a.size === b.size &&
+    [...a].every((x) => b.has(x));
 }
 
 export const useStreams = (uid: string) => {
-  const [streams, setStreams] = useState([]);
-  // Monitor for new streams through websockets
-  const webSocket = useWebSocket;
+  const [streams, setStreams] = useState<{[key: string]: Stream}>({});
   // Watch for new runs coming from websockets
-  const url = makeWebsocketUrl(
-    `${tiledUri}stream/single/${uid}?envelope_format=msgpack`,
-  );
-  const { lastMessage, readyState } = webSocket(url);
-  // Decode the msgpack response
-  const [blob, setBlob] = useState<Blob>(new Blob());
-  const [message, setMessage] = useState<{ sequence?: number; key?: string }>(
-    {},
-  );
-  if (lastMessage?.data !== blob) {
-    setBlob(lastMessage?.data);
+  const url = `stream/single/${uid}?envelope_format=msgpack`;
+  const { payload, readyState } = useTiledWebSocket(url);
+  const wsStreams: {[key: string]: Stream} = {};
+  if (payload?.type === "container-child-created") {
+    wsStreams[payload.key] = {
+      ancestors: [uid],
+      structure_family: payload.structure_family,
+      specs: payload.specs,
+      data_keys: payload.metadata?.data_keys ?? {},
+      configuration: payload.metadata?.configuration ?? {},
+      hints: payload.metadata?.hints ?? {},
+      time: payload.time,
+      key: payload.key,
+      uid: payload.uid,
+    }
   }
-  useDecodeBlob(blob, setMessage);
-  const {data: oldStreams, isLoading, error} = useQuery({
+  // Get streams by HTTP request to compare
+  const {data: queryStreams, isLoading, error} = useQuery({
     queryFn: async() => {
       return await getStreams(uid)
     },
-    queryKey: [uid, message?.sequence],
+    queryKey: [uid],
   });
-  let newStreams;
-  if (message?.key != null) {
-    newStreams = [message.key, ...(oldStreams ?? streams)];
-  } else {
-    newStreams = oldStreams;
-  }
-  // Check if the list has changed
-  const arraysDiffer = (newStreams != null && !compareArrays(streams, newStreams));
-  if (arraysDiffer) {
+  // Check if the combined streams are different than what we had before
+  const newStreams = {...streams, ...queryStreams, ...wsStreams};
+  if (!streamsAreEqual(streams, newStreams)) {
+    // We have new entries, so update state
     setStreams(newStreams);
   }
   return {streams, isLoading};

@@ -1,4 +1,4 @@
-import { useLatestRun } from "../tiled/streaming";
+import { useLatestRun } from "../tiled";
 import { RunPlots } from "../catalog/run_plots";
 import type { webSocketMessage } from "../types";
 
@@ -8,21 +8,21 @@ export const LivePlot = ({
   beamlineId: string;
 }) => {
   // const sendMessage, lastMessage, readyState
-  const { latestUID } = useLatestRun({
+  const {run} = useLatestRun({
     beamlineId: beamlineId,
   });
   const plots =
-    latestUID == null ? (
+    run == null ? (
       <></>
     ) : (
       <RunPlots
-        uid={latestUID}
+        uid={run.key}
         plotStyle="lineplot"
       />
     );
   return (
     <>
-      <h1>{latestUID}</h1>
+      <h1>{run?.metadata?.start?.uid ?? ""}</h1>
       {plots}
     </>
   );

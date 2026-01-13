@@ -14,20 +14,19 @@ export const SignalPicker = ({
   error = false,
 }: {
   uid?: string;
-  stream: string;
+  stream: Stream;
   currentSignal?: string;
   onSignalChange?: ChangeEventHandler;
   disabled?: boolean;
   error?: boolean;
 }) => {
-  const { data } = useDataKeys(uid, stream);
-  let signals: string[];
-  if (data == null) {
-    signals = [];
-  } else {
-    signals = Object.keys(data);
+  // Prepare the list of signals from the stream's data keys
+  if (stream?.data_keys == null) {
+    console.error("Stream metadata did not contain data keys.", stream);
   }
+  let signals: string[] = Object.keys(stream?.data_keys ?? {});
   signals = signals.sort();
+  
   return (
     <select
       className={"select" + (error ? " border-yellow-400" : "")}

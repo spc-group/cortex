@@ -37,7 +37,6 @@ export function prepareYData(
       op = first;
       break;
   }
-
   const ydata = vdata.map(function (num, idx) {
     const rval = rdata != null ? rdata[idx] : 0;
     let val = op(num, rval);

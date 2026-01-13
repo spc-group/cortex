@@ -32,16 +32,31 @@ export interface SearchParams {
 }
 
 export interface Run {
-  "start.uid": string;
-  "start.plan_name": string;
-  "start.scan_name": string;
-  "start.sample_name": string;
-  "stop.exit_status": string;
-  "start.time": Date;
-  "start.proposal": string;
-  "start.esaf": string;
+  metadata: {
+    "start.uid": string;
+    "start.plan_name": string;
+    "start.scan_name": string;
+    "start.sample_name": string;
+    "stop.exit_status": string;
+    "start.time": Date;
+    "start.proposal": string;
+    "start.esaf": string;
+  };
+  key: string,
   specs: BlueskySpec[];
   structure_family: string;
+}
+
+export interface Stream {
+  ancestors: string[],
+  structure_family: string,
+  specs: BlueskySpec[],
+  data_keys: {[ key: string]: DataKey},
+  configuration: {[key: string]: object},
+  hints: {[ key: string]: {fields: string[]}},
+  time: number,
+  uid: string,
+  key: string,
 }
 
 export interface DataKey {

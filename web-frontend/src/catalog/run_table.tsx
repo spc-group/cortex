@@ -134,7 +134,7 @@ export default function RunTable({
             runs.map((run) => (
               <Row
                 run={run}
-                key={run["start.uid"]}
+                key={run.key}
                 onSelect={selectRun}
                 columns={columns}
               />
@@ -144,6 +144,7 @@ export default function RunTable({
   );
 }
 
+// A row in the run table for a given run
 export function Row({
   run,
   onSelect,
@@ -155,7 +156,7 @@ export function Row({
   columns: TableColumn[];
   apiUri?: string;
 }) {
-  // A row in the run table for a given run
+  
   // Handler for selecting a run
   const handleCheckboxChecked = (event: ChangeEvent<HTMLInputElement>) => {
     if (onSelect !== undefined) {
@@ -174,10 +175,10 @@ export function Row({
   if (!isLoading && !error) {
     const defaultFilename = (aliases: string[]) => {
       let fragments = [
-        run["start.uid"] === undefined ? null : run["start.uid"].split("-")[0],
-        run["start.sample_name"],
-        run["start.scan_name"],
-        run["start.plan_name"],
+        (run?.metadata?.start?.uid == null) ? null : run.metadata.start.uid.split("-")[0],
+        run.metadata.start.sample_name,
+        run.metadata.start.scan_name,
+        run.metadata.start.plan_name,
       ];
       fragments = fragments.filter((frag) => frag);
       const suffix = aliases.length > 0 ? `.${aliases[0]}` : "";
@@ -205,14 +206,25 @@ export function Row({
     }
   }
   // Prepare additional data
-  const uid = run["start.uid"];
-  const runUri = `${apiUri}container/full/${run["start.uid"]}`;
+  const uid = run.metadata.start.uid;
+  const runUri = `${apiUri}container/full/${run.key}`;
   const specs = run.specs === undefined ? [] : run.specs;
   const specNames = specs.map((spec: BlueskySpec) => spec.name);
   const dataSpecs = ["XASRun"];
   const isDataRun =
     specNames.filter((thisSpec: string) => dataSpecs.includes(thisSpec))
       .length > 0;
+
+  // Prepare the column data
+  const columnValues = {
+    "start.scan_name": run.metadata.start.scan_name,
+    "start.uid": run.metadata.start.uid,
+    "start.sample_name": run.metadata.start.sample_name,
+    "start.plan_name": run.metadata.start.plan_name,
+    "stop.exit_status": run.metadata.stop.exit_status,
+    "start.proposal": run.metadata.start.proposal_id,
+    "start.esaf": run.metadata.start.esaf_id,
+  }
 
   return (
     <tr>
@@ -238,7 +250,7 @@ export function Row({
           >
             {exportFormats.map((format) => {
               return (
-                <li key={`${run["start.uid"]}-${format.mimeType}`}>
+                <li key={`${run.metadata.start.uid}-${format.mimeType}`}>
                   <a
                     href={`${runUri}?format=${format.mimeType}`}
                     download={format.defaultFilename}
@@ -261,12 +273,12 @@ export function Row({
       </td>
 
       {columns.map((col: TableColumn) => {
-        const value = run[col.field];
+        const value = columnValues[col.field];
         let text: string;
         if (value instanceof Date) {
           text = value.toISOString().split("T").join(" ");
         } else {
-          text = String(run[col.field] ?? "");
+          text = String(value ?? "");
         }
         return (
           <td key={uid + col.name}>
