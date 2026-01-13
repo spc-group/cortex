@@ -243,10 +243,13 @@ export const StreamPlots = ({uid, stream, plotStyle}: {uid: string, stream: Stre
             Logarithm <InlineMath math="\big(\ln y\big)"/>
           </label>
           {/* Need to get a good gradient function. */}
-          <label className="label disabled">
-            <input type="checkbox" className="checkbox" checked={gradient} onChange={(e) => setGradient(e.target.checked)} />
-            Gradient <InlineMath math="\big(\frac{dy}{dx}\big)"/>
-          </label>
+          <div className="tooltip" data-tip="This feature is in development. Stay tuned.">
+            <label className="label disabled">
+              <input type="checkbox" className="checkbox" disabled checked={gradient} onChange={(e) => setGradient(e.target.checked)} />
+              Gradient <InlineMath math="\big(\frac{dy}{dx}\big)"/>
+            </label>
+          </div>
+    
         </div>
         {plot}
   

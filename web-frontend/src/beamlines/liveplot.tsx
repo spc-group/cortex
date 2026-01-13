@@ -22,7 +22,7 @@ export const LivePlot = ({
     );
   return (
     <>
-      <h1>{run?.metadata?.start?.uid ?? ""}</h1>
+      <h1>UID: {run?.metadata?.start?.uid ?? ""}</h1>
       {plots}
     </>
   );
