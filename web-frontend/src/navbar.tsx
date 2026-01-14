@@ -44,6 +44,8 @@ export default function Navbar() {
                   alt="Spectroscopy group logo"
                   src={logoUrl}
                   className="h-8 w-auto"
+                  /* Make the logo look different so we can tell if we're in the dev server */
+                  style={(import.meta.env.MODE == "development") ? {filter: "invert(1)"} : {}}
                 />
               </a>
             </div>
