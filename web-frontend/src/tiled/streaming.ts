@@ -57,7 +57,7 @@ export const makeWebsocketUrl = (httpUrl: string): string => {
     "https:": "wss:",
   }[url.protocol];
   if (newProtocol != null) {
-    url.protocol = newProtocol;    
+    url.protocol = newProtocol;
   }
   return url.href;
 };

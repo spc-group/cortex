@@ -7,10 +7,10 @@
     "dev": "vite",
     "lint": "eslint .",
     "test": "vitest",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && VITE_TILED_URI=https://cortex.xray.aps.anl.gov vite build",
     "preview": "vite preview",
     "pretty": "prettier src/ --write",
-    "deploy": "rsync -avP dist/ newton:/Public/docroot_cortex/app/"
+    "deploy": "rsync -avP dist/ cortex-server:/Public/docroot_cortex/app/"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
