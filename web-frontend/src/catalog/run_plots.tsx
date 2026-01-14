@@ -185,26 +185,36 @@ export const StreamPlots = ({
             <tr>
               <th>Horizontal:</th>
               <th>
-                <SignalPicker
-                  uid={uid}
-                  stream={stream}
-                  onSignalChange={(e) => {
-                    setXSignal((e.target as HTMLSelectElement).value);
-                  }}
-                />
+                <div className="tooltip" data-tip="Horizontal signal used for plotting.">
+                  <SignalPicker
+                    uid={uid}
+                    stream={stream}
+                    onSignalChange={(e) => {
+                      setXSignal((e.target as HTMLSelectElement).value);
+                    }}
+                  />
+                </div>
               </th>
             </tr>
             <tr>
-              <th>Vertical:</th>
+	      <th>Signal (S):</th>
               <th className="flex">
-                <SignalPicker
-                  uid={uid}
-                  stream={stream}
-                  error={needsVSignal}
-                  onSignalChange={(e) => {
+                <div className="tooltip" data-tip="Primary data signal (S) used for plotting.">
+                  <SignalPicker
+                    uid={uid}
+                    stream={stream}
+                    error={needsVSignal}
+                    onSignalChange={(e) => {
                     setVSignal((e.target as HTMLSelectElement).value);
-                  }}
-                />
+                    }}
+                    />
+		</div>
+
+	      </th>
+	    </tr>
+            <tr>
+              <th>Reference (R):</th>
+	      <th>
                 <select
                   className="select w-18 float-left"
                   value={operation}
@@ -219,34 +229,37 @@ export const StreamPlots = ({
                   <option>×</option>
                   <option>÷</option>
                 </select>
-                <SignalPicker
-                  disabled={referenceDisabled}
-                  uid={uid}
-                  stream={stream}
-                  error={needsRSignal}
-                  onSignalChange={(e) => {
-                    setRSignal((e.target as HTMLSelectElement).value);
-                  }}
-                />
-              </th>
-            </tr>
+                <div className="tooltip" data-tip="Reference signal (R) used for plotting.">
+                  <SignalPicker
+                    disabled={referenceDisabled}
+                    uid={uid}
+                    stream={stream}
+                    error={needsRSignal}
+                    onSignalChange={(e) => {
+                      setRSignal((e.target as HTMLSelectElement).value);
+                    }}
+                  />
+                </div>
+	      </th >
+	      </tr >
+
           </tbody>
         </table>
       </div>
       <div className="space-x-2">
         <span>Presets: </span>
         <button className="btn btn-soft" onClick={normalMode}>
-          <InlineMath math="V" />
+          <InlineMath math="S" />
         </button>
         <button className="btn btn-soft" onClick={fluoroMode}>
-          <InlineMath math="\frac{V}{R}" />
+          <InlineMath math="\frac{S}{R}" />
         </button>
         <button className="btn btn-soft" onClick={transMode}>
-          <InlineMath math="\ln \frac{R}{V}" />
+          <InlineMath math="\ln \frac{R}{S}" />
         </button>
       </div>
 
-      <div className="space-x-4">
+      <div className="space-x-4 m-2">
         <label className="label">
           <input
             type="checkbox"
@@ -263,7 +276,7 @@ export const StreamPlots = ({
             checked={logarithm}
             onChange={(e) => setLogarithm(e.target.checked)}
           />
-          Logarithm <InlineMath math="\big(\ln y\big)" />
+          Natural logarithm 
         </label>
         {/* Need to get a good gradient function. */}
         <div
@@ -278,7 +291,7 @@ export const StreamPlots = ({
               checked={gradient}
               onChange={(e) => setGradient(e.target.checked)}
             />
-            Gradient <InlineMath math="\big(\frac{dy}{dx}\big)" />
+            Derivative
           </label>
         </div>
       </div>
@@ -308,13 +321,12 @@ export function DataPlots({
 }) {
   // Open a websocket connection to listen for data updates
   const uid = stream.ancestors[0];
-  const streamKey = [...stream.ancestors.slice(1), stream.key].join("/");
-  const { sequence, readyState } = useLatestData(uid, streamKey);
+  const { sequence, readyState } = useLatestData(uid, stream.key);
 
   const { isLoading: isLoadingData, data } = useQuery({
     queryFn: async () =>
-      await getTableData(streamKey, uid, [xSignal, vSignal, rSignal]),
-    queryKey: ["table", streamKey, uid, xSignal, vSignal, rSignal, sequence],
+      await getTableData(stream.key, uid, [xSignal, vSignal, rSignal]),
+    queryKey: ["table", stream.key, uid, xSignal, vSignal, rSignal, sequence],
   });
   const { data: runMetadata } = useQuery({
     queryFn: async () => await getMetadata(uid),
