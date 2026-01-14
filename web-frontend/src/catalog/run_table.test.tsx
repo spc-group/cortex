@@ -36,8 +36,14 @@ describe("run table", () => {
   });
   it("creates rows for each run", () => {
     const runs = [
-      { "start.uid": "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa" },
-      { "start.uid": "391c9a55-8dfa-4faa-be49-e60140596b7c" },
+      {
+        key: 0,
+        metadata: { start: { uid: "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa" } },
+      },
+      {
+        key: 1,
+        metadata: { start: { uid: "391c9a55-8dfa-4faa-be49-e60140596b7c" } },
+      },
     ];
     render(
       <BrowserRouter>
@@ -54,7 +60,12 @@ describe("run table", () => {
   it("can (de)select a run", async () => {
     const selectRun = vi.fn(() => {});
     // Prepare the UI
-    const runs = [{ "start.uid": "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa" }];
+    const runs = [
+      {
+        key: "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa",
+        metadata: { start: { uid: "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa" } },
+      },
+    ];
     render(
       <BrowserRouter>
         <RunTable runs={runs} selectRun={selectRun} />
@@ -157,16 +168,22 @@ describe("run table row", () => {
   });
   it("shows export buttons", () => {
     const run = {
-      "start.uid": "883847",
-      "start.sample_name": "CrO3",
-      "start.scan_name": "NiK",
-      "start.plan_name": "xafs_scan",
       specs: [{ name: "XASRun", version: "1.0" }],
       structure_family: "container",
-      "stop.exit_status": "",
-      "start.time": new Date(),
-      "start.proposal": "",
-      "start.esaf": "",
+      metadata: {
+        start: {
+          uid: "883847",
+          sample_name: "CrO3",
+          scan_name: "NiK",
+          plan_name: "xafs_scan",
+          time: new Date(),
+          proposal: "",
+          esaf: "",
+        },
+        stop: {
+          exit_status: "",
+        },
+      },
     };
     render(
       <BrowserRouter>
@@ -194,14 +211,20 @@ describe("run table row", () => {
   });
   it("shows the data-run icon", () => {
     const run = {
-      "start.uid": "",
-      "start.plan_name": "",
-      "start.scan_name": "",
-      "start.sample_name": "",
-      "stop.exit_status": "",
-      "start.time": new Date(),
-      "start.proposal": "",
-      "start.esaf": "",
+      metadata: {
+        start: {
+          uid: "",
+          plan_name: "",
+          scan_name: "",
+          sample_name: "",
+          time: new Date(),
+          proposal: "",
+          esaf: "",
+        },
+        stop: {
+          exit_status: "",
+        },
+      },
       structure_family: "",
       specs: [
         {
@@ -227,16 +250,23 @@ describe("run table row", () => {
   });
   it("has the correct columns", () => {
     const run = {
-      "start.uid": "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa",
-      "start.plan_name": "rel_scan",
-      "start.scan_name": "copper tastic",
-      "start.sample_name": "SrN03",
-      "stop.exit_status": "success",
-      "start.time": new Date(0),
-      "start.proposal": "2",
-      "start.esaf": "13",
-      specs: [],
-      structure_family: "",
+      metadata: {
+        start: {
+          uid: "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa",
+          plan_name: "rel_scan",
+          scan_name: "copper tastic",
+          sample_name: "SrN03",
+
+          time: 0,
+          proposal_id: "2",
+          esaf_id: "13",
+        },
+        stop: {
+          exit_status: "success",
+        },
+        specs: [],
+        structure_family: "",
+      },
     };
     const columns = testColumns;
     render(

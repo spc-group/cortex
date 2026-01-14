@@ -2,13 +2,14 @@ import { decode, decodeAsync } from "@msgpack/msgpack";
 import { useState, useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 
-import { useRuns } from "./use_runs";
 import { tiledUri } from "./tiled_api";
-import type { webSocketMessage } from "./types";
 
 // Decode a msgpack formatted blob into a javascript object
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useDecodeBlob = (blob: Blob | null, setDecoded: (a: any) => void) => {
+export const useDecodeBlob = (
+  blob: Blob | null,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setDecoded: (a: any) => void,
+) => {
   useEffect(() => {
     const decodeFromBlob = async () => {
       let decoded: unknown;
@@ -27,14 +28,12 @@ export const useDecodeBlob = (blob: Blob | null, setDecoded: (a: any) => void) =
   }, [blob, setDecoded]);
 };
 
-export const useTiledWebSocket = (url) => {
+export const useTiledWebSocket = <T>(url: string) => {
   const wsUrl = makeWebsocketUrl(`${tiledUri}${url}`);
   const { lastMessage, readyState } = useWebSocket(wsUrl);
   // Hacky useEffect to decode the blob asynchronously
   const [blob, setBlob] = useState<Blob>(new Blob());
-  const [payload, setPayload] = useState<{ sequence?: number; key?: string }>(
-    {},
-  );
+  const [payload, setPayload] = useState<T>();
   if (lastMessage?.data !== blob) {
     setBlob(lastMessage?.data);
   }
@@ -44,8 +43,8 @@ export const useTiledWebSocket = (url) => {
     payload,
     readyState,
   };
-  return result
-}
+  return result;
+};
 
 // Convert a (maybe) http URL for the tiled server into a websocket
 // url.
@@ -58,11 +57,7 @@ export const makeWebsocketUrl = (httpUrl: string): string => {
   return url.href;
 };
 
-
-export const useLatestData = (
-  uid: string,
-  stream: string,
-) => {
+export const useLatestData = (uid: string, stream: string) => {
   const url = `stream/single/${uid}/${stream}/internal?envelope_format=msgpack`;
   const { lastMessage, readyState } = useTiledWebSocket(url);
   // Decode the msgpack response

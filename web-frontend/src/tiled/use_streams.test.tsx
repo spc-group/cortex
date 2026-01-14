@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom/vitest";
+import type { ReactElement } from "react";
 import { render, screen, cleanup, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router";
@@ -12,21 +13,20 @@ beforeEach(() => {
       ...(await importOriginal()),
       useQuery: () => ({
         data: {
-	  baseline: {
-	  }
-	},
-	isLoading: false,
+          baseline: {},
+        },
+        isLoading: false,
       }),
     };
   });
-  vi.mock("./streaming", async (importOriginal) => {
+  vi.mock("./streaming", async () => {
     return {
       useTiledWebSocket: () => ({
         payload: {
-	  "type": "container-child-created",
-	  "sequence": 1,
-	  "key": "primary",
-	},
+          type: "container-child-created",
+          sequence: 1,
+          key: "primary",
+        },
         readyState: 1,
       }),
     };
@@ -37,60 +37,68 @@ afterEach(() => {
   cleanup();
 });
 
-const doRender = (elem)=>{
+const doRender = (elem: ReactElement) => {
   const queryClient = new QueryClient();
-  return  render(
+  return render(
     <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        {elem}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{elem}</QueryClientProvider>
     </BrowserRouter>,
   );
 };
 
-const StreamsComponent = ({uid}) => {
-  const {streams} = useStreams(uid);
-  return (
-    Object.entries(streams).map(([key, stream]) => <div key={key}>{key}</div>)
-  );
+const StreamsComponent = ({ uid }: { uid: string }) => {
+  const { streams } = useStreams(uid);
+  return Object.entries(streams).map(([key]) => <div key={key}>{key}</div>);
 };
 
 describe("useStreams() hook", () => {
   it("returns stream names", async () => {
     await act(() => {
-      doRender(
-        <StreamsComponent uid="new_run" />
-      );
+      doRender(<StreamsComponent uid="new_run" />);
     });
     expect(screen.getByText("baseline")).toBeInTheDocument();
   });
   it("responds to websocket updates", async () => {
     await act(() => {
-      doRender(
-        <StreamsComponent uid="new_run" />
-      );
+      doRender(<StreamsComponent uid="new_run" />);
     });
     expect(screen.getByText("primary")).toBeInTheDocument();
-  });	    
+  });
 });
 
-describe('streamsAreEqual() test', () => {
+describe("streamsAreEqual() test", () => {
+  const emptyStream = {
+    structure_family: "",
+    specs: [],
+    data_keys: {},
+    configuration: {},
+    hints: {},
+    time: 0,
+    uid: "",
+    key: "",
+    ancestors: [],
+  };
   it("checks keys", () => {
-    const a = {'hello': 1};
-    const b = {'hello': 2};
+    const a = { hello: emptyStream };
+    const b = { hello: emptyStream };
     expect(streamsAreEqual(a, b)).toBeTruthy();
   });
   it("checks stream ancestors", () => {
-    const a = {'hello': {
-      ancestors: ['a'],
-    }};
-    const b = {'hello': {
-      ancestors: ['b'],
-    }};
+    const a = {
+      hello: {
+        ...emptyStream,
+        ancestors: ["a"],
+      },
+    };
+    const b = {
+      hello: {
+        ...emptyStream,
+        ancestors: ["b"],
+      },
+    };
     expect(streamsAreEqual(a, b)).toBeFalsy();
   });
 });
-
 
 // Websocket payload when new stream is added
 // {
@@ -238,7 +246,6 @@ describe('streamsAreEqual() test', () => {
 //     "data_sources": [],
 //     "access_blob": {}
 // }
-
 
 // HTTP GET response for search
 // /api/v1/search/3d811824-0747-44f9-b91d-05f7155f3a6d

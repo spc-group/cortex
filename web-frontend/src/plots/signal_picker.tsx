@@ -1,12 +1,8 @@
-// import { useState } from "react";
 import type { ChangeEventHandler } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getDataKeys } from "../tiled/tiled_api.ts";
-import { useDataKeys } from "../tiled/use_data_keys";
 
+import type { Stream } from "../types";
 
 export const SignalPicker = ({
-  uid,
   stream,
   currentSignal,
   onSignalChange,
@@ -26,7 +22,7 @@ export const SignalPicker = ({
   }
   let signals: string[] = Object.keys(stream?.data_keys ?? {});
   signals = signals.sort();
-  
+
   return (
     <select
       className={"select" + (error ? " border-yellow-400" : "")}

@@ -1,8 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import * as React from "react";
-import { Blob } from "buffer";
-import { encode } from "@msgpack/msgpack";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
@@ -18,33 +16,39 @@ beforeEach(() => {
     return {
       ...(await importOriginal()),
       useQuery: () => ({
-	isLoading: false,
-	error: null,
-	data: { uid: "hello" },
+        isLoading: false,
+        error: null,
+        data: { uid: "hello" },
       }),
     };
-  });  
+  });
   vi.mock(import("../tiled/use_streams"), () => {
     return {
       useStreams: () => {
-	return {streams: {primary: {}}};
+        return {
+          streams: {
+            primary: {
+              data_keys: {},
+            },
+          },
+        };
       },
     };
   });
   vi.mock(import("../tiled/use_data_keys"), () => {
     return {
       useDataKeys: () => {
-	return {sim_motor_2: {}};
+        return { sim_motor_2: {} };
       },
     };
   });
   vi.mock(import("../tiled/streaming"), () => {
     return {
       useLatestData: () => {
-	return {readyState: 1};
+        return { readyState: 1 };
       },
     };
-  });  
+  });
 });
 afterEach(() => {
   vi.restoreAllMocks();
@@ -52,7 +56,6 @@ afterEach(() => {
 });
 
 describe("the RunPlots component", () => {
-  const socket = vi.fn();
   beforeEach(async () => {
     const queryClient = new QueryClient();
     await React.act(async () => {
@@ -73,8 +76,8 @@ describe("the RunPlots component", () => {
 describe("the StreamPlots component", () => {
   const stream: Stream = {
     key: "primary",
-    data_keys: {"sim_motor_2": {}},
-  }
+    data_keys: { sim_motor_2: {} },
+  };
   beforeEach(async () => {
     await renderRouter(<StreamPlots uid={5} stream={stream} />);
   });
@@ -83,26 +86,27 @@ describe("the StreamPlots component", () => {
   });
 });
 
-const renderRouter = async(element) => {
-    const queryClient = new QueryClient();
-    await React.act(async () => {
-      render(
-        <BrowserRouter>
-          <QueryClientProvider client={queryClient}>
-            {element}
-          </QueryClientProvider>
-        </BrowserRouter>,
-      );
-    });    
-  
+const renderRouter = async (element) => {
+  const queryClient = new QueryClient();
+  await React.act(async () => {
+    render(
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          {element}
+        </QueryClientProvider>
+      </BrowserRouter>,
+    );
+  });
 };
 
 describe("the RunDataPlots component", () => {
   beforeEach(async () => {
-    await renderRouter(<DataPlots uid={5} />);
-  })
+    const stream = {
+      ancestors: ["12345-6789"],
+    };
+    await renderRouter(<DataPlots stream={stream} />);
+  });
   it("shows the 'live' badge", () => {
     expect(screen.getByText("Live")).toBeInTheDocument();
   });
-
 });

@@ -1,15 +1,19 @@
 import { useParams } from "react-router";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
 import { RunPlots } from "./run_plots";
 import { useMetadata } from "../tiled/use_metadata";
 
 export function Run() {
   const { uid, plotStyle } = useParams();
-  const { isLoading: isLoadingMetadata, data: metadata} = useMetadata(uid);
+  const { data: metadata } = useMetadata(uid);
   if (uid == null) {
     return (
       <div role="alert" className="alert alert-error">
-        <span>No UID provided.</span>
+        <span>
+          <ExclamationTriangleIcon className="size-4 inline" />
+          The uid <pre>{uid}</pre> is not available or not recognized.
+        </span>
       </div>
     );
   } else {
@@ -19,6 +23,6 @@ export function Run() {
         <h2>UID: {metadata?.start?.uid}</h2>
         <RunPlots uid={uid} plotStyle={plotStyle} />;
       </>
-    )
+    );
   }
 }

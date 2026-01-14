@@ -1,18 +1,25 @@
 import axios from "axios";
 import type { AxiosInstance } from "axios";
-import type { SearchParams, APIRun, DataKey } from "./types";
+import type { SearchParams, Run, DataKey, Stream, BlueskySpec } from "../types";
 import qs from "qs";
 
 const envHost = import.meta.env.VITE_TILED_URI;
 export const tiledHost = envHost ?? "http://127.0.0.1:0";
 export const tiledUri = tiledHost + "/api/v1/";
 
+interface APIRun {
+  id: string;
+  attributes: Run;
+}
+
 export const v1Client = axios.create({
   baseURL: tiledUri,
 });
 
 // Retrieve the info about API accepted formats, etc.
-export const getApiInfo = async ({client}: {client: AxiosInstance} = {}) => {
+export const getApiInfo = async ({
+  client,
+}: { client?: AxiosInstance } = {}) => {
   const client_ = client ?? v1Client;
   const response = await client_.get("");
   return response.data;
@@ -20,12 +27,13 @@ export const getApiInfo = async ({client}: {client: AxiosInstance} = {}) => {
 
 export const getMetadata = async (
   path: string,
-  client: AxiosInstance = v1Client,
+  { client }: { client?: AxiosInstance } = {},
 ) => {
+  const client_ = client ?? v1Client;
   if (path === null) {
     return {};
   }
-  const response = await client.get(`metadata/${encodeURIComponent(path)}`, {
+  const response = await client_.get(`metadata/${encodeURIComponent(path)}`, {
     params: {},
   });
   return response.data.data.attributes.metadata;
@@ -35,7 +43,7 @@ export const getMetadata = async (
 export const getDataKeys = async (
   uid: string,
   stream: string,
-  {client}: {client?: AxiosInstance} = {},
+  { client }: { client?: AxiosInstance } = {},
 ): Promise<{ [key: string]: DataKey }> => {
   const path = `${uid}/${stream}`;
   const client_ = client ?? v1Client;
@@ -80,7 +88,7 @@ export const prepareQueryParams = ({
 // Retrieve set of runs metadata from the API
 export const getRuns = async (
   searchParams: SearchParams,
-  {client}: {client: AxiosInstance} = {},
+  { client }: { client?: AxiosInstance } = {},
 ) => {
   const client_ = client ?? v1Client;
   const params = prepareQueryParams(searchParams);
@@ -90,9 +98,6 @@ export const getRuns = async (
   });
   // Parse into a sensible list defintion
   const runs = response.data.data.map((run: APIRun) => {
-    const start_doc = run.attributes.metadata.start;
-    const stop_doc = run.attributes.metadata.stop ?? {};
-    const date = new Date(start_doc.time * 1000);
     const specs = run.attributes.specs;
     return {
       metadata: run.attributes.metadata,
@@ -112,13 +117,13 @@ export const getTableData = async (
   uid?: string,
   columns?: string[],
   partition?: number,
-  {client} = {},
+  { client }: { client?: AxiosInstance } = {},
 ) => {
   if (uid == null || stream == null) {
     return {};
   }
   const client_ = client ?? v1Client;
-  const endpoint = (partition == null) ? "/table/full" : "/table/partition";
+  const endpoint = partition == null ? "/table/full" : "/table/partition";
   const queryParams: { column?: string[]; partition?: number } = {};
   if (columns != null) {
     queryParams.column = columns;
@@ -136,36 +141,53 @@ export const getTableData = async (
   return response.data;
 };
 
+type APIStream = {
+  data: {
+    id: string;
+    attributes: {
+      metadata: { [key: string]: object | string | number };
+      ancestors: string[];
+      structure_family: string;
+      specs: BlueskySpec[];
+    };
+  }[];
+};
 
-export const getStreams = async (uid: string, {client}={}): string[] => {
+export const getStreams = async (
+  uid: string,
+  { client }: { client?: AxiosInstance } = {},
+): Promise<{ [key: string]: Stream }> => {
   const client_ = client ?? v1Client;
-  const {data, status} = await client_.get(`search/${uid}`);
+  const { data } = await client_.get<APIStream>(`search/${uid}`);
   // Check if we are reading a legacy run with the old "streams" namespace
   let streamData = data.data;
   let streamPrefix = "";
   const streamNames = streamData.map((child) => child.id);
-  const hasStreamsNamespace = (JSON.stringify(streamNames) === '["streams"]');
+  const hasStreamsNamespace = JSON.stringify(streamNames) === '["streams"]';
   if (hasStreamsNamespace) {
-    const {data, status} = await client_.get(`search/${uid}/streams`);
+    const { data } = await client_.get(`search/${uid}/streams`);
     streamData = data.data;
     streamPrefix = "streams/";
   }
   // Convert to the internal Stream interface
   const streamEntries = streamData.map((datum) => {
     const attrs = datum.attributes;
-    const key = `${streamPrefix}${datum.id}`
-    return [key, {
-      key: key,
-      ancestors: attrs.ancestors,
-      structure_family: attrs.structure_family,
-      specs: attrs.specs,
-      data_keys: attrs.metadata.data_keys,
-      configuration: attrs.metadata.configuration,
-      hints: attrs.metadata.hints,
-      time: attrs.metadata.time,
-      uid: attrs.metadata.uid,
-    }]
+    const key = `${streamPrefix}${datum.id}`;
+    return [
+      key,
+      {
+        key: key,
+        ancestors: attrs.ancestors,
+        structure_family: attrs.structure_family,
+        specs: attrs.specs,
+        data_keys: attrs.metadata.data_keys,
+        configuration: attrs.metadata.configuration,
+        hints: attrs.metadata.hints,
+        time: attrs.metadata.time,
+        uid: attrs.metadata.uid,
+      },
+    ];
   });
   const streams = Object.fromEntries(streamEntries);
   return streams;
-}
+};

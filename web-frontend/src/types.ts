@@ -32,39 +32,65 @@ export interface SearchParams {
 }
 
 export interface Run {
-  metadata: {
-    "start.uid": string;
-    "start.plan_name": string;
-    "start.scan_name": string;
-    "start.sample_name": string;
-    "stop.exit_status": string;
-    "start.time": Date;
-    "start.proposal": string;
-    "start.esaf": string;
-  };
-  key: string,
-  specs: BlueskySpec[];
+  key: string;
+  ancestor: string[];
   structure_family: string;
+  specs: BlueskySpec[];
+  metadata: {
+    start: {
+      esaf_id: string;
+      proposal_id: string;
+      sample_name: string;
+      scan_name: string;
+      plan_name: string;
+      time: number;
+      uid: string;
+    };
+    stop: {
+      exit_status: string;
+    };
+  };
+  structure: {
+    data_type: {
+      endianess: string;
+      kind: string;
+      itemsize: number;
+      dt_units: string;
+    };
+    chunks: [[number]];
+    shape: [number];
+    dims: [string];
+    resizable: boolean;
+  };
 }
 
 export interface Stream {
-  ancestors: string[],
-  structure_family: string,
-  specs: BlueskySpec[],
-  data_keys: {[ key: string]: DataKey},
-  configuration: {[key: string]: object},
-  hints: {[ key: string]: {fields: string[]}},
-  time: number,
-  uid: string,
-  key: string,
+  ancestors: string[];
+  structure_family: string;
+  specs: BlueskySpec[];
+  data_keys: { [key: string]: DataKey };
+  configuration: { [key: string]: object };
+  hints: { [key: string]: { fields: string[] } };
+  time: number;
+  uid: string;
+  key: string;
+}
+
+export interface WebSocketNode {
+  key: string;
+  type: string;
+  sequence: number;
+  structure_family: string;
+  specs: BlueskySpec[];
+  metadata: { [key: string]: object | number | string };
 }
 
 export interface DataKey {
   // Description of a column/signal in a run.
   dtype: string;
   shape: number[];
-  units: string;
-  limits: {
+  units?: string;
+  limits?: {
     control: {
       low: number;
       high: number;
@@ -75,48 +101,14 @@ export interface DataKey {
     };
   };
   source: string;
-  precision: number;
-  dtype_numpy: string;
-  object_name: string;
+  precision?: number;
+  dtype_numpy?: string;
+  object_name?: string;
 }
 
 export interface BlueskySpec {
   name: string;
   version: string;
-}
-
-export interface APIRun {
-  id: string;
-  attributes: {
-    ancestor: string[];
-    structure_family: string;
-    specs: BlueskySpec[];
-    metadata: {
-      start: {
-        esaf: string;
-        proposal: string;
-        sample_name: string;
-        scan_name: string;
-        plan_name: string;
-        time: number;
-      };
-      stop: {
-        exit_status: string;
-      };
-    };
-    structure: {
-      data_type: {
-        endianess: string;
-        kind: string;
-        itemsize: number;
-        dt_units: string;
-      };
-      chunks: [[number]];
-      shape: [number];
-      dims: [string];
-      resizable: boolean;
-    };
-  };
 }
 
 export interface webSocketMessage {

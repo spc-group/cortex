@@ -1,14 +1,9 @@
-import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
-import {
-  ExclamationTriangleIcon,
-  SignalIcon,
-  SignalSlashIcon,
-} from "@heroicons/react/24/solid";
+import "katex/dist/katex.min.css";
+import { InlineMath } from "react-katex";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { NavLink } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ReadyState } from "react-use-websocket";
 
 import { LinePlot } from "../plots/lineplot";
 import { SignalPicker } from "../plots/signal_picker";
@@ -18,14 +13,11 @@ import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
 import { useLatestData } from "../tiled/streaming";
 import { useMetadata } from "../tiled/use_metadata";
-
-import type { webSocketMessage } from "../types";
-import {useStreams } from "../tiled/use_streams";
-
+import { useStreams } from "../tiled/use_streams";
+import type { Stream } from "../types";
 
 const NULL_SIGNAL = "---";
 const OPERATIONS = ["+", "−", "×", "÷"];
-
 
 export const RunPlots = ({
   uid,
@@ -39,10 +31,13 @@ export const RunPlots = ({
   const needsStream = streamName === NULL_SIGNAL;
   const { streams, isLoading: isLoadingStreams } = useStreams(uid);
   const streamNames = Object.keys(streams);
-  const stream = streams?.[streamName];
 
   // Select the primary stream by default
-  if (streamName === NULL_SIGNAL && !isLoadingStreams && streamNames.length > 0) {
+  if (
+    streamName === NULL_SIGNAL &&
+    !isLoadingStreams &&
+    streamNames.length > 0
+  ) {
     setStream(streamNames[0]);
   }
 
@@ -70,10 +65,14 @@ export const RunPlots = ({
     );
   } else {
     plot = (
-      <StreamPlots uid={uid} stream={streams?.[streamName] ?? {}} plotStyle={plotStyle} />
+      <StreamPlots
+        uid={uid}
+        stream={streams?.[streamName] ?? {}}
+        plotStyle={plotStyle ?? "lineplot"}
+      />
     );
   }
-  
+
   return (
     <div className="m-4">
       {/* Header for the run as a whole */}
@@ -92,9 +91,15 @@ export const RunPlots = ({
 
       <div>
         Stream:
-        <select className="select" value={streamName} onChange={(e) => {setStream(e.target.value)}}>
-          {streamNames.map( (stream) => {
-            return <option key={stream}>{stream}</option>
+        <select
+          className="select"
+          value={streamName}
+          onChange={(e) => {
+            setStream(e.target.value);
+          }}
+        >
+          {streamNames.map((stream) => {
+            return <option key={stream}>{stream}</option>;
           })}
         </select>
       </div>
@@ -104,11 +109,18 @@ export const RunPlots = ({
   );
 };
 
-
 // A react component to plot data for a given Bluesky run stream
 // @param uid - The unique ID for this run
 // @param stream - The stream name within this run to plot.
-export const StreamPlots = ({uid, stream, plotStyle}: {uid: string, stream: Stream, plotStyle: string}) => {
+export const StreamPlots = ({
+  uid,
+  stream,
+  plotStyle,
+}: {
+  uid: string;
+  stream: Stream;
+  plotStyle: string;
+}) => {
   const [xSignal, setXSignal] = useState(NULL_SIGNAL);
   const [vSignal, setVSignal] = useState(NULL_SIGNAL);
   const [rSignal, setRSignal] = useState(NULL_SIGNAL);
@@ -118,9 +130,10 @@ export const StreamPlots = ({uid, stream, plotStyle}: {uid: string, stream: Stre
   const [operation, setOperation] = useState("");
   const referenceDisabled = operation === "";
 
-    // Check for error conditions due to missing data signals
+  // Check for error conditions due to missing data signals
   const needsVSignal = vSignal === NULL_SIGNAL;
-  const needsRSignal = rSignal === NULL_SIGNAL && OPERATIONS.includes(operation);
+  const needsRSignal =
+    rSignal === NULL_SIGNAL && OPERATIONS.includes(operation);
 
   // Handlers for preset configuration
   const normalMode = () => {
@@ -150,113 +163,129 @@ export const StreamPlots = ({uid, stream, plotStyle}: {uid: string, stream: Stre
       </div>
     );
   } else {
-    plot = (<DataPlots uid={uid} stream={stream} xSignal={xSignal} vSignal={vSignal} rSignal={rSignal} plotStyle={plotStyle} operation={operation} inverted={inverted} logarithm={logarithm} />);
+    plot = (
+      <DataPlots
+        stream={stream}
+        xSignal={xSignal}
+        vSignal={vSignal}
+        rSignal={rSignal}
+        plotStyle={plotStyle}
+        operation={operation}
+        inverted={inverted}
+        logarithm={logarithm}
+      />
+    );
   }
 
   return (
-      <>
-        <div className="overflow-x-auto">
-          <table className="table table-sm max-w-md">
-            <tbody>
-              <tr>
-                <th>Horizontal:</th>
-                <th>
-                  <SignalPicker
-                    uid={uid}
-                    stream={stream}
-                    onSignalChange={(e) => {
-                      setXSignal((e.target as HTMLSelectElement).value);
-                    }}
-                  />
-                </th>
-              </tr>
-              <tr>
-                <th>Vertical:</th>
-                <th className="flex">
-                  <SignalPicker
-                    uid={uid}
-                    stream={stream}
-                    error={needsVSignal}
-                    onSignalChange={(e) => {
-                      setVSignal((e.target as HTMLSelectElement).value);
-                    }}
-                  />
-                  <select
-                    className="select w-18 float-left"
-                    value={operation}
-                    role="listbox"
-                    onChange={(e) => {
-                      setOperation((e.target as HTMLSelectElement).value);
-                    }}
-                  >
-                    <option></option>
-                    <option>+</option>
-                    <option>−</option>
-                    <option>×</option>
-                    <option>÷</option>
-                  </select>
-                  <SignalPicker
-                    disabled={referenceDisabled}
-                    uid={uid}
-                    stream={stream}
-                    error={needsRSignal}
-                    onSignalChange={(e) => {
-                      setRSignal((e.target as HTMLSelectElement).value);
-                    }}
-                  />
-                </th>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="space-x-2">
-          <span>Presets: </span>
-          <button className="btn btn-soft" onClick={normalMode}>
-            <InlineMath math="V"/>
-          </button>
-          <button className="btn btn-soft" onClick={fluoroMode}>
-            <InlineMath math="\frac{V}{R}"/>
-          </button>
-          <button className="btn btn-soft" onClick={transMode}>
-            <InlineMath math="\ln \frac{R}{V}"/>
-          </button>
+    <>
+      <div className="overflow-x-auto">
+        <table className="table table-sm max-w-md">
+          <tbody>
+            <tr>
+              <th>Horizontal:</th>
+              <th>
+                <SignalPicker
+                  uid={uid}
+                  stream={stream}
+                  onSignalChange={(e) => {
+                    setXSignal((e.target as HTMLSelectElement).value);
+                  }}
+                />
+              </th>
+            </tr>
+            <tr>
+              <th>Vertical:</th>
+              <th className="flex">
+                <SignalPicker
+                  uid={uid}
+                  stream={stream}
+                  error={needsVSignal}
+                  onSignalChange={(e) => {
+                    setVSignal((e.target as HTMLSelectElement).value);
+                  }}
+                />
+                <select
+                  className="select w-18 float-left"
+                  value={operation}
+                  role="listbox"
+                  onChange={(e) => {
+                    setOperation((e.target as HTMLSelectElement).value);
+                  }}
+                >
+                  <option></option>
+                  <option>+</option>
+                  <option>−</option>
+                  <option>×</option>
+                  <option>÷</option>
+                </select>
+                <SignalPicker
+                  disabled={referenceDisabled}
+                  uid={uid}
+                  stream={stream}
+                  error={needsRSignal}
+                  onSignalChange={(e) => {
+                    setRSignal((e.target as HTMLSelectElement).value);
+                  }}
+                />
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div className="space-x-2">
+        <span>Presets: </span>
+        <button className="btn btn-soft" onClick={normalMode}>
+          <InlineMath math="V" />
+        </button>
+        <button className="btn btn-soft" onClick={fluoroMode}>
+          <InlineMath math="\frac{V}{R}" />
+        </button>
+        <button className="btn btn-soft" onClick={transMode}>
+          <InlineMath math="\ln \frac{R}{V}" />
+        </button>
+      </div>
 
-        </div>
-
-        <div className="space-x-4">
-          <label className="label">
+      <div className="space-x-4">
+        <label className="label">
+          <input
+            type="checkbox"
+            className="checkbox"
+            checked={inverted}
+            onChange={(e) => setInverted(e.target.checked)}
+          />
+          Inverted <InlineMath math="\big(\frac{1}{y}\big)" />
+        </label>
+        <label className="label">
+          <input
+            type="checkbox"
+            className="checkbox"
+            checked={logarithm}
+            onChange={(e) => setLogarithm(e.target.checked)}
+          />
+          Logarithm <InlineMath math="\big(\ln y\big)" />
+        </label>
+        {/* Need to get a good gradient function. */}
+        <div
+          className="tooltip"
+          data-tip="This feature is in development. Stay tuned."
+        >
+          <label className="label disabled">
             <input
               type="checkbox"
               className="checkbox"
-              checked={inverted}
-              onChange={(e) => setInverted(e.target.checked)}
+              disabled
+              checked={gradient}
+              onChange={(e) => setGradient(e.target.checked)}
             />
-            Inverted <InlineMath math="\big(\frac{1}{y}\big)"/>
+            Gradient <InlineMath math="\big(\frac{dy}{dx}\big)" />
           </label>
-          <label className="label">
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={logarithm}
-              onChange={(e) => setLogarithm(e.target.checked)}
-            />
-            Logarithm <InlineMath math="\big(\ln y\big)"/>
-          </label>
-          {/* Need to get a good gradient function. */}
-          <div className="tooltip" data-tip="This feature is in development. Stay tuned.">
-            <label className="label disabled">
-              <input type="checkbox" className="checkbox" disabled checked={gradient} onChange={(e) => setGradient(e.target.checked)} />
-              Gradient <InlineMath math="\big(\frac{dy}{dx}\big)"/>
-            </label>
-          </div>
-    
         </div>
-        {plot}
-  
+      </div>
+      {plot}
     </>
   );
 };
-
 
 export function DataPlots({
   stream,
@@ -269,29 +298,30 @@ export function DataPlots({
   plotStyle,
 }: {
   stream: Stream;
-  xSignal: string,
-  vSignal: string,
-  rSignal: string,
-  operation: string,
-  inverted: boolean,
-  logarithm: boolean,
+  xSignal: string;
+  vSignal: string;
+  rSignal: string;
+  operation: string;
+  inverted: boolean;
+  logarithm: boolean;
   plotStyle?: string;
 }) {
   // Open a websocket connection to listen for data updates
   const uid = stream.ancestors[0];
-  const streamKey = [...stream.ancestors.slice(1), stream.key].join('/');
+  const streamKey = [...stream.ancestors.slice(1), stream.key].join("/");
   const { sequence, readyState } = useLatestData(uid, streamKey);
 
   const { isLoading: isLoadingData, data } = useQuery({
-    queryFn: async () => await getTableData(streamKey, uid, [xSignal, vSignal, rSignal]),
+    queryFn: async () =>
+      await getTableData(streamKey, uid, [xSignal, vSignal, rSignal]),
     queryKey: ["table", streamKey, uid, xSignal, vSignal, rSignal, sequence],
   });
-  const { isLoading: isLoadingMetadata, data: runMetadata } = useQuery({
+  const { data: runMetadata } = useQuery({
     queryFn: async () => await getMetadata(uid),
     queryKey: ["metadata", uid],
   });
-  const plotTitle = runMetadata?.start?.sample_name + " " + runMetadata?.start?.scan_name;
-
+  const plotTitle =
+    runMetadata?.start?.sample_name + " " + runMetadata?.start?.scan_name;
 
   // Process data into a form consumable by the plots
   let xdata, vdata, rdata;
@@ -324,9 +354,9 @@ export function DataPlots({
   }
   // Decide what kind of thing to show
   let widget;
-   if (isLoadingData) {
-     widget = <div className="skeleton h-112 w-175"></div>;
-   } else if (ydata == null) {
+  if (isLoadingData) {
+    widget = <div className="skeleton h-112 w-175"></div>;
+  } else if (ydata == null) {
     widget = (
       <div role="alert" className="m-2 alert alert-error alert-soft">
         <span>
@@ -346,11 +376,13 @@ export function DataPlots({
         title={plotTitle}
       />
     );
-  };
+  }
 
   return (
     <>
-      <div className="m-2"><LiveBadge readyState={readyState} /></div>
+      <div className="m-2">
+        <LiveBadge readyState={readyState} />
+      </div>
 
       <div role="tablist" className="tabs tabs-border">
         <NavLink to="../multiples" relative="path" role="tab" className="tab">

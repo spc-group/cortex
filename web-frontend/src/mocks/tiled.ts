@@ -14,7 +14,7 @@ export const searchJson = {
       attributes: {
         metadata: {
           start: {
-	    uid: "58839482",
+            uid: "58839482",
             time: 0,
           },
           stop: {
@@ -3422,212 +3422,206 @@ export const streamMetadataJson = {
 };
 
 const streamsMetadata = {
-  "data": [
+  data: [
     {
-      "id": "primary",
-      "attributes": {
-        "ancestors": [
-          "6bc6d326-d288-42c8-98d4-0f20f715fca1",
-          "streams"
-        ],
-        "structure_family": "container",
-        "specs": [
+      id: "primary",
+      attributes: {
+        ancestors: ["6bc6d326-d288-42c8-98d4-0f20f715fca1", "streams"],
+        structure_family: "container",
+        specs: [
           {
-            "name": "BlueskyEventStream",
-            "version": "3.0"
+            name: "BlueskyEventStream",
+            version: "3.0",
           },
           {
-            "name": "composite",
-            "version": null
-          }
-        ],
-        "metadata": {
-          "uid": "3bea507b-c00f-4a84-82ba-be08dc0eb9cf",
-          "time": 1767998299.2170787,
-          "hints": {
-            "sim_motor_2": {
-              "fields": [
-                "sim_motor_2"
-              ]
-            }
+            name: "composite",
+            version: null,
           },
-          "data_keys": {
-            "sim_motor_2": {
-              "dtype": "number",
-              "shape": [],
-              "units": "degrees",
-              "limits": {
-                "control": {
-                  "low": -300,
-                  "high": 1000
+        ],
+        metadata: {
+          uid: "3bea507b-c00f-4a84-82ba-be08dc0eb9cf",
+          time: 1767998299.2170787,
+          hints: {
+            sim_motor_2: {
+              fields: ["sim_motor_2"],
+            },
+          },
+          data_keys: {
+            sim_motor_2: {
+              dtype: "number",
+              shape: [],
+              units: "degrees",
+              limits: {
+                control: {
+                  low: -300,
+                  high: 1000,
                 },
-                "display": {
-                  "low": -300,
-                  "high": 1000
-                }
+                display: {
+                  low: -300,
+                  high: 1000,
+                },
               },
-              "source": "ca://25idd:simMotor:m2.RBV",
-              "precision": 5,
-              "dtype_numpy": "<f8",
-              "object_name": "sim_motor_2"
-            }
+              source: "ca://25idd:simMotor:m2.RBV",
+              precision: 5,
+              dtype_numpy: "<f8",
+              object_name: "sim_motor_2",
+            },
           },
-          "configuration": {
-            "sim_motor_2": {
-              "data": {
+          configuration: {
+            sim_motor_2: {
+              data: {
                 "sim_motor_2-offset": 0,
                 "sim_motor_2-velocity": 50,
                 "sim_motor_2-motor_egu": "degrees",
                 "sim_motor_2-offset_dir": "Pos",
-                "sim_motor_2-description": "sim_motor_2"
+                "sim_motor_2-description": "sim_motor_2",
               },
-              "data_keys": {
+              data_keys: {
                 "sim_motor_2-offset": {
-                  "dtype": "number",
-                  "shape": [],
-                  "units": "degrees",
-                  "limits": {
-                    "control": {
-                      "low": -9007199254740991,
-                      "high": 9007199254740991
+                  dtype: "number",
+                  shape: [],
+                  units: "degrees",
+                  limits: {
+                    control: {
+                      low: -9007199254740991,
+                      high: 9007199254740991,
                     },
-                    "display": {
-                      "low": -9007199254740991,
-                      "high": 9007199254740991
-                    }
+                    display: {
+                      low: -9007199254740991,
+                      high: 9007199254740991,
+                    },
                   },
-                  "source": "ca://25idd:simMotor:m2.OFF",
-                  "precision": 5,
-                  "dtype_numpy": "<f8"
+                  source: "ca://25idd:simMotor:m2.OFF",
+                  precision: 5,
+                  dtype_numpy: "<f8",
                 },
                 "sim_motor_2-velocity": {
-                  "dtype": "number",
-                  "shape": [],
-                  "units": "degrees",
-                  "limits": {
-                    "control": {
-                      "low": 0.1,
-                      "high": 0
+                  dtype: "number",
+                  shape: [],
+                  units: "degrees",
+                  limits: {
+                    control: {
+                      low: 0.1,
+                      high: 0,
                     },
-                    "display": {
-                      "low": 0.1,
-                      "high": 0
-                    }
+                    display: {
+                      low: 0.1,
+                      high: 0,
+                    },
                   },
-                  "source": "ca://25idd:simMotor:m2.VELO",
-                  "precision": 5,
-                  "dtype_numpy": "<f8"
+                  source: "ca://25idd:simMotor:m2.VELO",
+                  precision: 5,
+                  dtype_numpy: "<f8",
                 },
                 "sim_motor_2-motor_egu": {
-                  "dtype": "string",
-                  "shape": [],
-                  "source": "ca://25idd:simMotor:m2.EGU",
-                  "dtype_numpy": "|S40"
+                  dtype: "string",
+                  shape: [],
+                  source: "ca://25idd:simMotor:m2.EGU",
+                  dtype_numpy: "|S40",
                 },
                 "sim_motor_2-offset_dir": {
-                  "dtype": "string",
-                  "shape": [],
-                  "source": "ca://25idd:simMotor:m2.DIR",
-                  "choices": [
-                    "Pos",
-                    "Neg"
-                  ],
-                  "dtype_numpy": "|S40"
+                  dtype: "string",
+                  shape: [],
+                  source: "ca://25idd:simMotor:m2.DIR",
+                  choices: ["Pos", "Neg"],
+                  dtype_numpy: "|S40",
                 },
                 "sim_motor_2-description": {
-                  "dtype": "string",
-                  "shape": [],
-                  "source": "ca://25idd:simMotor:m2.DESC",
-                  "dtype_numpy": "|S40"
-                }
+                  dtype: "string",
+                  shape: [],
+                  source: "ca://25idd:simMotor:m2.DESC",
+                  dtype_numpy: "|S40",
+                },
               },
-              "timestamps": {
+              timestamps: {
                 "sim_motor_2-offset": 1767645177.199237,
                 "sim_motor_2-velocity": 1767645177.199237,
                 "sim_motor_2-motor_egu": 1767645177.199237,
                 "sim_motor_2-offset_dir": 1767645177.199237,
-                "sim_motor_2-description": 1767645177.199237
-              }
-            }
-          }
+                "sim_motor_2-description": 1767645177.199237,
+              },
+            },
+          },
         },
-        "structure": {
-          "contents": null,
-          "count": 1
+        structure: {
+          contents: null,
+          count: 1,
         },
-        "access_blob": {},
-        "sorting": [
+        access_blob: {},
+        sorting: [
           {
-            "key": "",
-            "direction": 1
-          }
+            key: "",
+            direction: 1,
+          },
         ],
-        "data_sources": null
+        data_sources: null,
       },
-      "links": {
-        "self": "http://fedorov.xray.aps.anl.gov:8022/api/v1/metadata/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams/primary",
-        "search": "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams/primary",
-        "full": "http://fedorov.xray.aps.anl.gov:8022/api/v1/container/full/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams/primary"
+      links: {
+        self: "http://fedorov.xray.aps.anl.gov:8022/api/v1/metadata/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams/primary",
+        search:
+          "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams/primary",
+        full: "http://fedorov.xray.aps.anl.gov:8022/api/v1/container/full/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams/primary",
       },
-      "meta": null
-    }
+      meta: null,
+    },
   ],
-  "error": null,
-  "links": {
-    "self": "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams?page[offset]=0&page[limit]=100",
-    "first": "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams?page[offset]=0&page[limit]=100",
-    "last": "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams?page[offset]=0&page[limit]=100",
-    "next": null,
-    "prev": null
+  error: null,
+  links: {
+    self: "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams?page[offset]=0&page[limit]=100",
+    first:
+      "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams?page[offset]=0&page[limit]=100",
+    last: "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams?page[offset]=0&page[limit]=100",
+    next: null,
+    prev: null,
   },
-  "meta": {
-    "count": 1
-  }
+  meta: {
+    count: 1,
+  },
 };
 
 const oldStreamsMetadata = {
-  "data": [
+  data: [
     {
-      "id": "streams",
-      "attributes": {
-	"ancestors": [
-	  "6bc6d326-d288-42c8-98d4-0f20f715fca1"
-	],
-	"structure_family": "container",
-	"specs": [],
-	"metadata": {},
-	"structure": {
-	  "contents": null,
-	  "count": 1
-	},
-	"access_blob": {},
-	"sorting": [
-	  {
-	    "key": "",
-	    "direction": 1
-	  }
-	],
-	"data_sources": null
+      id: "streams",
+      attributes: {
+        ancestors: ["6bc6d326-d288-42c8-98d4-0f20f715fca1"],
+        structure_family: "container",
+        specs: [],
+        metadata: {},
+        structure: {
+          contents: null,
+          count: 1,
+        },
+        access_blob: {},
+        sorting: [
+          {
+            key: "",
+            direction: 1,
+          },
+        ],
+        data_sources: null,
       },
-      "links": {
-	"self": "http://fedorov.xray.aps.anl.gov:8022/api/v1/metadata/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams",
-	"search": "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams",
-	"full": "http://fedorov.xray.aps.anl.gov:8022/api/v1/container/full/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams"
+      links: {
+        self: "http://fedorov.xray.aps.anl.gov:8022/api/v1/metadata/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams",
+        search:
+          "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams",
+        full: "http://fedorov.xray.aps.anl.gov:8022/api/v1/container/full/6bc6d326-d288-42c8-98d4-0f20f715fca1/streams",
       },
-      "meta": null
-    }
+      meta: null,
+    },
   ],
-  "error": null,
-  "links": {
-    "self": "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1?page[offset]=0&page[limit]=100",
-    "first": "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1?page[offset]=0&page[limit]=100",
-    "last": "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1?page[offset]=0&page[limit]=100",
-    "next": null,
-    "prev": null
+  error: null,
+  links: {
+    self: "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1?page[offset]=0&page[limit]=100",
+    first:
+      "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1?page[offset]=0&page[limit]=100",
+    last: "http://fedorov.xray.aps.anl.gov:8022/api/v1/search/6bc6d326-d288-42c8-98d4-0f20f715fca1?page[offset]=0&page[limit]=100",
+    next: null,
+    prev: null,
   },
-  "meta": {
-    "count": 1
-  }
+  meta: {
+    count: 1,
+  },
 };
 
 const tableData = {
@@ -3668,22 +3662,16 @@ export const handlers = [
       return HttpResponse.json(newData);
     },
   ),
-    // 	api/v1/search/%2F6bc6d326-d288-42c8-98d4-0f20f715fca1?fields=metadata&fields=structure_family&fields=structure&fields=count&fields=sorting&fields=specs&fields=data_sources&fields=access_blob&page%5Boffset%5D=0&sort=-start.time&omit_links=false&include_data_sources=false' \
-    http.get(
-	`${mockUrl}/search/new_run`, () => {
-	    return HttpResponse.json(streamsMetadata);
-	}
-    ),
-  http.get(
-	`${mockUrl}/search/legacy_run`, () => {
-	    return HttpResponse.json(oldStreamsMetadata);
-	}
-  ),
-  http.get(
-	`${mockUrl}/search/legacy_run/streams`, () => {
-	    return HttpResponse.json(streamsMetadata);
-	}
-    ),  
+  // 	api/v1/search/%2F6bc6d326-d288-42c8-98d4-0f20f715fca1?fields=metadata&fields=structure_family&fields=structure&fields=count&fields=sorting&fields=specs&fields=data_sources&fields=access_blob&page%5Boffset%5D=0&sort=-start.time&omit_links=false&include_data_sources=false' \
+  http.get(`${mockUrl}/search/new_run`, () => {
+    return HttpResponse.json(streamsMetadata);
+  }),
+  http.get(`${mockUrl}/search/legacy_run`, () => {
+    return HttpResponse.json(oldStreamsMetadata);
+  }),
+  http.get(`${mockUrl}/search/legacy_run/streams`, () => {
+    return HttpResponse.json(streamsMetadata);
+  }),
 ];
 
 export const server = setupServer(...handlers);

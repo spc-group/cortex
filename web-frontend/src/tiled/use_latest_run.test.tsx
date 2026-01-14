@@ -1,23 +1,23 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen, cleanup, act } from "@testing-library/react";
-import {vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
-import {useLatestRun} from ".";
+import { useLatestRun } from ".";
 
 beforeEach(() => {
   vi.mock("./streaming", () => {
     return {
       useTiledWebSocket: () => {
-	return {payload: {}}
+        return { payload: {} };
       },
     };
   });
   vi.mock("./use_runs", () => {
     return {
       useRuns: () => {
-	return {
-	  runs: [{metadata: {"start.uid": "my_run_uid"}}],
-	}
+        return {
+          runs: [{ metadata: { start: { uid: "my_run_uid" } } }],
+        };
       },
     };
   });
@@ -28,12 +28,9 @@ afterEach(() => {
 });
 
 const Run = () => {
-  const { uid } = useLatestRun();
-  return (
-    <>{uid}</>
-  );
+  const { run } = useLatestRun();
+  return <>{run.metadata.start.uid}</>;
 };
-
 
 describe("the useLatestRun() hook", () => {
   it("gets the last run from the API", () => {
@@ -41,13 +38,85 @@ describe("the useLatestRun() hook", () => {
     expect(screen.getByText("my_run_uid")).toBeInTheDocument();
   });
   it("updates based on websocket messages", () => {
-    vi.mock(import("./streaming"), () => {
+    vi.mock("./streaming", () => {
       return {
         useTiledWebSocket: () => {
-          return {payload: {sequence: 1}}
+          return { payload: { sequence: 1 } };
         },
       };
     });
     return render(<Run></Run>);
   });
 });
+
+// Example websocket message for new run being created
+// {
+//     "type": "container-child-created",
+//     "sequence": 3475,
+//     "timestamp": "2026-01-12T21:46:07.751846",
+//     "key": "6b757d2f-c0d0-4d9d-a0a3-4f1bcbe94c2e",
+//     "structure_family": "container",
+//     "specs": [
+//         {
+//             "name": "BlueskyRun",
+//             "version": "3.0"
+//         }
+//     ],
+//     "metadata": {
+//         "start": {
+//             "uid": "6b757d2f-c0d0-4d9d-a0a3-4f1bcbe94c2e",
+//             "time": 1768275967.7297194,
+//             "versions": {
+//                 "ophyd": "1.11.0",
+//                 "ophyd_async": "0.14.0",
+//                 "bluesky": "1.14.6"
+//             },
+//             "scan_id": 23,
+//             "plan_type": "generator",
+//             "plan_name": "scan",
+//             "detectors": [
+//                 "det"
+//             ],
+//             "motors": [
+//                 "stage-x"
+//             ],
+//             "num_points": 51,
+//             "num_intervals": 50,
+//             "plan_args": {
+//                 "detectors": [
+//                     "<ophyd_async.sim._point_detector.SimPointDetector object at 0x7f2eb8294da0>"
+//                 ],
+//                 "num": 51,
+//                 "args": [
+//                     "<ophyd_async.sim._motor.SimMotor object at 0x7f2eb82c6ba0>",
+//                     -10,
+//                     10
+//                 ],
+//                 "per_step": "None"
+//             },
+//             "hints": {
+//                 "dimensions": [
+//                     [
+//                         [
+//                             "stage-x"
+//                         ],
+//                         "primary"
+//                     ]
+//                 ]
+//             },
+//             "plan_pattern": "inner_product",
+//             "plan_pattern_module": "bluesky.plan_patterns",
+//             "plan_pattern_args": {
+//                 "num": 51,
+//                 "args": [
+//                     "<ophyd_async.sim._motor.SimMotor object at 0x7f2eb82c6ba0>",
+//                     -10,
+//                     10
+//                 ]
+//             },
+//             "beamline_id": "25-ID-C"
+//         }
+//     },
+//     "data_sources": [],
+//     "access_blob": {}
+// }

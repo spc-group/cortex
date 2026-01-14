@@ -156,11 +156,10 @@ export function Row({
   columns: TableColumn[];
   apiUri?: string;
 }) {
-  
   // Handler for selecting a run
   const handleCheckboxChecked = (event: ChangeEvent<HTMLInputElement>) => {
     if (onSelect !== undefined) {
-      onSelect(run["start.uid"], event.target.checked);
+      onSelect(run.metadata.start.uid, event.target.checked);
     }
   };
 
@@ -175,7 +174,9 @@ export function Row({
   if (!isLoading && !error) {
     const defaultFilename = (aliases: string[]) => {
       let fragments = [
-        (run?.metadata?.start?.uid == null) ? null : run.metadata.start.uid.split("-")[0],
+        run?.metadata?.start?.uid == null
+          ? null
+          : run.metadata.start.uid.split("-")[0],
         run.metadata.start.sample_name,
         run.metadata.start.scan_name,
         run.metadata.start.plan_name,
@@ -221,10 +222,12 @@ export function Row({
     "start.uid": run.metadata.start.uid,
     "start.sample_name": run.metadata.start.sample_name,
     "start.plan_name": run.metadata.start.plan_name,
-    "stop.exit_status": run.metadata.stop.exit_status,
+    "stop.exit_status": run.metadata.stop?.exit_status ?? "",
     "start.proposal": run.metadata.start.proposal_id,
     "start.esaf": run.metadata.start.esaf_id,
-  }
+    "start.time":
+      run.metadata.start.time != null ? new Date(run.metadata.start.time) : "",
+  };
 
   return (
     <tr>
@@ -271,8 +274,8 @@ export function Row({
           <BeakerIcon title="Data run icon" className="size-4" />
         )}
       </td>
-
       {columns.map((col: TableColumn) => {
+        // @ts-expect-error: no implicit any
         const value = columnValues[col.field];
         let text: string;
         if (value instanceof Date) {
