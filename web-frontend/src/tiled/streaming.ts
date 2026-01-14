@@ -46,14 +46,19 @@ export const useTiledWebSocket = <T>(url: string) => {
   return result;
 };
 
-// Convert a (maybe) http URL for the tiled server into a websocket
+// Convert a (maybe) http(s) URL for the tiled server into a websocket
 // url.
 // @param httpUrl: The HTTP equivalent url that will be parsed
 // @returns A similar URL but formatted to be a websocket (i.e. ws:// or wss://)
-
 export const makeWebsocketUrl = (httpUrl: string): string => {
   const url = new URL(httpUrl);
-  url.protocol = "ws";
+  const newProtocol = {
+    "http:": "ws:",
+    "https:": "wss:",
+  }[url.protocol];
+  if (newProtocol != null) {
+    url.protocol = newProtocol;    
+  }
   return url.href;
 };
 
