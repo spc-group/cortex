@@ -12,6 +12,8 @@ import { Link } from "react-router";
 import { tiledUri, getApiInfo } from "../tiled/tiled_api";
 import type { TableColumn, BlueskySpec, Run } from "../types";
 
+const seconds = 1000;  // Convert seconds to milliseconds
+
 const SortIcon = ({
   fieldName,
   sortField,
@@ -226,7 +228,7 @@ export function Row({
     "start.proposal": run.metadata.start.proposal_id,
     "start.esaf": run.metadata.start.esaf_id,
     "start.time":
-      run.metadata.start.time != null ? new Date(run.metadata.start.time) : "",
+      run.metadata.start.time != null ? new Date(run.metadata.start.time * seconds) : "",
   };
 
   return (
