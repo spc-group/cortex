@@ -7,7 +7,7 @@
     "dev": "vite",
     "lint": "eslint .",
     "test": "vitest",
-    "build": "tsc -b && VITE_TILED_URI=https://cortex.xray.aps.anl.gov vite build",
+    "build": "tsc -b && VITE_TILED_URI=https://tiled.xray.aps.anl.gov/spc vite build",
     "preview": "vite preview",
     "pretty": "prettier src/ --write",
     "deploy": "rsync -avP dist/ cortex-server:/Public/docroot_cortex/app/"
