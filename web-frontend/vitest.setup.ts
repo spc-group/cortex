@@ -1,6 +1,7 @@
 // vitest.setup.ts
 import { beforeAll, afterEach, afterAll } from 'vitest'
 import { server } from './src/mocks/tiled'
+import 'blob-polyfill';
 import 'vitest-canvas-mock';  // For using plotly in tests
 
 // Allow plotly.js to be used with jsdom

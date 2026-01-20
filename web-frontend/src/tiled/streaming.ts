@@ -5,22 +5,23 @@ import useWebSocket from "react-use-websocket";
 
 import { tiledUri } from "./tiled_api";
 
-type BlobLike = {
-  arrayBuffer?: () => Uint8Array;
+type RawMsgPack = {
+  payload?: Uint8Array;
+  mimetype?: string;
 };
 
 // Convert a msgpack payload into its native object equivalent
 // @param encoded - The msgpack'd binary data that will be encoded.
-export const decodeMsgPack = async (encoded: BlobLike) => {
-  let decoded: { payload?: Uint8Array; mimetype?: string };
+export const decodeMsgPack = async (encoded: Blob) => {
+  let decoded: RawMsgPack;
   if (encoded == null) {
-    decoded = null;
+    return null;
   } else if (encoded?.stream != null) {
     // Blob#stream(): ReadableStream<Uint8Array> (recommended)
-    decoded = await decodeAsync(encoded.stream());
+    decoded = (await decodeAsync(encoded.stream())) as RawMsgPack;
   } else {
     // Blob#arrayBuffer(): Promise<ArrayBuffer> (if stream() is not available)
-    decoded = decode(await encoded.arrayBuffer());
+    decoded = decode(await encoded.arrayBuffer()) as RawMsgPack;
   } //  else {
   //   // Just a regular array buffer (e.g. used in testing
   //   decoded = decode(encoded);
@@ -44,8 +45,7 @@ export const useDecodeBlob = (
   useEffect(() => {
     const decodeFromBlob = async () => {
       if (blob != null) {
-        // Ignore uses from before a blob is available.
-
+        // Ignore calls from before a blob is available.
         setDecoded(await decodeMsgPack(blob));
       }
     };

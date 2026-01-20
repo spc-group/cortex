@@ -166,18 +166,16 @@ export const getStreams = async (
   const { data } = await client_.get<APIStream>(`search/${uid}`);
   // Check if we are reading a legacy run with the old "streams" namespace
   let streamData = data.data;
-  let streamPrefix = "";
   const streamNames = streamData.map((child) => child.id);
   const hasStreamsNamespace = JSON.stringify(streamNames) === '["streams"]';
   if (hasStreamsNamespace) {
     const { data } = await client_.get(`search/${uid}/streams`);
     streamData = data.data;
-    streamPrefix = "streams/";
   }
   // Convert to the internal Stream interface
   const streamEntries = streamData.map((datum) => {
     const attrs = datum.attributes;
-    const key = `${streamPrefix}${datum.id}`;
+    const key = datum.id;
     return [
       key,
       {

@@ -127,7 +127,11 @@ describe("getStreams()", () => {
   });
   it("navigates the legacy 'streams' namespace", async () => {
     const streams = await getStreams("legacy_run", { client });
-    expect(Object.keys(streams)).toEqual(["streams/primary"]);
-    expect(streams["streams/primary"].key).toEqual("streams/primary");
+    expect(Object.keys(streams)).toEqual(["primary"]);
+    expect(streams["primary"].key).toEqual("primary");
+    expect(streams["primary"].ancestors).toEqual([
+      "6bc6d326-d288-42c8-98d4-0f20f715fca1",
+      "streams",
+    ]);
   });
 });

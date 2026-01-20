@@ -1,7 +1,6 @@
 import { tableFromArrays, tableToIPC, Table } from "apache-arrow";
 import { encode } from "@msgpack/msgpack";
 import { describe, it, expect } from "vitest";
-import { Blob } from "node:buffer";
 
 import { makeWebsocketUrl, decodeMsgPack } from "./streaming.ts";
 
@@ -20,8 +19,11 @@ describe("decodeMsgPack()", () => {
       mimetype: "application/vnd.apache.arrow.file",
     };
     const bytes = encode(obj);
-    const result = await decodeMsgPack(new Blob([bytes]));
-    const resultTable = result.payload as Table;
+    // Uses the blob-polyfill package to get around missing attributes
+    //   Pulled in through `vitest.setup.ts`
+    const blob = new Blob([bytes], { type: "application/octet-stream" });
+    const result = await decodeMsgPack(blob);
+    const resultTable = result?.payload as Table;
     expect(resultTable.toArray()).toEqual(table.toArray());
   });
 });
