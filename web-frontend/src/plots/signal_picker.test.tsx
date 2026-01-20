@@ -56,7 +56,7 @@ describe("the signal picker widget", () => {
     await React.act(async () => {
       render(
         <QueryClientProvider client={queryClient}>
-          <SignalPicker uid="93b837d" stream={stream} />
+          <SignalPicker dataKeys={stream.data_keys} />
         </QueryClientProvider>,
       );
     });
@@ -64,6 +64,6 @@ describe("the signal picker widget", () => {
 
   it("sets the values from datakeys", () => {
     const options = screen.getAllByRole("option");
-    expect(options.length).toEqual(5);
+    expect(options.length).toEqual(4);
   });
 });

@@ -1,3 +1,4 @@
+import { tableFromIPC } from "apache-arrow";
 import axios from "axios";
 import type { AxiosInstance } from "axios";
 import type { SearchParams, Run, DataKey, Stream, BlueskySpec } from "../types";
@@ -113,32 +114,36 @@ export const getRuns = async (
 };
 
 export const getTableData = async (
-  stream?: string,
-  uid?: string,
+  path: string,
   columns?: string[],
   partition?: number,
   { client }: { client?: AxiosInstance } = {},
 ) => {
-  if (uid == null || stream == null) {
-    return {};
-  }
   const client_ = client ?? v1Client;
   const endpoint = partition == null ? "/table/full" : "/table/partition";
-  const queryParams: { column?: string[]; partition?: number } = {};
+
+  const queryParams: { column?: string[]; partition?: number; format: string } =
+    {
+      format: "application/vnd.apache.arrow.file",
+      // format: "application/json",
+    };
   if (columns != null) {
-    queryParams.column = columns;
+    queryParams.column = columns.filter((col) => col !== "---");
   }
   if (partition != null) {
     queryParams.partition = partition;
   }
-  const uri = `${endpoint}/${uid}/${stream}/internal`;
+  const uri = `${endpoint}/${path}/internal`;
   const response = await client_.get(uri, {
     params: queryParams,
     paramsSerializer: (params) => {
       return qs.stringify(params, { indices: false });
     },
+    responseType: "arraybuffer",
   });
-  return response.data;
+  // Convert the raw data from a byte stream to a apache arrow table
+  const table = tableFromIPC(new Uint8Array(response.data));
+  return table;
 };
 
 type APIStream = {

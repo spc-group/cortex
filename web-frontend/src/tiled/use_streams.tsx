@@ -42,8 +42,7 @@ interface WebSocketStream extends WebSocketNode {
 export const useStreams = (uid: string) => {
   const [streams, setStreams] = useState<{ [key: string]: Stream }>({});
   // Watch for new runs coming from websockets
-  const url = `stream/single/${uid}?envelope_format=msgpack`;
-  const { payload, readyState } = useTiledWebSocket<WebSocketStream>(url);
+  const { payload, readyState } = useTiledWebSocket<WebSocketStream>(uid);
   const wsStreams: { [key: string]: Stream } = {};
   if (payload?.type === "container-child-created") {
     wsStreams[payload.key] = {

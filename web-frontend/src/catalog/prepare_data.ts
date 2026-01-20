@@ -5,8 +5,8 @@ const multiply = (a: number, b: number) => a * b;
 const divide = (a: number, b: number) => a / b;
 
 export function prepareYData(
-  vdata: number[],
-  rdata: number[],
+  vdata: number[] | null,
+  rdata: number[] | null,
   operation: string,
   { inverted, logarithm }: { inverted?: boolean; logarithm?: boolean } = {},
 ) {

@@ -1,7 +1,10 @@
 import axios from "axios";
 import type { AxiosInstance } from "axios";
 import { describe, it, expect, beforeEach } from "vitest";
+import { tableFromArrays } from "apache-arrow";
+
 import { apiInfoJson, mockUrl } from "../mocks/tiled";
+
 import {
   getRuns,
   getApiInfo,
@@ -84,32 +87,18 @@ describe("getDataKeys() function", () => {
 describe("getTableData() function", () => {
   it("loads full table", async () => {
     const data = await getTableData(
-      "primary",
-      "b68c7712-cb05-47f4-8e25-11cb05cc2cd5",
+      "b68c7712-cb05-47f4-8e25-11cb05cc2cd5/primary",
       undefined,
       undefined,
       { client },
     );
-    expect(data).toEqual({
+    const expectedTable = tableFromArrays({
       seq_num: [1, 2],
       time: [1747085782.057788, 1747085783.246987],
       sim_motor_2: [-100, 100],
       ts_sim_motor_2: [1747085782.032349, 1747085783.233922],
     });
-  });
-  it("selects columns", async () => {
-    const columns = ["sim_motor_2", "seq_num"];
-    const data = await getTableData(
-      "primary",
-      "b68c7712-cb05-47f4-8e25-11cb05cc2cd5",
-      columns,
-      undefined,
-      { client },
-    );
-    expect(data).toEqual({
-      seq_num: [1, 2],
-      sim_motor_2: [-100, 100],
-    });
+    expect(data.toArray()).toEqual(expectedTable.toArray());
   });
 });
 

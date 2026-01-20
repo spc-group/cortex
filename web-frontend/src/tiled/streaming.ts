@@ -1,8 +1,39 @@
+import { tableFromIPC } from "apache-arrow";
 import { decode, decodeAsync } from "@msgpack/msgpack";
 import { useState, useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 
 import { tiledUri } from "./tiled_api";
+
+type BlobLike = {
+  arrayBuffer?: () => Uint8Array;
+};
+
+// Convert a msgpack payload into its native object equivalent
+// @param encoded - The msgpack'd binary data that will be encoded.
+export const decodeMsgPack = async (encoded: BlobLike) => {
+  let decoded: { payload?: Uint8Array; mimetype?: string };
+  if (encoded == null) {
+    decoded = null;
+  } else if (encoded?.stream != null) {
+    // Blob#stream(): ReadableStream<Uint8Array> (recommended)
+    decoded = await decodeAsync(encoded.stream());
+  } else {
+    // Blob#arrayBuffer(): Promise<ArrayBuffer> (if stream() is not available)
+    decoded = decode(await encoded.arrayBuffer());
+  } //  else {
+  //   // Just a regular array buffer (e.g. used in testing
+  //   decoded = decode(encoded);
+  // }
+  // Decode the awkward array if present
+  if (decoded?.mimetype === "application/vnd.apache.arrow.file") {
+    return {
+      ...decoded,
+      payload: tableFromIPC(decoded.payload),
+    };
+  }
+  return decoded;
+};
 
 // Decode a msgpack formatted blob into a javascript object
 export const useDecodeBlob = (
@@ -12,24 +43,20 @@ export const useDecodeBlob = (
 ) => {
   useEffect(() => {
     const decodeFromBlob = async () => {
-      let decoded: unknown;
-      if (blob == null) {
-        decoded = null;
-      } else if (blob?.stream) {
-        // Blob#stream(): ReadableStream<Uint8Array> (recommended)
-        decoded = await decodeAsync(blob.stream());
-      } else {
-        // Blob#arrayBuffer(): Promise<ArrayBuffer> (if stream() is not available)
-        decoded = decode(await blob.arrayBuffer());
+      if (blob != null) {
+        // Ignore uses from before a blob is available.
+
+        setDecoded(await decodeMsgPack(blob));
       }
-      setDecoded(decoded);
     };
     decodeFromBlob();
   }, [blob, setDecoded]);
 };
 
-export const useTiledWebSocket = <T>(url: string) => {
-  const wsUrl = makeWebsocketUrl(`${tiledUri}${url}`);
+export const useTiledWebSocket = <T>(path: string) => {
+  const wsUrl = makeWebsocketUrl(
+    `${tiledUri}stream/single/${path}?envelope_format=msgpack`,
+  );
   const { lastMessage, readyState } = useWebSocket(wsUrl);
   // Hacky useEffect to decode the blob asynchronously
   const [blob, setBlob] = useState<Blob>(new Blob());
@@ -62,18 +89,21 @@ export const makeWebsocketUrl = (httpUrl: string): string => {
   return url.href;
 };
 
-export const useLatestData = (uid: string, stream: string) => {
-  const url = `stream/single/${uid}/${stream}/internal?envelope_format=msgpack`;
-  const { lastMessage, readyState } = useTiledWebSocket(url);
-  // Decode the msgpack response
-  const [blob, setBlob] = useState<Blob>(new Blob());
-  const [message, setMessage] = useState<{ sequence?: number } | null>(null);
-  if (lastMessage?.data !== blob) {
-    setBlob(lastMessage?.data);
-  }
-  useDecodeBlob(blob, setMessage);
-  return {
-    readyState: readyState,
-    sequence: message?.sequence ?? null,
-  };
-};
+// export const useLatestData = (uid: string, stream: string) => {
+//   const url = `stream/single/${uid}/${stream}/internal?envelope_format=msgpack`;
+//   const { lastMessage, readyState } = useTiledWebSocket(url);
+//   // Decode the msgpack response
+//   const [blob, setBlob] = useState<Blob>(new Blob());
+//   const [message, setMessage] = useState<{ sequence?: number } | null>(null);
+//   if (lastMessage?.data !== blob) {
+//     setBlob(lastMessage?.data);
+//   }
+//   useDecodeBlob(blob, setMessage);
+//   if (message?.type === "table-data") {
+//     console.log(message.payload.toArray());
+//   }
+//   return {
+//     readyState: readyState,
+//     sequence: message?.sequence ?? null,
+//   };
+// };

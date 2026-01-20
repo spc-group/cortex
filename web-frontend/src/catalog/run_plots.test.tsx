@@ -6,6 +6,8 @@ import { render, screen, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Table } from "apache-arrow";
+import { ReadyState } from "react-use-websocket";
 
 import { RunPlots, StreamPlots, DataPlots } from "./run_plots.tsx";
 
@@ -29,6 +31,7 @@ beforeEach(() => {
           streams: {
             primary: {
               data_keys: {},
+              ancestors: [],
             },
           },
         };
@@ -42,10 +45,13 @@ beforeEach(() => {
       },
     };
   });
-  vi.mock(import("../tiled/streaming"), () => {
+  vi.mock(import("../tiled/use_data_table"), () => {
     return {
-      useLatestData: () => {
-        return { readyState: 1 };
+      useDataTable: () => {
+        return {
+          table: new Table(),
+          readyState: ReadyState.OPEN,
+        };
       },
     };
   });

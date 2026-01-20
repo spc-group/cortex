@@ -8,3 +8,4 @@
 // - useDataKeys: Retrieves descriptions of the data keys for a given run/stream.
 
 export { useLatestRun } from "./use_latest_run";
+export { useDataTable } from "./use_data_table";

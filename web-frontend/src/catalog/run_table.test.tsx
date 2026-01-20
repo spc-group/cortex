@@ -284,7 +284,7 @@ describe("run table row", () => {
     expect(screen.getByText("rel_scan")).toBeInTheDocument();
     expect(screen.getByText("SrN03")).toBeInTheDocument();
     expect(screen.getByText("success")).toBeInTheDocument();
-    expect(screen.getByText("1970-01-01 00:00:00.000Z")).toBeInTheDocument();
+    expect(screen.getByText("1970-01-01 00:00")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("13")).toBeInTheDocument();
   });

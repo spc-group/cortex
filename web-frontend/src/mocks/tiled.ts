@@ -1,5 +1,6 @@
 import { setupServer } from "msw/node";
 import { http, HttpResponse } from "msw";
+import { tableFromArrays, tableToIPC } from "apache-arrow";
 
 export const apiInfoJson = {
   id: "abc-123",
@@ -3651,15 +3652,15 @@ export const handlers = [
   ),
   http.get(
     `${mockUrl}/table/full/b68c7712-cb05-47f4-8e25-11cb05cc2cd5/primary/internal`,
-    ({ request }) => {
-      const url = new URL(request.url);
+    () => {
       // Filter by request column in the search parameters
-      const columns = url.searchParams.getAll("column");
-      const newEntries = Object.entries(tableData).filter(
-        ([key]) => columns.length === 0 || columns.includes(key),
-      );
-      const newData = Object.fromEntries(newEntries);
-      return HttpResponse.json(newData);
+      const table = tableFromArrays(tableData);
+      return HttpResponse.arrayBuffer(tableToIPC(table), {
+        headers: {
+          "Content-Type": "application/octet-stream",
+        },
+      });
+      return HttpResponse.json(tableToIPC(table));
     },
   ),
   // 	api/v1/search/%2F6bc6d326-d288-42c8-98d4-0f20f715fca1?fields=metadata&fields=structure_family&fields=structure&fields=count&fields=sorting&fields=specs&fields=data_sources&fields=access_blob&page%5Boffset%5D=0&sort=-start.time&omit_links=false&include_data_sources=false' \

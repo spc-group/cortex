@@ -3,6 +3,7 @@ import { vi, expect, describe, beforeEach, it } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
+import { Table } from "apache-arrow";
 
 import { LivePlot } from "./liveplot";
 
@@ -29,6 +30,7 @@ beforeEach(() => {
           streams: {
             primary: {
               data_keys: {},
+              ancestors: ["b68c7712-cb05-47f4-8e25-11cb05cc2cd5"],
             },
           },
         };
@@ -39,6 +41,13 @@ beforeEach(() => {
     return {
       useMetadata: () => {
         return { data: { "start.scan_name": "my run" } };
+      },
+    };
+  });
+  vi.mock("../tiled/use_data_table", () => {
+    return {
+      useDataTable: () => {
+        return { table: new Table() };
       },
     };
   });

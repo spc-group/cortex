@@ -1,26 +1,22 @@
 import type { ChangeEventHandler } from "react";
 
-import type { Stream } from "../types";
+import type { DataKey } from "../types";
 
 export const SignalPicker = ({
-  stream,
+  dataKeys,
   currentSignal,
   onSignalChange,
   disabled = false,
   error = false,
 }: {
-  uid?: string;
-  stream: Stream;
+  dataKeys: { [key: string]: DataKey };
   currentSignal?: string;
   onSignalChange?: ChangeEventHandler;
   disabled?: boolean;
   error?: boolean;
 }) => {
   // Prepare the list of signals from the stream's data keys
-  if (stream?.data_keys == null) {
-    console.error("Stream metadata did not contain data keys.", stream);
-  }
-  let signals: string[] = Object.keys(stream?.data_keys ?? {});
+  let signals: string[] = Object.keys(dataKeys);
   signals = signals.sort();
 
   return (
@@ -31,7 +27,6 @@ export const SignalPicker = ({
       value={currentSignal}
       onChange={onSignalChange}
     >
-      <option>---</option>
       {signals.map(function (signal) {
         return <option key={signal}>{signal}</option>;
       })}

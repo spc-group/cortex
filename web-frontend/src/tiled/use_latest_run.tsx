@@ -7,7 +7,7 @@ export const useLatestRun = ({
 }: {
   beamlineId?: string;
 } = {}) => {
-  const url = "stream/single/?envelope_format=msgpack";
+  const url = "";
   const { payload, readyState } = useTiledWebSocket<WebSocketNode>(url);
   // Get the latest run through a regular query as a fallback
   const filters: { "start.beamline_id"?: string } = {};
@@ -25,7 +25,10 @@ export const useLatestRun = ({
     pageOffset: 0,
   });
   let run;
-  if (payload?.type === "container-child-created") {
+  if (
+    payload?.type === "container-child-created" ||
+    payload?.type === "container-child-metadata-updated"
+  ) {
     run = payload;
   } else if (isLoadingRuns || runCount === 0) {
     run = null;

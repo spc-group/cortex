@@ -3,21 +3,29 @@ import { InlineMath } from "react-katex";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { NavLink } from "react-router";
-import { useQuery } from "@tanstack/react-query";
 
 import { LinePlot } from "../plots/lineplot";
 import { SignalPicker } from "../plots/signal_picker";
-import { getTableData } from "../tiled/tiled_api";
-import { getMetadata } from "../tiled/tiled_api";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
-import { useLatestData } from "../tiled/streaming";
 import { useMetadata } from "../tiled/use_metadata";
 import { useStreams } from "../tiled/use_streams";
+import { useDataTable } from "../tiled";
 import type { Stream } from "../types";
 
 const NULL_SIGNAL = "---";
 const OPERATIONS = ["+", "−", "×", "÷"];
+
+const toNumberArray = (intArray: BigInt64Array) => {
+  const numberArray = [];
+  if (intArray == null) {
+    return intArray;
+  }
+  for (const n of intArray) {
+    numberArray.push(Number(n));
+  }
+  return numberArray;
+};
 
 export const RunPlots = ({
   uid,
@@ -28,7 +36,6 @@ export const RunPlots = ({
 }) => {
   // Get the valid streams for this run
   const [streamName, setStream] = useState(NULL_SIGNAL);
-  const needsStream = streamName === NULL_SIGNAL;
   const { streams, isLoading: isLoadingStreams } = useStreams(uid);
   const streamNames = Object.keys(streams);
 
@@ -44,9 +51,8 @@ export const RunPlots = ({
   // Retrieve metadata and data keys for this dataset
   const { isLoading: isLoadingMetadata, data: runMetadata } = useMetadata(uid);
 
-  let plot;
   if (uid === undefined) {
-    plot = (
+    return (
       <div role="alert" className="m-2 alert alert-error alert-soft">
         <span>
           <ExclamationTriangleIcon className="size-4 inline" /> No UID was
@@ -54,25 +60,7 @@ export const RunPlots = ({
         </span>
       </div>
     );
-  } else if (needsStream) {
-    plot = (
-      <div role="alert" className="m-2 alert alert-warning alert-soft">
-        <span>
-          <ExclamationTriangleIcon className="size-4 inline" /> Select signals
-          above to plot.
-        </span>
-      </div>
-    );
-  } else {
-    plot = (
-      <StreamPlots
-        uid={uid}
-        stream={streams?.[streamName] ?? {}}
-        plotStyle={plotStyle ?? "lineplot"}
-      />
-    );
   }
-
   return (
     <div className="m-4">
       {/* Header for the run as a whole */}
@@ -104,7 +92,13 @@ export const RunPlots = ({
         </select>
       </div>
 
-      {plot}
+      <StreamPlots
+        stream={streams?.[streamName] ?? null}
+        plotStyle={plotStyle ?? "lineplot"}
+        plotTitle={`${runMetadata?.start?.sample_name} - ${runMetadata?.start?.scan_name}`}
+        plotSubtitle={`${runMetadata?.start?.uid ?? ""}`}
+        key={runMetadata?.start?.uid ?? null}
+      />
     </div>
   );
 };
@@ -113,22 +107,31 @@ export const RunPlots = ({
 // @param uid - The unique ID for this run
 // @param stream - The stream name within this run to plot.
 export const StreamPlots = ({
-  uid,
   stream,
   plotStyle,
+  plotTitle,
+  plotSubtitle,
 }: {
-  uid: string;
   stream: Stream;
   plotStyle: string;
+  plotTitle: string;
+  plotSubtitle: string;
 }) => {
-  const [xSignal, setXSignal] = useState(NULL_SIGNAL);
-  const [vSignal, setVSignal] = useState(NULL_SIGNAL);
-  const [rSignal, setRSignal] = useState(NULL_SIGNAL);
+  const [xSignal, setXSignal] = useState<string | null>(null);
+  const [vSignal, setVSignal] = useState<string | null>(null);
+  const [rSignal, setRSignal] = useState<string | null>(null);
   const [inverted, setInverted] = useState(false);
   const [logarithm, setLogarithm] = useState(false);
   const [gradient, setGradient] = useState(false);
   const [operation, setOperation] = useState("");
   const referenceDisabled = operation === "";
+
+  const dataKeyNames = Object.keys(stream?.data_keys ?? {});
+  if (dataKeyNames.length > 0) {
+    if (xSignal == null) setXSignal(dataKeyNames[0]);
+    if (vSignal == null) setVSignal(dataKeyNames[0]);
+    if (rSignal == null) setRSignal(dataKeyNames[0]);
+  }
 
   // Check for error conditions due to missing data signals
   const needsVSignal = vSignal === NULL_SIGNAL;
@@ -152,28 +155,26 @@ export const StreamPlots = ({
     setOperation("÷");
   };
 
-  let plot;
+  if (stream == null) {
+    return (
+      <div role="alert" className="m-2 alert alert-warning alert-soft">
+        <span>
+          <ExclamationTriangleIcon className="size-4 inline" /> No stream is
+          selected.
+        </span>
+      </div>
+    );
+  }
+
+  let infoWidget;
   if (needsVSignal || needsRSignal) {
-    plot = (
+    infoWidget = (
       <div role="alert" className="m-2 alert alert-warning alert-soft">
         <span>
           <ExclamationTriangleIcon className="size-4 inline" /> Select signals
           above to plot.
         </span>
       </div>
-    );
-  } else {
-    plot = (
-      <DataPlots
-        stream={stream}
-        xSignal={xSignal}
-        vSignal={vSignal}
-        rSignal={rSignal}
-        plotStyle={plotStyle}
-        operation={operation}
-        inverted={inverted}
-        logarithm={logarithm}
-      />
     );
   }
 
@@ -185,10 +186,12 @@ export const StreamPlots = ({
             <tr>
               <th>Horizontal:</th>
               <th>
-                <div className="tooltip" data-tip="Horizontal signal used for plotting.">
+                <div
+                  className="tooltip"
+                  data-tip="Horizontal signal used for plotting."
+                >
                   <SignalPicker
-                    uid={uid}
-                    stream={stream}
+                    dataKeys={stream.data_keys}
                     onSignalChange={(e) => {
                       setXSignal((e.target as HTMLSelectElement).value);
                     }}
@@ -197,24 +200,25 @@ export const StreamPlots = ({
               </th>
             </tr>
             <tr>
-	      <th>Signal (S):</th>
+              <th>Signal (S):</th>
               <th className="flex">
-                <div className="tooltip" data-tip="Primary data signal (S) used for plotting.">
+                <div
+                  className="tooltip"
+                  data-tip="Primary data signal (S) used for plotting."
+                >
                   <SignalPicker
-                    uid={uid}
-                    stream={stream}
+                    dataKeys={stream.data_keys}
                     error={needsVSignal}
                     onSignalChange={(e) => {
-                    setVSignal((e.target as HTMLSelectElement).value);
+                      setVSignal((e.target as HTMLSelectElement).value);
                     }}
-                    />
-		</div>
-
-	      </th>
-	    </tr>
+                  />
+                </div>
+              </th>
+            </tr>
             <tr>
               <th>Reference (R):</th>
-	      <th>
+              <th>
                 <select
                   className="select w-18 float-left"
                   value={operation}
@@ -229,20 +233,21 @@ export const StreamPlots = ({
                   <option>×</option>
                   <option>÷</option>
                 </select>
-                <div className="tooltip" data-tip="Reference signal (R) used for plotting.">
+                <div
+                  className="tooltip"
+                  data-tip="Reference signal (R) used for plotting."
+                >
                   <SignalPicker
                     disabled={referenceDisabled}
-                    uid={uid}
-                    stream={stream}
+                    dataKeys={stream.data_keys}
                     error={needsRSignal}
                     onSignalChange={(e) => {
                       setRSignal((e.target as HTMLSelectElement).value);
                     }}
                   />
                 </div>
-	      </th >
-	      </tr >
-
+              </th>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -276,7 +281,7 @@ export const StreamPlots = ({
             checked={logarithm}
             onChange={(e) => setLogarithm(e.target.checked)}
           />
-          Natural logarithm 
+          Natural logarithm
         </label>
         {/* Need to get a good gradient function. */}
         <div
@@ -295,7 +300,25 @@ export const StreamPlots = ({
           </label>
         </div>
       </div>
-      {plot}
+
+      {infoWidget}
+      {stream == null ? (
+        <></>
+      ) : (
+        <DataPlots
+          stream={stream}
+          xSignal={xSignal}
+          vSignal={vSignal}
+          rSignal={rSignal}
+          plotStyle={plotStyle}
+          operation={operation}
+          inverted={inverted}
+          logarithm={logarithm}
+          plotTitle={plotTitle}
+          plotSubtitle={plotSubtitle}
+          key={stream.uid}
+        />
+      )}
     </>
   );
 };
@@ -309,42 +332,40 @@ export function DataPlots({
   inverted,
   logarithm,
   plotStyle,
+  plotTitle,
+  plotSubtitle,
 }: {
   stream: Stream;
-  xSignal: string;
-  vSignal: string;
-  rSignal: string;
+  xSignal: string | null;
+  vSignal: string | null;
+  rSignal: string | null;
   operation: string;
   inverted: boolean;
   logarithm: boolean;
   plotStyle?: string;
+  plotTitle?: string;
+  plotSubtitle?: string;
 }) {
   // Open a websocket connection to listen for data updates
-  const uid = stream.ancestors[0];
-  const { sequence, readyState } = useLatestData(uid, stream.key);
-
-  const { isLoading: isLoadingData, data } = useQuery({
-    queryFn: async () =>
-      await getTableData(stream.key, uid, [xSignal, vSignal, rSignal]),
-    queryKey: ["table", stream.key, uid, xSignal, vSignal, rSignal, sequence],
-  });
-  const { data: runMetadata } = useQuery({
-    queryFn: async () => await getMetadata(uid),
-    queryKey: ["metadata", uid],
-  });
-  const plotTitle =
-    runMetadata?.start?.sample_name + " " + runMetadata?.start?.scan_name;
+  const {
+    isLoading: isLoadingData,
+    readyState,
+    table: data,
+  } = useDataTable(stream);
 
   // Process data into a form consumable by the plots
   let xdata, vdata, rdata;
-  if (isLoadingData) {
+  if (isLoadingData || data == null) {
     xdata = null;
     vdata = null;
     rdata = null;
   } else {
-    xdata = xSignal !== NULL_SIGNAL ? data[xSignal] : null;
-    vdata = vSignal !== NULL_SIGNAL ? data[vSignal] : null;
-    rdata = rSignal !== NULL_SIGNAL ? data[rSignal] : null;
+    xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
+    xdata = toNumberArray(xdata);
+    vdata = vSignal != null ? data.getChild(vSignal)?.toArray() : null;
+    vdata = toNumberArray(vdata);
+    rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
+    rdata = toNumberArray(rdata);
   }
 
   // Apply reference correction and processing steps
@@ -372,8 +393,8 @@ export function DataPlots({
     widget = (
       <div role="alert" className="m-2 alert alert-error alert-soft">
         <span>
-          <ExclamationTriangleIcon className="size-4 inline" /> An unknown error
-          has occurred.
+          <ExclamationTriangleIcon className="size-4 inline" /> No plottable
+          data are available.
         </span>
       </div>
     );
@@ -382,10 +403,10 @@ export function DataPlots({
       <LinePlot
         xdata={xdata}
         ydata={ydata}
-        uid={uid}
-        xlabel={xSignal}
-        ylabel={ylabel}
+        xlabel={xSignal ?? ""}
+        ylabel={ylabel ?? ""}
         title={plotTitle}
+        subtitle={plotSubtitle}
       />
     );
   }

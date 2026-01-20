@@ -12,7 +12,7 @@ import { Link } from "react-router";
 import { tiledUri, getApiInfo } from "../tiled/tiled_api";
 import type { TableColumn, BlueskySpec, Run } from "../types";
 
-const seconds = 1000;  // Convert seconds to milliseconds
+const seconds = 1000; // Convert seconds to milliseconds
 
 const SortIcon = ({
   fieldName,
@@ -228,7 +228,9 @@ export function Row({
     "start.proposal": run.metadata.start.proposal_id,
     "start.esaf": run.metadata.start.esaf_id,
     "start.time":
-      run.metadata.start.time != null ? new Date(run.metadata.start.time * seconds) : "",
+      run.metadata.start.time != null
+        ? new Date(run.metadata.start.time * seconds)
+        : "",
   };
 
   return (
@@ -281,7 +283,8 @@ export function Row({
         const value = columnValues[col.field];
         let text: string;
         if (value instanceof Date) {
-          text = value.toISOString().split("T").join(" ");
+          text = `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+          text += ` ${String(value.getHours()).padStart(2, "0")}:${String(value.getMinutes()).padStart(2, "0")}`;
         } else {
           text = String(value ?? "");
         }
