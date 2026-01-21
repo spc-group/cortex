@@ -175,6 +175,7 @@ export const getStreams = async (
   // Convert to the internal Stream interface
   const streamEntries = streamData.map((datum) => {
     const attrs = datum.attributes;
+
     const key = datum.id;
     return [
       key,

@@ -290,7 +290,7 @@ export function Row({
         }
         return (
           <td key={uid + col.name}>
-            <Link to={uid + "/lineplot"}>{text ?? ""}</Link>
+            <Link to={uid}>{text ?? ""}</Link>
           </td>
         );
       })}

@@ -83,6 +83,7 @@ describe("the StreamPlots component", () => {
   const stream: Stream = {
     key: "primary",
     data_keys: { sim_motor_2: {} },
+    ancestors: [],
   };
   beforeEach(async () => {
     await renderRouter(<StreamPlots uid={5} stream={stream} />);

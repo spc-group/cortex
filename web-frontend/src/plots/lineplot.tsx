@@ -1,4 +1,5 @@
 import type { Data } from "plotly.js";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import Plot from "react-plotly.js";
 
 export const LinePlot = ({
@@ -33,6 +34,17 @@ export const LinePlot = ({
   }
 
   const xtext = xlabel === "---" ? "Index" : xlabel;
+  // Show an error if no data are available
+  if (plotData.length === 0) {
+    return (
+      <div role="alert" className="m-2 alert alert-error alert-soft">
+        <span>
+          <ExclamationTriangleIcon className="size-4 inline" /> No plottable
+          data are available.
+        </span>
+      </div>
+    );
+  }
   return (
     <>
       <Plot

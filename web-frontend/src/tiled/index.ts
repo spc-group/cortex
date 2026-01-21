@@ -5,7 +5,10 @@
 //
 // - useLatestRun: Retrieve the latest UID for a given beamline, updates via websockets.
 // - useStreams: Retrieve the list of valid streams for a given run, updates via websockets.
-// - useDataKeys: Retrieves descriptions of the data keys for a given run/stream.
+// - useDataTable: Retrieve a table of internal data for a given stream, updates via websockets.
+// - useDataArray: Retrieve a data array for a given dataset (array adapter), updates via websockets.
 
 export { useLatestRun } from "./use_latest_run";
 export { useDataTable } from "./use_data_table";
+export { useFrame } from "./array";
+export { useStreams } from "./use_streams";

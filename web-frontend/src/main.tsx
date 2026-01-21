@@ -18,10 +18,10 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/catalog" element={<RunList />} />
-          <Route path="/catalog/:uid/:plotStyle?" element={<Run />} />
+          <Route path="/catalog/:uid" element={<Run />} />
           <Route path="/beamlines" element={<BeamlinePanels />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
-  </StrictMode>,
+  </StrictMode>
 );

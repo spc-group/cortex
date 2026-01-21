@@ -2,15 +2,14 @@ import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
-import { NavLink } from "react-router";
 
-import { LinePlot } from "../plots/lineplot";
+import { LinePlot } from "../plots";
+// import { GridPlot } from "../plots";
 import { SignalPicker } from "../plots/signal_picker";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
 import { useMetadata } from "../tiled/use_metadata";
-import { useStreams } from "../tiled/use_streams";
-import { useDataTable } from "../tiled";
+import { useDataTable, useStreams } from "../tiled";
 import type { Stream } from "../types";
 
 const NULL_SIGNAL = "---";
@@ -331,7 +330,6 @@ export function DataPlots({
   operation,
   inverted,
   logarithm,
-  plotStyle,
   plotTitle,
   plotSubtitle,
 }: {
@@ -346,12 +344,14 @@ export function DataPlots({
   plotTitle?: string;
   plotSubtitle?: string;
 }) {
-  // Open a websocket connection to listen for data updates
+  // Open connections to listen for latest data
   const {
     isLoading: isLoadingData,
     readyState,
     table: data,
   } = useDataTable(stream);
+
+  // const arrayPath = [...stream.ancestors, stream.key, vSignal].join('/');
 
   // Process data into a form consumable by the plots
   let xdata, vdata, rdata;
@@ -388,27 +388,7 @@ export function DataPlots({
   // Decide what kind of thing to show
   let widget;
   if (isLoadingData) {
-    widget = <div className="skeleton h-112 w-175"></div>;
-  } else if (ydata == null) {
-    widget = (
-      <div role="alert" className="m-2 alert alert-error alert-soft">
-        <span>
-          <ExclamationTriangleIcon className="size-4 inline" /> No plottable
-          data are available.
-        </span>
-      </div>
-    );
-  } else if (plotStyle === "lineplot") {
-    widget = (
-      <LinePlot
-        xdata={xdata}
-        ydata={ydata}
-        xlabel={xSignal ?? ""}
-        ylabel={ylabel ?? ""}
-        title={plotTitle}
-        subtitle={plotSubtitle}
-      />
-    );
+    return <div className="skeleton h-112 w-175"></div>;
   }
 
   return (
@@ -417,22 +397,25 @@ export function DataPlots({
         <LiveBadge readyState={readyState} />
       </div>
 
-      <div role="tablist" className="tabs tabs-border">
-        <NavLink to="../multiples" relative="path" role="tab" className="tab">
-          Multiples
-        </NavLink>
-        <NavLink to="../lineplot" relative="path" role="tab" className="tab">
-          Line
-        </NavLink>
-        <NavLink to="../gridplot" relative="path" role="tab" className="tab">
-          Grid
-        </NavLink>
-        <NavLink to="../frames" relative="path" role="tab" className="tab">
-          Frames
-        </NavLink>
-      </div>
-
       {widget}
+
+      <h3>Line plot</h3>
+
+      <LinePlot
+        xdata={xdata}
+        ydata={ydata}
+        xlabel={xSignal ?? ""}
+        ylabel={ylabel ?? ""}
+        title={plotTitle}
+        subtitle={plotSubtitle}
+      />
+      <h3>Frames</h3>
+      {/* <GridPlot */}
+      {/*   path={arrayPath} */}
+      {/*   /\* dataKey={stream.data_keys[vSignal]} *\/ */}
+      {/*   /\* title={plotTitle} *\/ */}
+      {/*   /\* subtitle={plotSubtitle} *\/ */}
+      {/* /> */}
     </>
   );
 }

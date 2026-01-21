@@ -21,7 +21,7 @@ export function Run() {
       <>
         <h1>{metadata?.start?.scan_name}</h1>
         <h2>UID: {metadata?.start?.uid}</h2>
-        <RunPlots uid={uid} plotStyle={plotStyle} />;
+        <RunPlots uid={uid} plotStyle={plotStyle} />
       </>
     );
   }
