@@ -1,16 +1,21 @@
 import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
+import type { AxiosInstance } from "axios";
 
 import { useTiledWebSocket } from "./streaming";
-import { v1Client as client } from "./tiled_api";
+import { v1Client as v1Client } from "./tiled_api";
 import type { WebSocketContainer } from "./types";
 
 // HTTP Call to GET the node's metadata
-export const getMetadata = async (path: string) => {
-  const response = await client.get(`metadata/${encodeURIComponent(path)}`, {
+export const getMetadata = async (
+  path: string,
+  { client }: { client?: AxiosInstance } = {},
+) => {
+  const client_ = client ?? v1Client;
+  const response = await client_.get(`metadata/${encodeURIComponent(path)}`, {
     params: {},
   });
-  return response.data;
+  return response.data.data;
 };
 
 // Hook that delivers the latest metadata for a path, updated by
@@ -24,7 +29,7 @@ export const getMetadata = async (path: string) => {
 // @returns metadata - The metadata for the request node.
 // @returns isLoading - Whether the original HTTP GET request has completed.
 // @return readyState - The latest state of the websocket connection.
-export const useMetadata = <M>(path: string) => {
+export const useMetadata = <M, S = object>(path: string) => {
   // Parse the path to get its parent
   const bits = path.split("/");
   const parent = bits.slice(0, -1).join("/");
@@ -33,6 +38,7 @@ export const useMetadata = <M>(path: string) => {
   interface Metadata {
     attributes: {
       metadata: M;
+      structure: S;
     };
   }
   const metadataRef = useRef<Metadata | null>(null);

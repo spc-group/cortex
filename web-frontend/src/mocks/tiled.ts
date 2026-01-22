@@ -3629,7 +3629,6 @@ const tableData = {
 };
 
 export const mockUrl = "http://127.0.0.1:0/api/v1";
-
 export const handlers = [
   http.get(`${mockUrl}/search/`, () => {
     return HttpResponse.json(searchJson);

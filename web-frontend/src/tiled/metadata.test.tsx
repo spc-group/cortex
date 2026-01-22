@@ -1,12 +1,15 @@
 import "@testing-library/jest-dom/vitest";
+import axios from "axios";
+import type { AxiosInstance } from "axios";
 import type { Mock } from "vitest";
-import { expect, describe, it, afterEach, vi } from "vitest";
+import { expect, describe, it, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 
 import { useMetadata } from ".";
 import { getMetadata } from "./metadata";
 import { useTiledWebSocket } from "./streaming";
 import type { RunMetadata } from "../types";
+import { mockUrl } from "../mocks/";
 
 vi.mock("./streaming", async () => {
   return {
@@ -84,10 +87,16 @@ describe("useMetadata() hook", () => {
 });
 
 describe("getMetadata()", () => {
+  let client: AxiosInstance;
+  beforeEach(() => {
+    client = axios.create({ baseURL: mockUrl });
+  });
   it("returns the metadata", async () => {
-    const { data } = await getMetadata("79344606-4efc-4fd3-8ee6-de0528e6577b");
-    expect(data.id).toEqual("79344606-4efc-4fd3-8ee6-de0528e6577b");
-    expect(data.attributes.metadata.start.uid).toEqual(
+    const md = await getMetadata("79344606-4efc-4fd3-8ee6-de0528e6577b", {
+      client: client,
+    });
+    expect(md.id).toEqual("79344606-4efc-4fd3-8ee6-de0528e6577b");
+    expect(md.attributes.metadata.start.uid).toEqual(
       "79344606-4efc-4fd3-8ee6-de0528e6577b",
     );
   });

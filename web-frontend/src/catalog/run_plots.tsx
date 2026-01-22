@@ -4,7 +4,7 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 
 import { LinePlot } from "../plots";
-// import { GridPlot } from "../plots";
+import { FramePlot } from "../plots";
 import { SignalPicker } from "../plots/signal_picker";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
@@ -356,7 +356,8 @@ export function DataPlots({
     table: data,
   } = useDataTable(stream);
 
-  // const arrayPath = [...stream.ancestors, stream.key, vSignal].join('/');
+  const arrayPath = [...stream.ancestors, stream.key, vSignal].join("/");
+  const vKey = vSignal != null ? stream?.data_keys?.[vSignal] : null;
 
   // Process data into a form consumable by the plots
   let xdata, vdata, rdata;
@@ -415,12 +416,18 @@ export function DataPlots({
         subtitle={plotSubtitle}
       />
       <h3>Frames</h3>
-      {/* <GridPlot */}
-      {/*   path={arrayPath} */}
-      {/*   /\* dataKey={stream.data_keys[vSignal]} *\/ */}
-      {/*   /\* title={plotTitle} *\/ */}
-      {/*   /\* subtitle={plotSubtitle} *\/ */}
-      {/* /> */}
+      {vKey?.shape?.length === 3 ? (
+        <>
+          <FramePlot path={arrayPath} />
+        </>
+      ) : (
+        <div role="alert" className="m-2 alert alert-error alert-soft">
+          <span>
+            <ExclamationTriangleIcon className="size-4 inline" /> No plottable
+            frames are available for "{vSignal}".
+          </span>
+        </div>
+      )}
     </>
   );
 }

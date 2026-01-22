@@ -1,1 +1,1 @@
-export { server as tiledServer } from "./tiled.ts";
+export { server as tiledServer, mockUrl } from "./tiled.ts";

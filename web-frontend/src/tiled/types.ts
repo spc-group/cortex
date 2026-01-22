@@ -19,3 +19,16 @@ export interface WebSocketContainer<M = object> extends WebSocketMessage {
   specs: Spec[];
   structure_family?: string;
 }
+
+export interface ArrayStructure {
+  data_type: {
+    endianness: string;
+    kind: string;
+    itemsize: number;
+    dt_units: string | null;
+  };
+  chunks: number[][];
+  shape: number[];
+  dims: null;
+  resizable: boolean;
+}

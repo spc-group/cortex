@@ -1,16 +1,6 @@
-// import { useReducer, useRef } from "react";
-// import { Table } from "apache-arrow";
 import { useQuery } from "@tanstack/react-query";
 
-// import type { Stream, WebSocketNode } from "../types";
-// import type { WebSocketNode } from "../types";
-// import { useTiledWebSocket } from "./streaming.ts";
 import { v1Client as client } from "./tiled_api";
-
-// interface WebSocketArray extends WebSocketNode {
-//   append: boolean;
-//   payload: Table;
-// }
 
 // Hit the API over HTTP to get a given array slice
 // @param path - The Tiled URI path for this array
@@ -23,40 +13,6 @@ export const getArraySlice = async (path: string, sliceNum: number) => {
   });
   return response.data;
 };
-
-// type TableUpdate = {
-//   type: string;
-//   sequence?: number;
-//   timestamp?: string;
-//   mimetype?: string;
-//   partition?: number;
-//   append: boolean;
-//   payload: Table;
-// };
-
-// // Update the running data table with new data
-// // @param table - The original table to be modified
-// // @param action - Describes the update to be performed.
-// // @returns - The update table, possible the original table that was
-// //   passed in if no update is warranted.
-// //
-// // If `action.type` is "table-data", then a different table will be
-// // returned than was passed in. If `action.append` is true, the new
-// // table will be a concatenation of the original `table` and the new data in
-// // `action.payload`. Otherwise, the table in payload will be returned.
-// export const updateTableData = (table: Table, action: TableUpdate) => {
-//   if (action?.type !== "table-data") {
-//     // Guard against updates that don't modify the table
-//     return table;
-//   }
-//   if (table == null) {
-//     return action.payload;
-//   }
-//   if (action.append) {
-//     return table.concat(action.payload);
-//   }
-//   return action.payload;
-// };
 
 // A hook that provides a given slice from a given array.
 // @param path - The URL path to the array of interest on Tiled

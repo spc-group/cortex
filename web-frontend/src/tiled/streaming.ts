@@ -65,7 +65,6 @@ export const useTiledWebSocket = <T>(path: string) => {
     setBlob(lastMessage?.data);
   }
   useDecodeBlob(blob, setPayload);
-  console.log(payload);
   const result = {
     lastMessage,
     payload,
