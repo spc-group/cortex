@@ -1,7 +1,8 @@
 import { tableFromIPC } from "apache-arrow";
 import axios from "axios";
 import type { AxiosInstance } from "axios";
-import type { SearchParams, Run, DataKey, Stream, BlueskySpec } from "../types";
+import type { SearchParams, Run, DataKey, Stream } from "../types";
+import type { Spec as BlueskySpec } from "./types";
 import qs from "qs";
 
 const envHost = import.meta.env.VITE_TILED_URI;
@@ -24,20 +25,6 @@ export const getApiInfo = async ({
   const client_ = client ?? v1Client;
   const response = await client_.get("");
   return response.data;
-};
-
-export const getMetadata = async (
-  path: string,
-  { client }: { client?: AxiosInstance } = {},
-) => {
-  const client_ = client ?? v1Client;
-  if (path === null) {
-    return {};
-  }
-  const response = await client_.get(`metadata/${encodeURIComponent(path)}`, {
-    params: {},
-  });
-  return response.data.data.attributes.metadata;
 };
 
 // Retrieve the data key descriptions for a given run + stream.

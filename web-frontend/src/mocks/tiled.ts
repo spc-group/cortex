@@ -1,12 +1,8 @@
 import { setupServer } from "msw/node";
 import { http, HttpResponse } from "msw";
 import { tableFromArrays, tableToIPC } from "apache-arrow";
-
-export const apiInfoJson = {
-  id: "abc-123",
-  firstName: "John",
-  lastName: "Maverick",
-};
+import runMetadata from "./run_metadata.json";
+import apiInfo from "./api_info.json";
 
 export const searchJson = {
   data: [
@@ -3639,10 +3635,10 @@ export const handlers = [
     return HttpResponse.json(searchJson);
   }),
   http.get(`${mockUrl}`, () => {
-    return HttpResponse.json(apiInfoJson);
+    return HttpResponse.json(apiInfo);
   }),
-  http.get(`${mockUrl}/metadata/b68c7712-cb05-47f4-8e25-11cb05cc2cd5`, () => {
-    return HttpResponse.json({});
+  http.get(`${mockUrl}/metadata/79344606-4efc-4fd3-8ee6-de0528e6577b`, () => {
+    return HttpResponse.json(runMetadata);
   }),
   http.get(
     `${mockUrl}/metadata/b68c7712-cb05-47f4-8e25-11cb05cc2cd5/primary`,

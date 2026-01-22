@@ -1,0 +1,92 @@
+{
+  "data": {
+    "id": "79344606-4efc-4fd3-8ee6-de0528e6577b",
+    "attributes": {
+      "ancestors": [],
+      "structure_family": "container",
+      "specs": [
+        {
+          "name": "BlueskyRun",
+          "version": "3.0"
+        }
+      ],
+      "metadata": {
+        "start": {
+          "uid": "79344606-4efc-4fd3-8ee6-de0528e6577b",
+          "time": 1768861799.5750678,
+          "versions": {
+            "ophyd": "1.11.0",
+            "ophyd_async": "0.14.0",
+            "bluesky": "1.14.6"
+          },
+          "scan_id": 1,
+          "plan_type": "generator",
+          "plan_name": "scan",
+          "detectors": ["det"],
+          "motors": ["stage-x"],
+          "num_points": 101,
+          "num_intervals": 100,
+          "plan_args": {
+            "detectors": [
+              "<ophyd_async.sim._point_detector.SimPointDetector object at 0x7f05e9af4ec0>"
+            ],
+            "num": 101,
+            "args": [
+              "<ophyd_async.sim._motor.SimMotor object at 0x7f05e9af57f0>",
+              -10,
+              10
+            ],
+            "per_step": "None"
+          },
+          "hints": {
+            "dimensions": [[["stage-x"], "primary"]]
+          },
+          "plan_pattern": "inner_product",
+          "plan_pattern_module": "bluesky.plan_patterns",
+          "plan_pattern_args": {
+            "num": 101,
+            "args": [
+              "<ophyd_async.sim._motor.SimMotor object at 0x7f05e9af57f0>",
+              -10,
+              10
+            ]
+          },
+          "beamline_id": "25-ID-C",
+          "scan_name": "the scan",
+          "sample_name": "unobtanium"
+        },
+        "stop": {
+          "uid": "6b6f5561-7411-4a4f-a019-d88e30776407",
+          "time": 1768861893.2179012,
+          "run_start": "79344606-4efc-4fd3-8ee6-de0528e6577b",
+          "exit_status": "success",
+          "reason": "",
+          "num_events": {
+            "primary": 101
+          }
+        }
+      },
+      "structure": {
+        "contents": null,
+        "count": 1
+      },
+      "access_blob": null,
+      "sorting": [
+        {
+          "key": "",
+          "direction": 1
+        }
+      ],
+      "data_sources": null
+    },
+    "links": {
+      "self": "http://localhost:8000/api/v1/metadata/79344606-4efc-4fd3-8ee6-de0528e6577b",
+      "search": "http://localhost:8000/api/v1/search/79344606-4efc-4fd3-8ee6-de0528e6577b",
+      "full": "http://localhost:8000/api/v1/container/full/79344606-4efc-4fd3-8ee6-de0528e6577b"
+    },
+    "meta": null
+  },
+  "error": null,
+  "links": null,
+  "meta": {}
+}

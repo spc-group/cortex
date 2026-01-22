@@ -9,52 +9,58 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Table } from "apache-arrow";
 import { ReadyState } from "react-use-websocket";
 
+import mockMetadata from "../mocks/run_metadata.json";
 import { RunPlots, StreamPlots, DataPlots } from "./run_plots.tsx";
 
 // Mock API response
 // https://github.com/vitest-dev/vitest/discussions/3589
-beforeEach(() => {
-  vi.mock("@tanstack/react-query", async (importOriginal) => {
-    return {
-      ...(await importOriginal()),
-      useQuery: () => ({
-        isLoading: false,
-        error: null,
-        data: { uid: "hello" },
-      }),
-    };
-  });
-  vi.mock(import("../tiled/use_streams"), () => {
-    return {
-      useStreams: () => {
-        return {
-          streams: {
-            primary: {
-              data_keys: {},
-              ancestors: [],
-            },
+// vi.mock("@tanstack/react-query", async (importOriginal) => {
+//   return {
+//     ...(await importOriginal()),
+//     useQuery: () => ({
+//       isLoading: false,
+//       error: null,
+//       data: { uid: "hello" },
+//     }),
+//   };
+// });
+vi.mock(import("../tiled/metadata"), () => {
+  return {
+    useMetadata: () => {
+      return { metadata: mockMetadata.data };
+    },
+  };
+});
+vi.mock(import("../tiled/use_streams"), () => {
+  return {
+    useStreams: () => {
+      return {
+        streams: {
+          primary: {
+            data_keys: {},
+            ancestors: [],
           },
-        };
-      },
-    };
-  });
-  vi.mock(import("../tiled/use_data_keys"), () => {
-    return {
-      useDataKeys: () => {
-        return { sim_motor_2: {} };
-      },
-    };
-  });
-  vi.mock(import("../tiled/use_data_table"), () => {
-    return {
-      useDataTable: () => {
-        return {
-          table: new Table(),
-          readyState: ReadyState.OPEN,
-        };
-      },
-    };
-  });
+        },
+      };
+    },
+  };
+});
+vi.mock(import("../tiled/use_data_keys"), () => {
+  return {
+    useDataKeys: () => {
+      return { sim_motor_2: {} };
+    },
+  };
+});
+vi.mock(import("../tiled/use_data_table"), () => {
+  return {
+    useDataTable: () => {
+      return {
+        table: new Table(),
+        readyState: ReadyState.OPEN,
+      };
+    },
+  };
 });
 afterEach(() => {
   vi.restoreAllMocks();
@@ -68,14 +74,14 @@ describe("the RunPlots component", () => {
       render(
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
-            <RunPlots uid={5} />
+            <RunPlots uid={"5"} />
           </QueryClientProvider>
         </BrowserRouter>,
       );
     });
   });
   it("shows run details", () => {
-    expect(screen.getByText("hello")).toBeInTheDocument();
+    expect(screen.getByText("the scan")).toBeInTheDocument();
   });
 });
 

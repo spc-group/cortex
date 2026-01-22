@@ -1,6 +1,6 @@
 import { useTiledWebSocket } from "./streaming";
 import { useRuns } from "./use_runs";
-import type { WebSocketNode } from "../types";
+import type { WebSocketContainer as WebSocketNode } from "./types";
 
 export const useLatestRun = ({
   beamlineId,

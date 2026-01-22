@@ -2,7 +2,8 @@ import { useReducer, useRef } from "react";
 import { Table } from "apache-arrow";
 import { useQuery } from "@tanstack/react-query";
 
-import type { Stream, WebSocketNode } from "../types";
+import type { Stream } from "../types";
+import type { WebSocketContainer as WebSocketNode } from "./types";
 import { useTiledWebSocket } from "./streaming.ts";
 import { getTableData } from "./tiled_api";
 

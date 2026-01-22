@@ -12,3 +12,4 @@ export { useLatestRun } from "./use_latest_run";
 export { useDataTable } from "./use_data_table";
 export { useFrame } from "./array";
 export { useStreams } from "./use_streams";
+export { useMetadata } from "./metadata";

@@ -10,7 +10,8 @@ import type { ChangeEvent } from "react";
 
 import { Link } from "react-router";
 import { tiledUri, getApiInfo } from "../tiled/tiled_api";
-import type { TableColumn, BlueskySpec, Run } from "../types";
+import type { TableColumn, Run } from "../types";
+import type { Spec } from "../tiled/types";
 
 const seconds = 1000; // Convert seconds to milliseconds
 
@@ -161,7 +162,7 @@ export function Row({
   // Handler for selecting a run
   const handleCheckboxChecked = (event: ChangeEvent<HTMLInputElement>) => {
     if (onSelect !== undefined) {
-      onSelect(run.metadata.start.uid, event.target.checked);
+      onSelect(run?.metadata?.start?.uid ?? "", event.target.checked);
     }
   };
 
@@ -179,9 +180,9 @@ export function Row({
         run?.metadata?.start?.uid == null
           ? null
           : run.metadata.start.uid.split("-")[0],
-        run.metadata.start.sample_name,
-        run.metadata.start.scan_name,
-        run.metadata.start.plan_name,
+        run?.metadata?.start?.sample_name ?? "",
+        run?.metadata?.start?.scan_name ?? "",
+        run?.metadata?.start?.plan_name ?? "",
       ];
       fragments = fragments.filter((frag) => frag);
       const suffix = aliases.length > 0 ? `.${aliases[0]}` : "";
@@ -209,10 +210,10 @@ export function Row({
     }
   }
   // Prepare additional data
-  const uid = run.metadata.start.uid;
+  const uid = run?.metadata?.start?.uid ?? "";
   const runUri = `${apiUri}container/full/${run.key}`;
   const specs = run.specs === undefined ? [] : run.specs;
-  const specNames = specs.map((spec: BlueskySpec) => spec.name);
+  const specNames = specs.map((spec: Spec) => spec.name);
   const dataSpecs = ["XASRun"];
   const isDataRun =
     specNames.filter((thisSpec: string) => dataSpecs.includes(thisSpec))
@@ -220,15 +221,15 @@ export function Row({
 
   // Prepare the column data
   const columnValues = {
-    "start.scan_name": run.metadata.start.scan_name,
-    "start.uid": run.metadata.start.uid,
-    "start.sample_name": run.metadata.start.sample_name,
-    "start.plan_name": run.metadata.start.plan_name,
+    "start.scan_name": run.metadata.start?.scan_name ?? "",
+    "start.uid": run.metadata.start?.uid ?? "",
+    "start.sample_name": run.metadata.start?.sample_name ?? "",
+    "start.plan_name": run.metadata.start?.plan_name ?? "",
     "stop.exit_status": run.metadata.stop?.exit_status ?? "",
-    "start.proposal": run.metadata.start.proposal_id,
-    "start.esaf": run.metadata.start.esaf_id,
+    "start.proposal": run.metadata.start?.proposal_id ?? "",
+    "start.esaf": run.metadata.start?.esaf_id ?? "",
     "start.time":
-      run.metadata.start.time != null
+      run?.metadata?.start?.time != null
         ? new Date(run.metadata.start.time * seconds)
         : "",
   };
@@ -257,7 +258,7 @@ export function Row({
           >
             {exportFormats.map((format) => {
               return (
-                <li key={`${run.metadata.start.uid}-${format.mimeType}`}>
+                <li key={`${run?.metadata?.start?.uid}-${format.mimeType}`}>
                   <a
                     href={`${runUri}?format=${format.mimeType}`}
                     download={format.defaultFilename}

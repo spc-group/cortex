@@ -8,9 +8,8 @@ import { LinePlot } from "../plots";
 import { SignalPicker } from "../plots/signal_picker";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
-import { useMetadata } from "../tiled/use_metadata";
-import { useDataTable, useStreams } from "../tiled";
-import type { Stream } from "../types";
+import { useDataTable, useStreams, useMetadata } from "../tiled";
+import type { Stream, RunMetadata } from "../types";
 
 const NULL_SIGNAL = "---";
 const OPERATIONS = ["+", "−", "×", "÷"];
@@ -48,7 +47,9 @@ export const RunPlots = ({
   }
 
   // Retrieve metadata and data keys for this dataset
-  const { isLoading: isLoadingMetadata, data: runMetadata } = useMetadata(uid);
+  const { isLoading: isLoadingMetadata, metadata } =
+    useMetadata<RunMetadata>(uid);
+  const runMetadata: RunMetadata = metadata?.attributes?.metadata ?? {};
 
   if (uid === undefined) {
     return (
@@ -67,12 +68,16 @@ export const RunPlots = ({
         {isLoadingMetadata ? (
           <div className="skeleton" />
         ) : (
-          runMetadata["start.scan_name"]
+          (runMetadata.start?.scan_name ?? "<Unknown>")
         )}
       </h2>
       <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
         <div className="mt-2 flex items-center text-sm text-gray-500">
-          {isLoadingMetadata ? <div className="skeleton" /> : runMetadata.uid}
+          {isLoadingMetadata ? (
+            <div className="skeleton" />
+          ) : (
+            runMetadata?.start?.uid
+          )}
         </div>
       </div>
 

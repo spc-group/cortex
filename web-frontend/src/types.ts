@@ -1,4 +1,5 @@
 import { ReadyState } from "react-use-websocket";
+import type { Spec } from "./tiled/types";
 
 export interface Column {
   label: string;
@@ -31,25 +32,27 @@ export interface SearchParams {
   standardsOnly?: boolean;
 }
 
+export interface RunMetadata {
+  start?: {
+    esaf_id?: string;
+    proposal_id?: string;
+    sample_name?: string;
+    scan_name?: string;
+    plan_name?: string;
+    time: number;
+    uid: string;
+  };
+  stop?: {
+    exit_status: string;
+  };
+}
+
 export interface Run {
   key: string;
   ancestor: string[];
   structure_family: string;
-  specs: BlueskySpec[];
-  metadata: {
-    start: {
-      esaf_id: string;
-      proposal_id: string;
-      sample_name: string;
-      scan_name: string;
-      plan_name: string;
-      time: number;
-      uid: string;
-    };
-    stop: {
-      exit_status: string;
-    };
-  };
+  specs: Spec[];
+  metadata: RunMetadata;
   structure: {
     data_type: {
       endianess: string;
@@ -64,25 +67,24 @@ export interface Run {
   };
 }
 
+export interface StreamMetadata {
+  data_keys: { [key: string]: DataKey };
+  uid: string;
+  time: number;
+  hints: { [key: string]: { fields: string[] } };
+  configuration: { [key: string]: object };
+}
+
 export interface Stream {
   ancestors: string[];
   structure_family: string;
-  specs: BlueskySpec[];
+  specs: Spec[];
   data_keys: { [key: string]: DataKey };
   configuration: { [key: string]: object };
   hints: { [key: string]: { fields: string[] } };
   time: number;
   uid: string;
   key: string;
-}
-
-export interface WebSocketNode {
-  key: string;
-  type: string;
-  sequence: number;
-  structure_family: string;
-  specs: BlueskySpec[];
-  metadata: { [key: string]: object | number | string };
 }
 
 export interface DataKey {
@@ -104,11 +106,6 @@ export interface DataKey {
   precision?: number;
   dtype_numpy?: string;
   object_name?: string;
-}
-
-export interface BlueskySpec {
-  name: string;
-  version: string;
 }
 
 export interface webSocketMessage {

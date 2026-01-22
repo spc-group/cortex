@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 // import useWebSocket from "react-use-websocket";
 
-import type { Stream, WebSocketNode, DataKey } from "../types";
+import type { Stream, DataKey } from "../types";
+import type { WebSocketContainer } from "./types";
 import { useTiledWebSocket } from "./streaming";
 import { getStreams } from "./tiled_api.ts";
 
@@ -29,7 +30,7 @@ function compareSets(a: Set<string>, b: Set<string>) {
   return a.size === b.size && [...a].every((x) => b.has(x));
 }
 
-interface WebSocketStream extends WebSocketNode {
+interface WebSocketStream extends WebSocketContainer {
   metadata: {
     data_keys: { [key: string]: DataKey };
     uid: string;
@@ -47,7 +48,7 @@ export const useStreams = (uid: string) => {
   if (payload?.type === "container-child-created") {
     wsStreams[payload.key] = {
       ancestors: [uid],
-      structure_family: payload.structure_family,
+      structure_family: payload.structure_family ?? "",
       specs: payload.specs,
       data_keys: payload.metadata?.data_keys ?? {},
       configuration: payload.metadata?.configuration ?? {},

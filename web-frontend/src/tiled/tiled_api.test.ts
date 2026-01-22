@@ -3,7 +3,8 @@ import type { AxiosInstance } from "axios";
 import { describe, it, expect, beforeEach } from "vitest";
 import { tableFromArrays } from "apache-arrow";
 
-import { apiInfoJson, mockUrl } from "../mocks/tiled";
+import { mockUrl } from "../mocks/tiled";
+import apiInfo from "../mocks/api_info.json";
 
 import {
   getRuns,
@@ -67,8 +68,8 @@ describe("prepareQueryParams() function", () => {
 describe("getApiInfo() function", () => {
   // HTTP responses defined in './mocks/tiled.ts'
   it("calls the API", async () => {
-    const apiInfo = await getApiInfo({ client });
-    expect(apiInfo).toEqual(apiInfoJson);
+    const response = await getApiInfo({ client });
+    expect(response).toEqual(apiInfo);
   });
 });
 

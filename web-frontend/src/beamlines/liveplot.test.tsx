@@ -5,52 +5,51 @@ import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { Table } from "apache-arrow";
 
+import mockMetadata from "../mocks/run_metadata.json";
 import { LivePlot } from "./liveplot";
 
-beforeEach(() => {
-  vi.mock("../tiled/use_latest_run", async (importOriginal) => {
-    return {
-      ...(await importOriginal()),
-      useLatestRun: () => {
-        return {
-          run: {
-            key: "b68c7712-cb05-47f4-8e25-11cb05cc2cd5",
-            metadata: {
-              start: { uid: "b68c7712-cb05-47f4-8e25-11cb05cc2cd5" },
-            },
+vi.mock("../tiled/use_latest_run", async (importOriginal) => {
+  return {
+    ...(await importOriginal()),
+    useLatestRun: () => {
+      return {
+        run: {
+          key: "b68c7712-cb05-47f4-8e25-11cb05cc2cd5",
+          metadata: {
+            start: { uid: "b68c7712-cb05-47f4-8e25-11cb05cc2cd5" },
           },
-        };
-      },
-    };
-  });
-  vi.mock("../tiled/use_streams", () => {
-    return {
-      useStreams: () => {
-        return {
-          streams: {
-            primary: {
-              data_keys: {},
-              ancestors: ["b68c7712-cb05-47f4-8e25-11cb05cc2cd5"],
-            },
+        },
+      };
+    },
+  };
+});
+vi.mock("../tiled/use_streams", () => {
+  return {
+    useStreams: () => {
+      return {
+        streams: {
+          primary: {
+            data_keys: {},
+            ancestors: ["b68c7712-cb05-47f4-8e25-11cb05cc2cd5"],
           },
-        };
-      },
-    };
-  });
-  vi.mock("../tiled/use_metadata", () => {
-    return {
-      useMetadata: () => {
-        return { data: { "start.scan_name": "my run" } };
-      },
-    };
-  });
-  vi.mock("../tiled/use_data_table", () => {
-    return {
-      useDataTable: () => {
-        return { table: new Table() };
-      },
-    };
-  });
+        },
+      };
+    },
+  };
+});
+vi.mock("../tiled/metadata", () => {
+  return {
+    useMetadata: () => {
+      return { metadata: mockMetadata.data };
+    },
+  };
+});
+vi.mock("../tiled/use_data_table", () => {
+  return {
+    useDataTable: () => {
+      return { table: new Table() };
+    },
+  };
 });
 
 describe("the livePlot component", () => {
@@ -70,7 +69,7 @@ describe("the livePlot component", () => {
   });
   it("shows the new run UID", () => {
     expect(
-      screen.getByText("UID: b68c7712-cb05-47f4-8e25-11cb05cc2cd5"),
+      screen.getByText("b68c7712-cb05-47f4-8e25-11cb05cc2cd5"),
     ).toBeInTheDocument();
   });
 });

@@ -2,11 +2,17 @@ import { useParams } from "react-router";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
 import { RunPlots } from "./run_plots";
-import { useMetadata } from "../tiled/use_metadata";
+import { useMetadata } from "../tiled";
+import type { RunMetadata } from "../types";
+
+interface RunParams {
+  uid: string;
+}
 
 export function Run() {
-  const { uid, plotStyle } = useParams();
-  const { data: metadata } = useMetadata(uid);
+  const { uid } = useParams<"uid">() as RunParams;
+  const { metadata } = useMetadata<RunMetadata>(uid);
+  const runMetadata: RunMetadata = metadata?.attributes?.metadata ?? {};
   if (uid == null) {
     return (
       <div role="alert" className="alert alert-error">
@@ -19,9 +25,9 @@ export function Run() {
   } else {
     return (
       <>
-        <h1>{metadata?.start?.scan_name}</h1>
-        <h2>UID: {metadata?.start?.uid}</h2>
-        <RunPlots uid={uid} plotStyle={plotStyle} />
+        <h1>{runMetadata?.start?.scan_name}</h1>
+        <h2>UID: {runMetadata?.start?.uid}</h2>
+        <RunPlots uid={uid} />
       </>
     );
   }
