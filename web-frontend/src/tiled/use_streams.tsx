@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 // import useWebSocket from "react-use-websocket";
 
-import type { Stream, DataKey } from "../types";
+import type { Stream, DataKey } from "../catalog/types";
 import type { WebSocketContainer } from "./types";
 import { useTiledWebSocket } from "./streaming";
 import { getStreams } from "./tiled_api.ts";

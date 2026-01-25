@@ -1,18 +1,13 @@
 import { tableFromIPC } from "apache-arrow";
 import axios from "axios";
 import type { AxiosInstance } from "axios";
-import type { SearchParams, Run, DataKey, Stream } from "../types";
+import type { DataKey, Stream } from "../catalog/types";
 import type { Spec as BlueskySpec } from "./types";
 import qs from "qs";
 
 const envHost = import.meta.env.VITE_TILED_URI;
 export const tiledHost = envHost ?? "http://127.0.0.1:0";
 export const tiledUri = tiledHost + "/api/v1/";
-
-interface APIRun {
-  id: string;
-  attributes: Run;
-}
 
 export const v1Client = axios.create({
   baseURL: tiledUri,
@@ -37,67 +32,6 @@ export const getDataKeys = async (
   const client_ = client ?? v1Client;
   const response = await client_.get(`metadata/${path}`);
   return response.data.data.attributes.metadata.data_keys;
-};
-
-// Parse the query parameters needed for a search
-// @params filters: An object of the form {"start.beamline_id": "25-ID-C"}
-export const prepareQueryParams = ({
-  pageOffset,
-  pageLimit,
-  filters,
-  sortField = "",
-  searchText = "",
-  standardsOnly = false,
-}: SearchParams) => {
-  // Set up query parameters
-  const params = new URLSearchParams();
-  if (sortField !== "") {
-    params.append("sort", sortField);
-  }
-  params.append("fields", "metadata");
-  params.append("fields", "specs");
-  params.append("fields", "count");
-  params.append("page[offset]", String(pageOffset ?? 0));
-  params.append("page[limit]", String(pageLimit ?? 100));
-  for (const [field, value] of Object.entries(filters ?? {})) {
-    params.append("filter[contains][condition][key]", field);
-    params.append("filter[contains][condition][value]", `"${value}"`);
-  }
-  if (standardsOnly) {
-    params.append("filter[eq][condition][key]", "start.is_standard");
-    params.append("filter[eq][condition][value]", "true");
-  }
-  if (searchText !== "") {
-    params.append("filter[fulltext][condition][text]", searchText);
-  }
-  return params;
-};
-
-// Retrieve set of runs metadata from the API
-export const getRuns = async (
-  searchParams: SearchParams,
-  { client }: { client?: AxiosInstance } = {},
-) => {
-  const client_ = client ?? v1Client;
-  const params = prepareQueryParams(searchParams);
-  // retrieve list of runs from the API
-  const response = await client_.get(`search/`, {
-    params: params,
-  });
-  // Parse into a sensible list defintion
-  const runs = response.data.data.map((run: APIRun) => {
-    const specs = run.attributes.specs;
-    return {
-      metadata: run.attributes.metadata,
-      key: run.id,
-      specs: specs === null ? [] : specs,
-      structure_family: run.attributes.structure_family,
-    };
-  });
-  return await {
-    runs: runs,
-    count: response.data.meta.count,
-  };
 };
 
 export const getTableData = async (

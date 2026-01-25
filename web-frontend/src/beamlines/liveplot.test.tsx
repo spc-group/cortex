@@ -8,7 +8,7 @@ import { Table } from "apache-arrow";
 import mockMetadata from "../mocks/run_metadata.json";
 import { LivePlot } from "./liveplot";
 
-vi.mock("../tiled/use_latest_run", async (importOriginal) => {
+vi.mock("./latest_run", async (importOriginal) => {
   return {
     ...(await importOriginal()),
     useLatestRun: () => {

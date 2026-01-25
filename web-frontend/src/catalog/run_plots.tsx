@@ -9,7 +9,7 @@ import { SignalPicker } from "../plots/signal_picker";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
 import { useDataTable, useStreams, useMetadata } from "../tiled";
-import type { Stream, RunMetadata } from "../types";
+import type { Stream, RunMetadata } from "../catalog/types";
 
 const NULL_SIGNAL = "---";
 const OPERATIONS = ["+", "−", "×", "÷"];
@@ -47,10 +47,10 @@ export const RunPlots = ({
   }
 
   // Retrieve metadata and data keys for this dataset
-  const { isLoading: isLoadingMetadata, metadata } =
-    useMetadata<RunMetadata>(uid);
-  const runMetadata: RunMetadata = metadata?.attributes?.metadata ?? {};
+  const { metadata } = useMetadata<RunMetadata>(uid);
 
+  let plotTitle: string;
+  let plotSubtitle: string;
   if (uid === undefined) {
     return (
       <div role="alert" className="m-2 alert alert-error alert-soft">
@@ -60,27 +60,17 @@ export const RunPlots = ({
         </span>
       </div>
     );
+  } else if (metadata == null) {
+    plotTitle = "";
+    plotSubtitle = "";
+  } else {
+    const runMetadata: RunMetadata = metadata?.attributes?.metadata ?? {};
+    plotTitle = `${runMetadata?.start?.sample_name} - ${runMetadata?.start?.scan_name}`;
+    plotSubtitle = `${runMetadata?.start?.uid ?? ""}`;
   }
   return (
     <div className="m-4">
-      {/* Header for the run as a whole */}
-      <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-        {isLoadingMetadata ? (
-          <div className="skeleton" />
-        ) : (
-          (runMetadata.start?.scan_name ?? "<Unknown>")
-        )}
-      </h2>
-      <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-        <div className="mt-2 flex items-center text-sm text-gray-500">
-          {isLoadingMetadata ? (
-            <div className="skeleton" />
-          ) : (
-            runMetadata?.start?.uid
-          )}
-        </div>
-      </div>
-
+      {/* Widget to pick a stream */}
       <div>
         Stream:
         <select
@@ -95,13 +85,12 @@ export const RunPlots = ({
           })}
         </select>
       </div>
-
       <StreamPlots
         stream={streams?.[streamName] ?? null}
         plotStyle={plotStyle ?? "lineplot"}
-        plotTitle={`${runMetadata?.start?.sample_name} - ${runMetadata?.start?.scan_name}`}
-        plotSubtitle={`${runMetadata?.start?.uid ?? ""}`}
-        key={runMetadata?.start?.uid ?? null}
+        plotTitle={plotTitle}
+        plotSubtitle={plotSubtitle}
+        key={uid}
       />
     </div>
   );

@@ -1,6 +1,19 @@
+# Beamline and Data Management
+
+A react App that allows data browsing and beamline monitoring from a
+web browser.
+
+The app is broken up into several packages:
+
+- `src/tiled`: Generic tools and hooks for interacting with the Tiled backend server.
+- `src/catalog`: Specific tools for interacting with Bluesky runs in the Tiled backend server.
+- `src/plots`: Components for interacting with data from Tiled.
+- `src/beamlines`: Components for monitoring the beamline status.
+
 # React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This template provides a minimal setup to get React working in Vite
+with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
 
@@ -9,7 +22,8 @@ Currently, two official plugins are available:
 
 ## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+If you are developing a production application, we recommend updating
+the configuration to enable type-aware lint rules:
 
 ```js
 export default tseslint.config([

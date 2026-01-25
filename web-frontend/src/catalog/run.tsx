@@ -3,7 +3,8 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
 import { RunPlots } from "./run_plots";
 import { useMetadata } from "../tiled";
-import type { RunMetadata } from "../types";
+import type { RunMetadata } from "./types";
+import { ExitStatus } from "./exit_status";
 
 interface RunParams {
   uid: string;
@@ -12,7 +13,18 @@ interface RunParams {
 export function Run() {
   const { uid } = useParams<"uid">() as RunParams;
   const { metadata } = useMetadata<RunMetadata>(uid);
-  const runMetadata: RunMetadata = metadata?.attributes?.metadata ?? {};
+  let runMetadata = {
+    scanName: "",
+    uid: "",
+    exitStatus: "",
+  };
+  if (metadata != null) {
+    runMetadata = {
+      scanName: metadata.attributes.metadata.start?.scan_name ?? "",
+      uid: metadata.attributes.metadata.start.uid,
+      exitStatus: metadata.attributes.metadata.stop?.exit_status ?? "",
+    };
+  }
   if (uid == null) {
     return (
       <div role="alert" className="alert alert-error">
@@ -25,8 +37,11 @@ export function Run() {
   } else {
     return (
       <>
-        <h1>{runMetadata?.start?.scan_name}</h1>
-        <h2>UID: {runMetadata?.start?.uid}</h2>
+        <h1>{runMetadata.scanName}</h1>
+        <h2>UID: {runMetadata.uid}</h2>
+        <div>
+          Exit status: <ExitStatus status={runMetadata.exitStatus} />
+        </div>
         <RunPlots uid={uid} />
       </>
     );

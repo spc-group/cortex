@@ -3,28 +3,8 @@ import { http, HttpResponse } from "msw";
 import { tableFromArrays, tableToIPC } from "apache-arrow";
 import runMetadata from "./run_metadata.json";
 import apiInfo from "./api_info.json";
-
-export const searchJson = {
-  data: [
-    {
-      id: "58839482",
-      attributes: {
-        metadata: {
-          start: {
-            uid: "58839482",
-            time: 0,
-          },
-          stop: {
-            exit_status: "success",
-          },
-        },
-      },
-    },
-  ],
-  meta: {
-    count: 0,
-  },
-};
+import searchJson from "./search_result.json";
+import arrayJson from "./array_full.json";
 
 export const streamMetadataJson = {
   data: {
@@ -3667,6 +3647,9 @@ export const handlers = [
   }),
   http.get(`${mockUrl}/search/legacy_run/streams`, () => {
     return HttpResponse.json(streamsMetadata);
+  }),
+  http.get(`${mockUrl}/array/full/my_run/primary/bdet`, () => {
+    return HttpResponse.json(arrayJson);
   }),
 ];
 

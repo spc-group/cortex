@@ -1,27 +1,34 @@
 import "@testing-library/jest-dom/vitest";
 import { render, screen, cleanup } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { vi, describe, it, expect, afterEach } from "vitest";
 
-import { useLatestRun } from ".";
+import { useLatestRun } from "./latest_run";
 
-beforeEach(() => {
-  vi.mock("./streaming", () => {
-    return {
-      useTiledWebSocket: () => {
-        return { payload: {} };
-      },
-    };
-  });
-  vi.mock("./use_runs", () => {
-    return {
-      useRuns: () => {
-        return {
-          runs: [{ metadata: { start: { uid: "my_run_uid" } } }],
-        };
-      },
-    };
-  });
+vi.mock("../tiled/streaming", () => {
+  return {
+    useTiledWebSocket: () => {
+      return { payload: {} };
+    },
+  };
 });
+vi.mock("../tiled/search", () => {
+  return {
+    useSearch: () => {
+      return {
+        data: [
+          {
+            id: "my_run_uid",
+            attributes: {
+              metadata: { start: { uid: "my_run_uid" } },
+              ancestors: [],
+            },
+          },
+        ],
+      };
+    },
+  };
+});
+
 afterEach(() => {
   vi.restoreAllMocks();
   cleanup();
@@ -29,7 +36,7 @@ afterEach(() => {
 
 const Run = () => {
   const { run } = useLatestRun();
-  return <>{run.metadata.start.uid}</>;
+  return <>{run != null ? run.metadata.start.uid : ""}</>;
 };
 
 describe("the useLatestRun() hook", () => {
@@ -38,13 +45,6 @@ describe("the useLatestRun() hook", () => {
     expect(screen.getByText("my_run_uid")).toBeInTheDocument();
   });
   it("updates based on websocket messages", () => {
-    vi.mock("./streaming", () => {
-      return {
-        useTiledWebSocket: () => {
-          return { payload: { sequence: 1 } };
-        },
-      };
-    });
     return render(<Run></Run>);
   });
 });

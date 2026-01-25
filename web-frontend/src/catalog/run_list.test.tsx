@@ -2,17 +2,21 @@
 // @ts-nocheck
 import * as React from "react";
 import { expect, vi, describe, beforeEach, afterEach, it } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { getRuns } from "../tiled/tiled_api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useSearch } from "../tiled";
 
 import { RunList, Paginator } from "./run_list.tsx";
 
-vi.mock("../tiled/tiled_api", () => ({
-  getRuns: vi.fn(() => Promise.resolve([])),
-}));
+vi.mock("../tiled/search", () => {
+  return {
+    useSearch: vi.fn(() => {
+      return { data: [], isLoading: false, error: null, count: 0 };
+    }),
+  };
+});
 
 afterEach(() => {
   cleanup();
@@ -126,12 +130,11 @@ describe("paginator", () => {
 describe("run list", () => {
   let user;
   beforeEach(async () => {
-    getRuns.mockClear();
     const queryClient = new QueryClient();
     await React.act(() => {
       render(
         <QueryClientProvider client={queryClient}>
-          <RunList />
+          <RunList debounce={0} />
         </QueryClientProvider>,
       );
     });
@@ -141,30 +144,62 @@ describe("run list", () => {
   it("applies column filters", async () => {
     // Find a filter text box
     const textbox = screen.getByTitle("Filter by UID");
-    getRuns.mockClear();
+    useSearch.mockClear();
     await user.type(textbox, "8675309");
-    await new Promise((r) => setTimeout(r, 620)); // Wait for debounce
-    expect(getRuns.mock.calls).toHaveLength(1);
-    expect(getRuns.mock.calls[0][0]["filters"]).toEqual({
-      "start.uid": "8675309",
-    });
+    expect(useSearch.mock.calls.length).toBeGreaterThan(0);
+    const options = useSearch.mock.lastCall[1];
+    expect(options.filters[0].key).toEqual("start.uid");
+    expect(options.filters[0].value).toEqual("8675309");
   });
-  it("applies generic filters", async () => {
+  it("applies full text search", async () => {
     const textbox = screen.getByPlaceholderText("Search (full words)…");
-    getRuns.mockClear();
+    useSearch.mockClear();
     await user.type(textbox, "Thorium");
-    await new Promise((r) => setTimeout(r, 620)); // Wait for debounce
-    expect(getRuns.mock.calls).toHaveLength(1);
-    expect(getRuns.mock.calls[0][0]["searchText"]).toEqual("Thorium");
+    expect(useSearch.mock.calls.length).toBeGreaterThan(0);
+    const filters = useSearch.mock.lastCall[1].filters;
+    expect(filters.length).toEqual(1);
+    expect(filters[0].type).toEqual("fulltext");
+    expect(filters[0].value).toEqual("Thorium");
   });
   it("filters standards only", async () => {
     const checkbox = screen.getByTitle("Standards checkbox");
-    getRuns.mockClear();
+    useSearch.mockClear();
     await user.click(checkbox);
-    expect(getRuns.mock.calls).toHaveLength(1);
-    expect(getRuns.mock.calls[0][0]["standardsOnly"]).toEqual(true);
+    expect(useSearch.mock.calls.length).toBeGreaterThan(0);
+    const filters1 = useSearch.mock.lastCall[1].filters;
+    expect(filters1.length).toEqual(1);
+    expect(filters1[0].key).toEqual("start.is_standard");
+    expect(filters1[0].value).toEqual("true");
     await user.click(checkbox);
-    expect(getRuns.mock.calls).toHaveLength(2);
-    expect(getRuns.mock.calls[1][0]["standardsOnly"]).toEqual(false);
+    const filters2 = useSearch.mock.lastCall[1].filters;
+    expect(filters2.length).toEqual(0);
+  });
+  it("filters by before date", async () => {
+    const beforeInput = screen.getByTitle(
+      "Only include runs started before a given time.",
+    );
+    useSearch.mockClear();
+    fireEvent.change(beforeInput, { target: { value: "2025-01-01T08:00" } });
+    expect(useSearch.mock.lastCall[1].filters).toHaveLength(1);
+    // In chicago time: 1735740000000
+    // In          UTC: 1735718400000
+    expect(useSearch.mock.lastCall[1].filters[0].type).toEqual("comparison");
+    expect(useSearch.mock.lastCall[1].filters[0].key).toEqual("start.time");
+    expect(useSearch.mock.lastCall[1].filters[0].operator).toEqual("lt");
+    expect(useSearch.mock.lastCall[1].filters[0].value).toEqual(1735718400);
+  });
+  it("filters by after date", async () => {
+    const afterInput = screen.getByTitle(
+      "Only include runs started on or after a given time.",
+    );
+    useSearch.mockClear();
+    fireEvent.change(afterInput, { target: { value: "2025-01-01T08:00" } });
+    expect(useSearch.mock.lastCall[1].filters).toHaveLength(1);
+    // In chicago time: 1735740000
+    // In          UTC: 1735718400
+    expect(useSearch.mock.lastCall[1].filters[0].type).toEqual("comparison");
+    expect(useSearch.mock.lastCall[1].filters[0].key).toEqual("start.time");
+    expect(useSearch.mock.lastCall[1].filters[0].operator).toEqual("ge");
+    expect(useSearch.mock.lastCall[1].filters[0].value).toEqual(1735718400);
   });
 });

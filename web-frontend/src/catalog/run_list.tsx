@@ -4,8 +4,12 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import RunTable from "./run_table";
 import { allColumns } from "./columns";
 import useDebounce from "../debounce";
-import { useRuns } from "../tiled/use_runs";
-import type { TableColumn, Column } from "../types";
+import type { TableColumn, Column } from "./types";
+import type { Query } from "../tiled/types";
+import { useRuns } from "./runs";
+import { LiveBadge } from "./live_badge";
+
+const DEBOUNCE_DELAY = 500;
 
 export function Paginator({
   runCount,
@@ -75,11 +79,11 @@ export function Paginator({
   );
 }
 
-export function RunList() {
+export function RunList({ debounce }: { debounce?: number }) {
+  const defaultDebounce = debounce ?? DEBOUNCE_DELAY;
   // State for keeping track of pagination
   const [pageLimit, setPageLimit] = useState(10);
   const [pageOffset, setPageOffset] = useState(0);
-  // const [runCount, setRunCount] = useState(0);
 
   // State for selecting which field to use for sorting
   const [sortField, setSortField] = useState<string>("-start.time");
@@ -87,13 +91,17 @@ export function RunList() {
   // State variables to keep track of how to filter the runs
   const useFilterCol = (col: Column) => {
     const [filter, setFilter] = useState("");
+    // <select> columns don't need a debounce
+    const debounce_ =
+      (col.query?.options ?? []).length > 0 ? 0 : defaultDebounce;
     const newCol: TableColumn = {
       label: col.label,
       name: col.name,
+      query: col.query,
       field: col.field,
       filter: filter,
       setFilter: setFilter,
-      debouncedFilter: useDebounce(filter),
+      debouncedFilter: useDebounce(filter, debounce_),
     };
     return newCol;
   };
@@ -111,40 +119,82 @@ export function RunList() {
     useFilterCol(allColumns[7]),
   ];
   const [searchText, setSearchText] = useState("");
-  const debouncedSearchText = useDebounce(searchText);
+  const debouncedSearchText = useDebounce(searchText, defaultDebounce);
   const [standardsOnly, setStandardsOnly] = useState(false);
+  const [beforeDate, setBeforeDate] = useState("");
+  const [afterDate, setAfterDate] = useState("");
 
-  let filterEntries = columns.map((col) => [col.field, col.debouncedFilter]);
-  filterEntries = filterEntries.filter(([, text]) => text !== "");
-  const filters = Object.fromEntries(filterEntries);
+  let filters = columns.map((col): Query => {
+    // Convert the column state to a Tiled query
+    return {
+      type: col?.query?.type ?? "",
+      value: col.debouncedFilter,
+      key: col?.query?.key,
+      operator: col?.query?.operator,
+      case_sensitive: col?.query?.case_sensitive,
+    };
+  });
+  // Remove empty filters
+  filters = filters.filter((query) => query.value);
+  // Add global filters
+  if (standardsOnly) {
+    filters.push({
+      type: "eq",
+      key: "start.is_standard",
+      value: "true",
+    });
+  }
+  if (debouncedSearchText !== "") {
+    filters.push({
+      type: "fulltext",
+      value: debouncedSearchText,
+    });
+  }
+  if (beforeDate !== "") {
+    const timestamp = new Date(beforeDate).getTime() / 1000;
+    filters.push({
+      type: "comparison",
+      key: "start.time",
+      value: timestamp,
+      operator: "lt",
+    });
+  }
+  if (afterDate !== "") {
+    const timestamp = new Date(afterDate).getTime() / 1000;
+    filters.push({
+      type: "comparison",
+      key: "start.time",
+      value: timestamp,
+      operator: "ge",
+    });
+  }
 
   // Load data from the database
   const {
     runs: allRuns,
-    error,
     isLoading,
-    runCount,
+    count: runCount,
+    readyState,
   } = useRuns({
     sortField: sortField,
     pageLimit: pageLimit,
     pageOffset: pageOffset,
-    searchText: debouncedSearchText,
-    standardsOnly: standardsOnly,
     filters: filters,
   });
 
   return (
     <div className="mx-auto max-w-full">
-      <div className="p-4">
-        <Paginator
-          runCount={runCount}
-          pageLimit={pageLimit}
-          setPageLimit={setPageLimit}
-          pageOffset={pageOffset}
-          setPageOffset={setPageOffset}
-        />
+      <div className="h-10 p-3 space-x-3">
+        <LiveBadge readyState={readyState} />
+        {isLoading ? (
+          <div className="badge badge-soft badge-info s-3">Loading…</div>
+        ) : (
+          <></>
+        )}
+      </div>
+      <div className="px-4 py-2 space-x-4">
         {/* Search box */}
-        <label className="input mx-4">
+        <label className="input">
           <MagnifyingGlassIcon className="size-4" />
           <input
             type="search"
@@ -152,6 +202,26 @@ export function RunList() {
             className="grow"
             placeholder="Search (full words)…"
             onChange={(e) => setSearchText(e.target.value)}
+          />
+        </label>
+        <label className="input">
+          <span className="label">Before:</span>
+          <input
+            type="datetime-local"
+            className="input mx-2"
+            value={beforeDate}
+            onChange={(e) => setBeforeDate(e.target.value)}
+            title="Only include runs started before a given time."
+          />
+        </label>
+        <label className="input">
+          <span className="label">After:</span>
+          <input
+            type="datetime-local"
+            className="input mx-2"
+            value={afterDate}
+            onChange={(e) => setAfterDate(e.target.value)}
+            title="Only include runs started on or after a given time."
           />
         </label>
         <label className="inline">
@@ -164,6 +234,13 @@ export function RunList() {
           />
           Standards only
         </label>
+        <Paginator
+          runCount={runCount}
+          pageLimit={pageLimit}
+          setPageLimit={setPageLimit}
+          pageOffset={pageOffset}
+          setPageOffset={setPageOffset}
+        />
       </div>
 
       <div className="relative overflow-x-auto">
@@ -172,22 +249,8 @@ export function RunList() {
           columns={columns}
           sortField={sortField}
           setSortField={setSortField}
-          isLoadingRuns={isLoading}
         />
       </div>
-      {/* Error reporting */}
-      <dialog id="errorModal" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">{String(error)}</h3>
-          <p className="py-4">{error ? error.message : null}</p>
-          <div className="modal-action">
-            <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn">OK</button>
-            </form>
-          </div>
-        </div>
-      </dialog>
     </div>
   );
 }

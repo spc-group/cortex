@@ -57,7 +57,7 @@ export const useTiledWebSocket = <T>(path: string) => {
   const wsUrl = makeWebsocketUrl(
     `${tiledUri}stream/single/${path}?envelope_format=msgpack`,
   );
-  const { lastMessage, readyState } = useWebSocket(wsUrl);
+  const { lastMessage, readyState } = useWebSocket<T>(wsUrl);
   // Hacky useEffect to decode the blob asynchronously
   const [blob, setBlob] = useState<Blob>(new Blob());
   const [payload, setPayload] = useState<T>();
@@ -88,22 +88,3 @@ export const makeWebsocketUrl = (httpUrl: string): string => {
   }
   return url.href;
 };
-
-// export const useLatestData = (uid: string, stream: string) => {
-//   const url = `stream/single/${uid}/${stream}/internal?envelope_format=msgpack`;
-//   const { lastMessage, readyState } = useTiledWebSocket(url);
-//   // Decode the msgpack response
-//   const [blob, setBlob] = useState<Blob>(new Blob());
-//   const [message, setMessage] = useState<{ sequence?: number } | null>(null);
-//   if (lastMessage?.data !== blob) {
-//     setBlob(lastMessage?.data);
-//   }
-//   useDecodeBlob(blob, setMessage);
-//   if (message?.type === "table-data") {
-//     console.log(message.payload.toArray());
-//   }
-//   return {
-//     readyState: readyState,
-//     sequence: message?.sequence ?? null,
-//   };
-// };

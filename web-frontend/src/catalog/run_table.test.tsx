@@ -37,11 +37,11 @@ describe("run table", () => {
   it("creates rows for each run", () => {
     const runs = [
       {
-        key: 0,
+        uid: 0,
         metadata: { start: { uid: "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa" } },
       },
       {
-        key: 1,
+        uid: 1,
         metadata: { start: { uid: "391c9a55-8dfa-4faa-be49-e60140596b7c" } },
       },
     ];
@@ -62,7 +62,7 @@ describe("run table", () => {
     // Prepare the UI
     const runs = [
       {
-        key: "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa",
+        uid: "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa",
         metadata: { start: { uid: "4e4a2ec3-5d33-4f47-b6a3-15cfdf1e41aa" } },
       },
     ];
@@ -283,7 +283,7 @@ describe("run table row", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("rel_scan")).toBeInTheDocument();
     expect(screen.getByText("SrN03")).toBeInTheDocument();
-    expect(screen.getByText("success")).toBeInTheDocument();
+    expect(screen.getByText("Success")).toBeInTheDocument();
     expect(screen.getByText("1970-01-01 00:00")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("13")).toBeInTheDocument();

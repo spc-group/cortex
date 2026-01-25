@@ -8,8 +8,9 @@
 // - useDataTable: Retrieve a table of internal data for a given stream, updates via websockets.
 // - useDataArray: Retrieve a data array for a given dataset (array adapter), updates via websockets.
 
-export { useLatestRun } from "./use_latest_run";
+export { useTiledWebSocket } from "./streaming";
 export { useDataTable } from "./use_data_table";
-export { useFrame } from "./array";
+export { useArray } from "./array";
 export { useStreams } from "./use_streams";
 export { useMetadata } from "./metadata";
+export { useSearch } from "./search";

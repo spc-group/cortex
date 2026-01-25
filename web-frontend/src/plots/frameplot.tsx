@@ -2,20 +2,16 @@ import type { Data } from "plotly.js";
 import { useState } from "react";
 import Plot from "react-plotly.js";
 
-import { useFrame, useMetadata } from "../tiled";
-import type { ArrayStructure } from "../tiled/types";
+import { useArray } from "../tiled";
 
 export const FramePlot = ({ path }: { path: string }) => {
   // E.g. /api/v1/array/block/04d28613-b2c4-4b5c-ba31-6aff5c49922d/streams/primary/ge_13element?block=10%2C0%2C0&expected_shape=1%2C13%2C4096
   const [activeFrame, setActiveFrame] = useState(0);
-  const { array } = useFrame(path, activeFrame);
-  const { metadata } = useMetadata<object, ArrayStructure>(path);
-  const structure = metadata?.attributes?.structure;
-  const shape = structure?.shape ?? [0];
+  const { array, shape } = useArray(path, [activeFrame]);
 
   const plotData: Data[] = [
     {
-      z: array,
+      z: array?.[0],
       type: "heatmap",
       colorscale: "Viridis",
       zmin: 0,
@@ -26,6 +22,7 @@ export const FramePlot = ({ path }: { path: string }) => {
   const subtitle = "SUBTITLE";
   const xtext = "XLABEL";
   const ylabel = "YBALEBL";
+  const lastFrame = (shape?.[0] ?? 1) - 1;
 
   return (
     <>
@@ -35,7 +32,7 @@ export const FramePlot = ({ path }: { path: string }) => {
         <input
           type="range"
           min={0}
-          max={shape[0] - 1}
+          max={lastFrame}
           value={activeFrame}
           onChange={(e) => {
             setActiveFrame(Number(e.target.value));
@@ -43,6 +40,7 @@ export const FramePlot = ({ path }: { path: string }) => {
           className="range"
           step="1"
         />
+        <span>{lastFrame}</span>
       </label>
       <Plot
         data={plotData}

@@ -1,6 +1,6 @@
 import type { ChangeEventHandler } from "react";
 
-import type { DataKey } from "../types";
+import type { DataKey } from "../catalog/types";
 
 export const SignalPicker = ({
   dataKeys,
