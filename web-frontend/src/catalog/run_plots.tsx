@@ -36,6 +36,16 @@ export const RunPlots = ({
   const [streamName, setStream] = useState(NULL_SIGNAL);
   const { streams, isLoading: isLoadingStreams } = useStreams(uid);
   const streamNames = Object.keys(streams);
+  streamNames.sort((a, b) => {
+    // "Primary" should be first and "baseline" should be last
+    if (a === "primary" || b === "baseline" || a < b) {
+      return -1;
+    } else if (b === "primary" || a === "baseline" || a > b) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
 
   // Select the primary stream by default
   if (
@@ -76,6 +86,7 @@ export const RunPlots = ({
         <select
           className="select"
           value={streamName}
+          title="Select a data stream"
           onChange={(e) => {
             setStream(e.target.value);
           }}

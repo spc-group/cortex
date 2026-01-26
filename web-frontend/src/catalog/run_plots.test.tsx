@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
+import "@testing-library/jest-dom/vitest";
 import * as React from "react";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
-import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Table } from "apache-arrow";
@@ -36,6 +36,11 @@ vi.mock("../tiled/use_streams", () => {
     useStreams: () => {
       return {
         streams: {
+          baseline: {
+            data_keys: {},
+            ancestors: [],
+          },
+
           primary: {
             data_keys: {},
             ancestors: [],
@@ -81,6 +86,10 @@ describe("the RunPlots component", () => {
     });
   });
   it("doesn't crash", () => {});
+  it("sorts the primary stream to be first", () => {
+    const select = screen.getByTitle("Select a data stream");
+    expect(select.children[0].textContent).toEqual("primary");
+  });
 });
 
 describe("the StreamPlots component", () => {
