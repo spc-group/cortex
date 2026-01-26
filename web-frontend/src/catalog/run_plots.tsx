@@ -199,6 +199,7 @@ export const StreamPlots = ({
                     onSignalChange={(e) => {
                       setXSignal((e.target as HTMLSelectElement).value);
                     }}
+                    localKey={"xSignal"}
                   />
                 </div>
               </th>
@@ -216,6 +217,7 @@ export const StreamPlots = ({
                     onSignalChange={(e) => {
                       setVSignal((e.target as HTMLSelectElement).value);
                     }}
+                    localKey={"vSignal"}
                   />
                 </div>
               </th>
@@ -248,6 +250,7 @@ export const StreamPlots = ({
                     onSignalChange={(e) => {
                       setRSignal((e.target as HTMLSelectElement).value);
                     }}
+                    localKey={"rSignal"}
                   />
                 </div>
               </th>

@@ -56,7 +56,7 @@ describe("the signal picker widget", () => {
     await React.act(async () => {
       render(
         <QueryClientProvider client={queryClient}>
-          <SignalPicker dataKeys={stream.data_keys} />
+          <SignalPicker dataKeys={stream.data_keys} localKey={"my_key"} />
         </QueryClientProvider>,
       );
     });
