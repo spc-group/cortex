@@ -63,30 +63,29 @@ export default function RunTable({
   // *selectRun* isn't doing much until we implement select checkboxes
   selectRun?: (uid: string, isSelected: boolean) => void;
   sortField: string;
-  setSortField: (val: (arg0: string) => string) => void;
+  setSortField: (val: string) => void;
   columns?: TableColumn[];
 }) {
   // Curried version of setSortField for each column
   const sortFieldParser = (field: string) => {
     return () => {
-      setSortField((prevField: string) => {
-        if (prevField == field) {
-          // Reverse sort order
-          return "-" + field;
-        } else if (prevField == "-" + field) {
-          // Turn off sorting
-          return "";
-        } else {
-          // Forward sort order
-          return field;
-        }
-      });
+      if (sortField == field) {
+        // Reverse sort order
+        setSortField("-" + field);
+      } else if (sortField == "-" + field) {
+        // Turn off sorting
+        setSortField("");
+      } else {
+        // Forward sort order
+        setSortField(field);
+      }
+      // setSortField((prevField: string) => {
     };
   };
   const columnHeaders = columns.map((col: TableColumn) => {
     const colOptions: string[] = col.query?.options ?? [];
     return (
-      <th key={"column-" + col.name}>
+      <th key={`column-${col.name}`}>
         <div onClick={sortFieldParser(col.field)}>
           {col.label} <SortIcon fieldName={col.field} sortField={sortField} />
         </div>
@@ -244,8 +243,8 @@ export function Row({
     "start.sample_name": run.metadata.start?.sample_name ?? "",
     "start.plan_name": run.metadata.start?.plan_name ?? "",
     "stop.exit_status": exitStatus,
-    "start.proposal": run.metadata.start?.proposal_id ?? "",
-    "start.esaf": run.metadata.start?.esaf_id ?? "",
+    "start.proposal_id": run.metadata.start?.proposal_id ?? "",
+    "start.esaf_id": run.metadata.start?.esaf_id ?? "",
     "start.time":
       run?.metadata?.start?.time != null
         ? new Date(run.metadata.start.time * seconds)
@@ -308,7 +307,7 @@ export function Row({
           text = value ?? "";
         }
         return (
-          <td key={uid + col.name}>
+          <td key={`${uid}-${col.name}`}>
             <Link to={uid}>{text ?? ""}</Link>
           </td>
         );

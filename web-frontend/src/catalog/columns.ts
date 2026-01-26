@@ -3,7 +3,7 @@ import type { Column } from "./types";
 export const allColumns: Column[] = [
   {
     label: "Plan",
-    name: "plan",
+    name: "planName",
     field: "start.plan_name",
     query: {
       type: "contains",
@@ -12,7 +12,7 @@ export const allColumns: Column[] = [
   },
   {
     label: "Scan",
-    name: "scan",
+    name: "scanName",
     field: "start.scan_name",
     query: {
       type: "contains",
@@ -21,7 +21,7 @@ export const allColumns: Column[] = [
   },
   {
     label: "Sample",
-    name: "sample",
+    name: "sampleName",
     field: "start.sample_name",
     query: {
       type: "contains",
@@ -30,7 +30,7 @@ export const allColumns: Column[] = [
   },
   {
     label: "Exit Status",
-    name: "exit-status",
+    name: "exitStatus",
     field: "stop.exit_status",
     query: {
       type: "eq",
@@ -40,14 +40,9 @@ export const allColumns: Column[] = [
   },
   {
     label: "Start",
-    name: "start-time",
+    name: "startTime",
     field: "start.time",
     query: null,
-    // query: {
-    //   type: "comparison",
-    //   key: "start.time",
-    //   operator: "ge",
-    // },
   },
   {
     label: "UID",
@@ -60,20 +55,20 @@ export const allColumns: Column[] = [
   },
   {
     label: "Proposal",
-    name: "proposal",
-    field: "start.proposal",
+    name: "proposalId",
+    field: "start.proposal_id",
     query: {
       type: "eq",
-      key: "start.proposal",
+      key: "start.proposal_id",
     },
   },
   {
     label: "ESAF",
-    name: "esaf",
-    field: "start.esaf",
+    name: "esafId",
+    field: "start.esaf_id",
     query: {
       type: "eq",
-      key: "start.esaf",
+      key: "start.esaf_id",
     },
   },
 ];

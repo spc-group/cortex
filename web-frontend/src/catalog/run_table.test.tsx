@@ -102,7 +102,7 @@ describe("run table", () => {
     await user.click(heading);
     // Check that we updated the sort field properly
     expect(setSortField.mock.calls).toHaveLength(1);
-    expect(setSortField.mock.calls[0][0](null)).toEqual("start.uid");
+    expect(setSortField.mock.calls[0][0]).toEqual("start.uid");
   });
   it("sorts descending by column", async () => {
     render(
@@ -117,7 +117,7 @@ describe("run table", () => {
     await user.click(heading);
     // Check that we updated the sort field properly
     expect(setSortField.mock.calls).toHaveLength(1);
-    expect(setSortField.mock.calls[0][0]("start.uid")).toEqual("-start.uid");
+    expect(setSortField.mock.calls[0][0]).toEqual("-start.uid");
   });
   it("turns off sorting", async () => {
     render(
@@ -132,7 +132,7 @@ describe("run table", () => {
     await user.click(heading);
     // Check that we updated the sort field properly
     expect(setSortField.mock.calls).toHaveLength(1);
-    expect(setSortField.mock.calls[0][0]("-start.uid")).toEqual("");
+    expect(setSortField.mock.calls[0][0]).toEqual("");
   });
 });
 

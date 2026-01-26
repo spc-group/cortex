@@ -26,33 +26,37 @@ export const FramePlot = ({ path }: { path: string }) => {
 
   return (
     <>
-      <label className="input">
-        <span className="label">Current frame:</span>
-        <span>{activeFrame}</span>
-        <input
-          type="range"
-          min={0}
-          max={lastFrame}
-          value={activeFrame}
-          onChange={(e) => {
-            setActiveFrame(Number(e.target.value));
+      <div>
+        <label className="input">
+          <span className="label">Current frame:</span>
+          <span>{activeFrame}</span>
+          <input
+            type="range"
+            min={0}
+            max={lastFrame}
+            value={activeFrame}
+            onChange={(e) => {
+              setActiveFrame(Number(e.target.value));
+            }}
+            className="range"
+            step="1"
+          />
+          <span>{lastFrame}</span>
+        </label>
+      </div>
+      <div>
+        <Plot
+          data={plotData}
+          layout={{
+            title: { text: title, subtitle: { text: subtitle } },
+            xaxis: { title: { text: xtext } },
+            yaxis: { title: { text: ylabel } },
           }}
-          className="range"
-          step="1"
+          config={{
+            editable: true,
+          }}
         />
-        <span>{lastFrame}</span>
-      </label>
-      <Plot
-        data={plotData}
-        layout={{
-          title: { text: title, subtitle: { text: subtitle } },
-          xaxis: { title: { text: xtext } },
-          yaxis: { title: { text: ylabel } },
-        }}
-        config={{
-          editable: true,
-        }}
-      />
+      </div>
     </>
   );
 };

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 import RunTable from "./run_table";
@@ -8,6 +9,7 @@ import type { TableColumn, Column } from "./types";
 import type { Query } from "../tiled/types";
 import { useRuns } from "./runs";
 import { LiveBadge } from "./live_badge";
+import { useSearchParam } from "./search_param";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -22,20 +24,16 @@ export function Paginator({
   pageLimit: number;
   setPageLimit: (value: number) => void;
   pageOffset: number;
-  setPageOffset: (value: (arg0: number) => number) => void;
+  setPageOffset: (value: number) => void;
 }) {
   // Handlers for swapping pages
   const previousPage = () => {
-    setPageOffset((prevOffset: number) => {
-      const newOffset = Math.max(prevOffset - pageLimit, 0);
-      return newOffset;
-    });
+    const newOffset = Math.max(pageOffset - pageLimit, 0);
+    setPageOffset(newOffset);
   };
   const nextPage = () => {
-    setPageOffset(() => {
-      const newOffset = Math.min(pageOffset + pageLimit, runCount - pageLimit);
-      return newOffset;
-    });
+    const newOffset = Math.min(pageOffset + pageLimit, runCount - pageLimit);
+    setPageOffset(newOffset);
   };
 
   // Render
@@ -65,9 +63,10 @@ export function Paginator({
         <select
           className="select w-20"
           value={pageLimit}
-          onChange={(e) => setPageLimit(Number(e.target.value))}
+          onChange={(e) => setPageLimit(Number(e.currentTarget.value))}
         >
           <option disabled>Runs per page</option>
+          <option>1</option>
           <option>5</option>
           <option>10</option>
           <option>20</option>
@@ -81,27 +80,35 @@ export function Paginator({
 
 export function RunList({ debounce }: { debounce?: number }) {
   const defaultDebounce = debounce ?? DEBOUNCE_DELAY;
+
+  const setSearchParams = useSearchParams()[1];
+
   // State for keeping track of pagination
-  const [pageLimit, setPageLimit] = useState(10);
-  const [pageOffset, setPageOffset] = useState(0);
+  const [pageLimit, setPageLimit] = useSearchParam<number>("pageLimit", 10);
+  const [pageOffset, setPageOffset] = useSearchParam<number>("pageOffset", 0);
 
   // State for selecting which field to use for sorting
-  const [sortField, setSortField] = useState<string>("-start.time");
+  const [sortField, setSortField] = useSearchParam<string>(
+    "sortField",
+    "-start.time",
+  );
 
   // State variables to keep track of how to filter the runs
   const useFilterCol = (col: Column) => {
-    const [filter, setFilter] = useState("");
+    const [filter, setFilter] = useSearchParam<string>(col.name, "");
+    const [rawFilter, setRawFilter] = useState<string>(filter);
     // <select> columns don't need a debounce
     const debounce_ =
       (col.query?.options ?? []).length > 0 ? 0 : defaultDebounce;
+    useDebounce(rawFilter, debounce_, setFilter);
     const newCol: TableColumn = {
       label: col.label,
       name: col.name,
       query: col.query,
       field: col.field,
-      filter: filter,
-      setFilter: setFilter,
-      debouncedFilter: useDebounce(filter, debounce_),
+      filter: rawFilter,
+      setFilter: setRawFilter,
+      debouncedFilter: filter,
     };
     return newCol;
   };
@@ -118,11 +125,22 @@ export function RunList({ debounce }: { debounce?: number }) {
     useFilterCol(allColumns[6]),
     useFilterCol(allColumns[7]),
   ];
-  const [searchText, setSearchText] = useState("");
-  const debouncedSearchText = useDebounce(searchText, defaultDebounce);
-  const [standardsOnly, setStandardsOnly] = useState(false);
-  const [beforeDate, setBeforeDate] = useState("");
-  const [afterDate, setAfterDate] = useState("");
+
+  // const beforeDate = searchParams.get("beforeDate") ?? "";
+  // const afterDate = searchParams.get("afterDate") ?? "";
+  const [beforeDate, setBeforeDate] = useSearchParam<string>("beforeDate", "");
+  const [afterDate, setAfterDate] = useSearchParam<string>("afterDate", "");
+  const [standardsOnly, setStandardsOnly] = useSearchParam<boolean>(
+    "standardsOnly",
+    false,
+  );
+  // Debounced parameters get handled differently
+  const [rawSearchText, setRawSearchText] = useState<string>("");
+  const [fullText, setFullText] = useSearchParam<string>("fullText", "");
+  useDebounce(rawSearchText, defaultDebounce, setFullText);
+  // if (debouncedSearchText != searchParams.get("searchText") ?? "") {
+  //   setSearchState("searchText")(debouncedSearchText);
+  // }
 
   let filters = columns.map((col): Query => {
     // Convert the column state to a Tiled query
@@ -144,10 +162,10 @@ export function RunList({ debounce }: { debounce?: number }) {
       value: "true",
     });
   }
-  if (debouncedSearchText !== "") {
+  if (fullText !== "") {
     filters.push({
       type: "fulltext",
-      value: debouncedSearchText,
+      value: fullText,
     });
   }
   if (beforeDate !== "") {
@@ -159,7 +177,7 @@ export function RunList({ debounce }: { debounce?: number }) {
       operator: "lt",
     });
   }
-  if (afterDate !== "") {
+  if (afterDate !== "" && afterDate != null) {
     const timestamp = new Date(afterDate).getTime() / 1000;
     filters.push({
       type: "comparison",
@@ -181,7 +199,6 @@ export function RunList({ debounce }: { debounce?: number }) {
     pageOffset: pageOffset,
     filters: filters,
   });
-
   return (
     <div className="mx-auto max-w-full">
       <div className="h-10 p-3 space-x-3">
@@ -198,10 +215,12 @@ export function RunList({ debounce }: { debounce?: number }) {
           <MagnifyingGlassIcon className="size-4" />
           <input
             type="search"
-            value={searchText}
+            value={rawSearchText}
             className="grow"
             placeholder="Search (full words)…"
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => {
+              setRawSearchText(e.currentTarget.value);
+            }}
           />
         </label>
         <label className="input">
@@ -210,7 +229,7 @@ export function RunList({ debounce }: { debounce?: number }) {
             type="datetime-local"
             className="input mx-2"
             value={beforeDate}
-            onChange={(e) => setBeforeDate(e.target.value)}
+            onChange={(e) => setBeforeDate(e.currentTarget.value)}
             title="Only include runs started before a given time."
           />
         </label>
@@ -220,7 +239,7 @@ export function RunList({ debounce }: { debounce?: number }) {
             type="datetime-local"
             className="input mx-2"
             value={afterDate}
-            onChange={(e) => setAfterDate(e.target.value)}
+            onChange={(e) => setAfterDate(e.currentTarget.value)}
             title="Only include runs started on or after a given time."
           />
         </label>
@@ -230,7 +249,7 @@ export function RunList({ debounce }: { debounce?: number }) {
             title="Standards checkbox"
             checked={standardsOnly}
             className="toggle"
-            onChange={(e) => setStandardsOnly(e.target.checked)}
+            onChange={(e) => setStandardsOnly(e.currentTarget.checked)}
           />
           Standards only
         </label>
@@ -241,6 +260,9 @@ export function RunList({ debounce }: { debounce?: number }) {
           pageOffset={pageOffset}
           setPageOffset={setPageOffset}
         />
+        <a className={"link"} onClick={() => setSearchParams({})}>
+          Reset all
+        </a>
       </div>
 
       <div className="relative overflow-x-auto">

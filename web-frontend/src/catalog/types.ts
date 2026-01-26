@@ -12,8 +12,8 @@ export interface Column {
       | "start.sample_name"
       | "stop.exit_status"
       | "start.time"
-      | "start.proposal"
-      | "start.esaf"
+      | "start.proposal_id"
+      | "start.esaf_id"
       | "structure_family";
     type: "eq" | "contains" | "comparison";
     operator?: "lt" | "gt" | "le" | "ge";

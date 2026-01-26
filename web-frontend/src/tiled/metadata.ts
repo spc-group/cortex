@@ -13,7 +13,8 @@ export const getMetadata = async (
   { client }: { client?: AxiosInstance } = {},
 ) => {
   const client_ = client ?? v1Client;
-  const response = await client_.get(`metadata/${encodeURIComponent(path)}`, {
+  const metadataPath = `metadata/${path}`;
+  const response = await client_.get(metadataPath, {
     params: {},
   });
   return response.data.data;
