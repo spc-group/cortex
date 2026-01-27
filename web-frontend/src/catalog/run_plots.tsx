@@ -136,6 +136,9 @@ export const StreamPlots = ({
     if (vSignal == null) setVSignal(dataKeyNames[0]);
     if (rSignal == null) setRSignal(dataKeyNames[0]);
   }
+  const iHints = Object.entries(stream?.hints ?? {})
+    .map(([, obj]) => obj.fields)
+    .flat();
 
   // Check for error conditions due to missing data signals
   const needsVSignal = vSignal === NULL_SIGNAL;
@@ -200,6 +203,7 @@ export const StreamPlots = ({
                       setXSignal((e.target as HTMLSelectElement).value);
                     }}
                     localKey={"xSignal"}
+                    hints={iHints}
                   />
                 </div>
               </th>
@@ -218,6 +222,7 @@ export const StreamPlots = ({
                       setVSignal((e.target as HTMLSelectElement).value);
                     }}
                     localKey={"vSignal"}
+                    hints={iHints}
                   />
                 </div>
               </th>
@@ -251,6 +256,7 @@ export const StreamPlots = ({
                       setRSignal((e.target as HTMLSelectElement).value);
                     }}
                     localKey={"rSignal"}
+                    hints={iHints}
                   />
                 </div>
               </th>

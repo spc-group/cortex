@@ -12,18 +12,6 @@ import { ReadyState } from "react-use-websocket";
 import mockMetadata from "../mocks/run_metadata.json";
 import { RunPlots, StreamPlots, DataPlots } from "./run_plots.tsx";
 
-// Mock API response
-// https://github.com/vitest-dev/vitest/discussions/3589
-// vi.mock("@tanstack/react-query", async (importOriginal) => {
-//   return {
-//     ...(await importOriginal()),
-//     useQuery: () => ({
-//       isLoading: false,
-//       error: null,
-//       data: { uid: "hello" },
-//     }),
-//   };
-// });
 vi.mock("../tiled/metadata", () => {
   return {
     useMetadata: () => {
@@ -97,6 +85,11 @@ describe("the StreamPlots component", () => {
     key: "primary",
     data_keys: { sim_motor_2: {} },
     ancestors: [],
+    hints: {
+      sim_motor_2: {
+        fields: ["sim_motor_2"],
+      },
+    },
   };
   beforeEach(async () => {
     await renderRouter(<StreamPlots uid={5} stream={stream} />);

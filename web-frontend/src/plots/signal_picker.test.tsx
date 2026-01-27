@@ -1,8 +1,6 @@
-import * as React from "react";
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 
 import { SignalPicker } from "./signal_picker.tsx";
 
@@ -11,7 +9,9 @@ const stream = {
   ancestors: ["93b837d"],
   specs: [],
   configuration: {},
-  hints: {},
+  hints: {
+    It: { fields: ["It-net-current"] },
+  },
   time: 0,
   uid: "123456",
   key: "primary",
@@ -52,18 +52,24 @@ afterEach(() => {
 
 describe("the signal picker widget", () => {
   beforeEach(async () => {
-    const queryClient = new QueryClient();
-    await React.act(async () => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <SignalPicker dataKeys={stream.data_keys} localKey={"my_key"} />
-        </QueryClientProvider>,
-      );
-    });
+    const hints = ["It-net_current"];
+    render(
+      <SignalPicker
+        dataKeys={stream.data_keys}
+        localKey={"my_key"}
+        hints={hints}
+      />,
+    );
   });
-
-  it("sets the values from datakeys", () => {
+  it("shows hinted signals by default", async () => {
     const options = screen.getAllByRole("option");
+    expect(options.length).toEqual(1);
+  });
+  it("can toggle hints off", async () => {
+    const checkbox = screen.getByRole("checkbox");
+    await fireEvent.click(checkbox);
+    const options = screen.getAllByRole("option");
+    // Two data keys plus "seq_num" and "time"
     expect(options.length).toEqual(4);
   });
 });
