@@ -38,6 +38,7 @@ export interface RunMetadata {
     plan_name?: string;
     time: number;
     uid: string;
+    hints?: { dimensions: [string[], string][] };
   };
   stop?: {
     exit_status: string;

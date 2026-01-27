@@ -6,8 +6,7 @@ import { useLatestRun } from "./latest_run";
 export const LivePlot = ({ beamlineId }: { beamlineId: string }) => {
   // const sendMessage, lastMessage, readyState
   const { run } = useLatestRun(beamlineId);
-  const plots =
-    run == null ? <></> : <RunPlots uid={run.uid} plotStyle="lineplot" />;
+  const plots = run == null ? <></> : <RunPlots run={run} />;
   const uid = run?.metadata?.start?.uid ?? "";
   return (
     <>

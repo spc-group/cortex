@@ -1,3 +1,3 @@
 export { RunList } from "./run_list";
-export { Run } from "./run";
+export { RunDetail } from "./run_detail";
 export { useRuns } from "./runs";

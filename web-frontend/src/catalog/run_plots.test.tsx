@@ -61,13 +61,17 @@ afterEach(() => {
 });
 
 describe("the RunPlots component", () => {
+  const run = {
+    uid: 5,
+    metadata: { start: {} },
+  };
   beforeEach(async () => {
     const queryClient = new QueryClient();
     await React.act(async () => {
       render(
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
-            <RunPlots uid={"5"} />
+            <RunPlots run={run} />
           </QueryClientProvider>
         </BrowserRouter>,
       );

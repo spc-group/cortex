@@ -9,7 +9,7 @@ import { SignalPicker } from "../plots/signal_picker";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
 import { useDataTable, useStreams, useMetadata } from "../tiled";
-import type { Stream, RunMetadata } from "../catalog/types";
+import type { Run, Stream, RunMetadata } from "../catalog/types";
 
 const NULL_SIGNAL = "---";
 const OPERATIONS = ["+", "−", "×", "÷"];
@@ -25,13 +25,8 @@ const toNumberArray = (intArray: BigInt64Array) => {
   return numberArray;
 };
 
-export const RunPlots = ({
-  uid,
-  plotStyle,
-}: {
-  uid: string;
-  plotStyle?: string;
-}) => {
+export const RunPlots = ({ run }: { run: Run }) => {
+  const uid = run.uid;
   // Get the valid streams for this run
   const [streamName, setStream] = useState(NULL_SIGNAL);
   const { streams, isLoading: isLoadingStreams } = useStreams(uid);
@@ -78,6 +73,13 @@ export const RunPlots = ({
     plotTitle = `${runMetadata?.start?.sample_name} - ${runMetadata?.start?.scan_name}`;
     plotSubtitle = `${runMetadata?.start?.uid ?? ""}`;
   }
+  // Get independent hints from the run
+  const dimensions = run.metadata.start?.hints?.dimensions ?? [];
+  const hints = dimensions
+    .map(([hints, stream_]) => {
+      return stream_ === streamName.split("/").slice(-1)[0] ? hints : [];
+    })
+    .flat();
   return (
     <div className="m-4">
       {/* Widget to pick a stream */}
@@ -98,7 +100,7 @@ export const RunPlots = ({
       </div>
       <StreamPlots
         stream={streams?.[streamName] ?? null}
-        plotStyle={plotStyle ?? "lineplot"}
+        runHints={hints}
         plotTitle={plotTitle}
         plotSubtitle={plotSubtitle}
         key={uid}
@@ -112,14 +114,14 @@ export const RunPlots = ({
 // @param stream - The stream name within this run to plot.
 export const StreamPlots = ({
   stream,
-  plotStyle,
   plotTitle,
   plotSubtitle,
+  runHints,
 }: {
   stream: Stream;
-  plotStyle: string;
   plotTitle: string;
   plotSubtitle: string;
+  runHints: string[];
 }) => {
   const [xSignal, setXSignal] = useState<string | null>(null);
   const [vSignal, setVSignal] = useState<string | null>(null);
@@ -199,11 +201,9 @@ export const StreamPlots = ({
                 >
                   <SignalPicker
                     dataKeys={stream.data_keys}
-                    onSignalChange={(e) => {
-                      setXSignal((e.target as HTMLSelectElement).value);
-                    }}
+                    onSignalChange={setXSignal}
                     localKey={"xSignal"}
-                    hints={iHints}
+                    hints={runHints}
                   />
                 </div>
               </th>
@@ -218,9 +218,7 @@ export const StreamPlots = ({
                   <SignalPicker
                     dataKeys={stream.data_keys}
                     error={needsVSignal}
-                    onSignalChange={(e) => {
-                      setVSignal((e.target as HTMLSelectElement).value);
-                    }}
+                    onSignalChange={setVSignal}
                     localKey={"vSignal"}
                     hints={iHints}
                   />
@@ -252,9 +250,7 @@ export const StreamPlots = ({
                     disabled={referenceDisabled}
                     dataKeys={stream.data_keys}
                     error={needsRSignal}
-                    onSignalChange={(e) => {
-                      setRSignal((e.target as HTMLSelectElement).value);
-                    }}
+                    onSignalChange={setRSignal}
                     localKey={"rSignal"}
                     hints={iHints}
                   />
@@ -323,7 +319,6 @@ export const StreamPlots = ({
           xSignal={xSignal}
           vSignal={vSignal}
           rSignal={rSignal}
-          plotStyle={plotStyle}
           operation={operation}
           inverted={inverted}
           logarithm={logarithm}
@@ -354,7 +349,6 @@ export function DataPlots({
   operation: string;
   inverted: boolean;
   logarithm: boolean;
-  plotStyle?: string;
   plotTitle?: string;
   plotSubtitle?: string;
 }) {

@@ -1,5 +1,5 @@
-import type { ChangeEventHandler, ChangeEvent } from "react";
-import { useState } from "react";
+import type { ChangeEvent } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import type { DataKey } from "../catalog/types";
 import { useLastChoice } from "./last_choice.ts";
@@ -13,13 +13,14 @@ export const SignalPicker = ({
   hints,
 }: {
   dataKeys: { [key: string]: DataKey };
-  onSignalChange?: ChangeEventHandler;
+  onSignalChange?: (value: string | null) => void;
   disabled?: boolean;
   error?: boolean;
   localKey: string;
   hints?: string[];
 }) => {
   const hasHints = (hints ?? []).length > 0;
+  const firstRender = useRef(true);
   const [hintsOnly, setHintsOnly] = useState(hasHints);
   // Prepare the list of signals from the stream's data keys
   let signals: string[] = Object.keys(dataKeys);
@@ -31,12 +32,19 @@ export const SignalPicker = ({
 
   // Get a default signal to start with
   const [signal, setSignal] = useLastChoice<string>("", signals, localKey);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      onSignalChange?.(signal);
+    }
+  }, [signal, onSignalChange]);
 
   const onChangeHandler = (event: ChangeEvent<HTMLSelectElement>) => {
+    const newValue = event.currentTarget.value;
     if (onSignalChange != null) {
-      onSignalChange(event); // <- change this pass value instead of event
+      onSignalChange(newValue); // <- change this pass value instead of event
     }
-    setSignal(event.currentTarget.value);
+    setSignal(newValue);
   };
   return (
     <>
