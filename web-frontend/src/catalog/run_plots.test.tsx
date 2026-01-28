@@ -10,7 +10,7 @@ import { Table } from "apache-arrow";
 import { ReadyState } from "react-use-websocket";
 
 import mockMetadata from "../mocks/run_metadata.json";
-import { RunPlots, StreamPlots, DataPlots } from "./run_plots.tsx";
+import { RunPlots, StreamPlots, TablePlots, ArrayPlots } from "./run_plots.tsx";
 
 vi.mock("../tiled/metadata", () => {
   return {
@@ -55,6 +55,23 @@ vi.mock("../tiled/use_data_table", () => {
     },
   };
 });
+vi.mock("../tiled/array", () => {
+  return {
+    useArray: () => {
+      return {
+        array: [],
+        readyState: ReadyState.OPEN,
+      };
+    },
+    useArrayStats: () => {
+      return {
+        sum: [],
+        readyState: ReadyState.OPEN,
+      };
+    },
+  };
+});
+
 afterEach(() => {
   vi.restoreAllMocks();
   cleanup();
@@ -116,12 +133,24 @@ const renderRouter = async (element) => {
   });
 };
 
-describe("the RunDataPlots component", () => {
+describe("the TablePlots component", () => {
   beforeEach(async () => {
     const stream = {
       ancestors: ["12345-6789"],
     };
-    await renderRouter(<DataPlots stream={stream} />);
+    await renderRouter(<TablePlots stream={stream} />);
+  });
+  it("shows the 'live' badge", () => {
+    expect(screen.getByText("Live")).toBeInTheDocument();
+  });
+});
+
+describe("the ArrayPlots component", () => {
+  beforeEach(async () => {
+    const stream = {
+      ancestors: ["12345-6789"],
+    };
+    await renderRouter(<ArrayPlots stream={stream} />);
   });
   it("shows the 'live' badge", () => {
     expect(screen.getByText("Live")).toBeInTheDocument();

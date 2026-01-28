@@ -10,7 +10,7 @@
 
 export { useTiledWebSocket } from "./streaming";
 export { useDataTable } from "./use_data_table";
-export { useArray } from "./array";
+export { useArray, useArrayStats } from "./array";
 export { useStreams } from "./use_streams";
 export { useMetadata } from "./metadata";
 export { useSearch } from "./search";

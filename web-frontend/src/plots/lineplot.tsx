@@ -2,6 +2,11 @@ import type { Data } from "plotly.js";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import Plot from "react-plotly.js";
 
+const COLORS = {
+  "tab:blue": "#1f77b4",
+  "tab:red": "#d62728",
+};
+
 export const LinePlot = ({
   xdata,
   ydata,
@@ -9,6 +14,7 @@ export const LinePlot = ({
   subtitle,
   xlabel,
   ylabel,
+  activePoint,
 }: {
   xdata: number[] | null;
   ydata: number[] | null;
@@ -16,16 +22,23 @@ export const LinePlot = ({
   subtitle?: string;
   xlabel?: string;
   ylabel?: string;
+  activePoint?: number;
 }) => {
   // http://localhost:8000/api/v1/table/partition/9e2ac83f-da86-4acd-9a20-26f8263aecf9%2Fstreams%2Fprimary%2Finternal?partition=0&column=sim_motor_2&column=ts_sim_motor_2
   // https://github.com/bluesky/tiled-viewer-react/blob/eabb0d63a00a31a0630c4cabd1ec35ae5e66ea16/src/components/Tiled/apiClient.ts#L258
   const plotData: Data[] = [];
   if (ydata != null) {
+    const colors = Array(ydata.length).fill(COLORS["tab:blue"]);
+    const symbols = Array(ydata.length).fill("circle");
+    if (activePoint != null) {
+      colors[activePoint] = COLORS["tab:red"];
+      symbols[activePoint] = "cross";
+    }
     const ds: Data = {
       y: ydata,
       type: "scatter",
       mode: "lines+markers",
-      marker: { color: "red" },
+      marker: { color: colors, symbol: symbols },
     };
     if (xdata != null) {
       ds.x = xdata;

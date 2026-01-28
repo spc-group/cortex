@@ -1,18 +1,25 @@
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { LinePlot } from "../plots";
 import { FramePlot } from "../plots";
 import { SignalPicker } from "../plots/signal_picker";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
-import { useDataTable, useStreams, useMetadata } from "../tiled";
+import {
+  useDataTable,
+  useStreams,
+  useMetadata,
+  useArray,
+  useArrayStats,
+} from "../tiled";
+import { axisLabels, OPERATIONS } from "./axis_labels";
 import type { Run, Stream, RunMetadata } from "../catalog/types";
+import { useLastChoice } from "../plots/last_choice.ts";
 
 const NULL_SIGNAL = "---";
-const OPERATIONS = ["+", "−", "×", "÷"];
 
 const toNumberArray = (intArray: BigInt64Array) => {
   const numberArray = [];
@@ -129,7 +136,11 @@ export const StreamPlots = ({
   const [inverted, setInverted] = useState(false);
   const [logarithm, setLogarithm] = useState(false);
   const [gradient, setGradient] = useState(false);
-  const [operation, setOperation] = useState("");
+  const [operation, setOperation] = useLastChoice<string>(
+    "",
+    ["", ...OPERATIONS],
+    "operation",
+  );
   const referenceDisabled = operation === "";
 
   const dataKeyNames = Object.keys(stream?.data_keys ?? {});
@@ -145,7 +156,7 @@ export const StreamPlots = ({
   // Check for error conditions due to missing data signals
   const needsVSignal = vSignal === NULL_SIGNAL;
   const needsRSignal =
-    rSignal === NULL_SIGNAL && OPERATIONS.includes(operation);
+    rSignal === NULL_SIGNAL && OPERATIONS.includes(operation ?? "");
 
   // Handlers for preset configuration
   const normalMode = () => {
@@ -184,6 +195,42 @@ export const StreamPlots = ({
           above to plot.
         </span>
       </div>
+    );
+  }
+
+  const vKey = vSignal != null ? stream?.data_keys?.[vSignal] : null;
+  let plotWidget;
+  if (stream == null) {
+    plotWidget = <></>;
+  } else if (vKey?.dtype === "array") {
+    plotWidget = (
+      <ArrayPlots
+        stream={stream}
+        xSignal={xSignal}
+        vSignal={vSignal}
+        rSignal={rSignal}
+        operation={operation ?? ""}
+        inverted={inverted}
+        logarithm={logarithm}
+        plotTitle={plotTitle}
+        plotSubtitle={plotSubtitle}
+        key={stream.uid}
+      />
+    );
+  } else {
+    plotWidget = (
+      <TablePlots
+        stream={stream}
+        xSignal={xSignal}
+        vSignal={vSignal}
+        rSignal={rSignal}
+        operation={operation ?? ""}
+        inverted={inverted}
+        logarithm={logarithm}
+        plotTitle={plotTitle}
+        plotSubtitle={plotSubtitle}
+        key={stream.uid}
+      />
     );
   }
 
@@ -230,7 +277,7 @@ export const StreamPlots = ({
               <th>
                 <select
                   className="select w-18 float-left"
-                  value={operation}
+                  value={operation ?? ""}
                   role="listbox"
                   onChange={(e) => {
                     setOperation((e.target as HTMLSelectElement).value);
@@ -311,27 +358,12 @@ export const StreamPlots = ({
       </div>
 
       {infoWidget}
-      {stream == null ? (
-        <></>
-      ) : (
-        <DataPlots
-          stream={stream}
-          xSignal={xSignal}
-          vSignal={vSignal}
-          rSignal={rSignal}
-          operation={operation}
-          inverted={inverted}
-          logarithm={logarithm}
-          plotTitle={plotTitle}
-          plotSubtitle={plotSubtitle}
-          key={stream.uid}
-        />
-      )}
+      {plotWidget}
     </>
   );
 };
 
-export function DataPlots({
+export function TablePlots({
   stream,
   xSignal,
   vSignal,
@@ -359,9 +391,6 @@ export function DataPlots({
     table: data,
   } = useDataTable(stream);
 
-  const arrayPath = [...stream.ancestors, stream.key, vSignal].join("/");
-  const vKey = vSignal != null ? stream?.data_keys?.[vSignal] : null;
-
   // Process data into a form consumable by the plots
   let xdata, vdata, rdata;
   if (isLoadingData || data == null) {
@@ -384,21 +413,19 @@ export function DataPlots({
   });
 
   // Decide on plot annotations based on data processing
-  let ylabel = vSignal;
-  if (OPERATIONS.includes(operation)) {
-    ylabel = `${ylabel} ${operation} ${rSignal}`;
-  }
-  if (inverted) {
-    ylabel = `( ${ylabel} )⁻`;
-  }
-  if (logarithm) {
-    ylabel = `ln( ${ylabel} )`;
-  }
   // Decide what kind of thing to show
-  let widget;
   if (isLoadingData) {
     return <div className="skeleton h-112 w-175"></div>;
   }
+
+  const labels = axisLabels({
+    xSignal: [xSignal ?? "", null],
+    vSignal: [vSignal ?? "", null],
+    rSignal: [rSignal ?? "", null],
+    inverted,
+    logarithm,
+    operation,
+  });
 
   return (
     <>
@@ -406,30 +433,131 @@ export function DataPlots({
         <LiveBadge readyState={readyState} />
       </div>
 
-      {widget}
-
-      <h3>Line plot</h3>
-
       <LinePlot
         xdata={xdata}
         ydata={ydata}
-        xlabel={xSignal ?? ""}
-        ylabel={ylabel ?? ""}
+        xlabel={labels.x}
+        ylabel={labels.y}
         title={plotTitle}
         subtitle={plotSubtitle}
       />
-      <h3>Frames</h3>
-      {vKey?.shape?.length === 3 ? (
-        <>
-          <FramePlot path={arrayPath} />
-        </>
+    </>
+  );
+}
+
+export function ArrayPlots({
+  stream,
+  xSignal,
+  vSignal,
+  rSignal,
+  operation,
+  inverted,
+  logarithm,
+  plotTitle,
+  plotSubtitle,
+}: {
+  stream: Stream;
+  xSignal: string | null;
+  vSignal: string | null;
+  rSignal: string | null;
+  operation: string;
+  inverted: boolean;
+  logarithm: boolean;
+  plotTitle?: string;
+  plotSubtitle?: string;
+}) {
+  // Open connections to listen for latest data
+  const {
+    isLoading: isLoadingTable,
+    readyState,
+    table: data,
+  } = useDataTable(stream);
+
+  const arrayPath = [...stream.ancestors, stream.key, vSignal].join("/");
+  const [activeFrame, setActiveFrame] = useState(0);
+  const previousFrame = useRef<number[][] | null>(null);
+  const { array: frameData, shape: frameShape } = useArray(arrayPath, [
+    activeFrame,
+  ]);
+  const { sum, isLoading: isLoadingStats } = useArrayStats(arrayPath);
+  const lastFrame = (frameShape?.[0] ?? 1) - 1;
+  if (frameData != null) {
+    previousFrame.current = frameData;
+  }
+
+  // Process data into a form consumable by the plots
+  let xdata, vdata, rdata;
+  if (isLoadingTable || data == null || isLoadingStats) {
+    xdata = null;
+    vdata = null;
+    rdata = null;
+  } else {
+    xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
+    xdata = toNumberArray(xdata);
+    vdata = sum;
+    rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
+    rdata = toNumberArray(rdata);
+  }
+
+  // Apply reference correction and processing steps
+  const ydata = prepareYData(vdata, rdata, operation, {
+    inverted: inverted,
+    logarithm: logarithm,
+  });
+
+  const labels = axisLabels({
+    xSignal: [xSignal ?? "", null],
+    vSignal: [vSignal ?? "", null],
+    rSignal: [rSignal ?? "", null],
+    inverted,
+    logarithm,
+    operation,
+  });
+
+  const imData = frameData ?? previousFrame.current;
+
+  return (
+    <>
+      <div className="m-2">
+        <LiveBadge readyState={readyState} />
+      </div>
+      {isLoadingTable || isLoadingStats ? (
+        <div className="skeleton h-112 w-175"></div>
       ) : (
-        <div role="alert" className="m-2 alert alert-error alert-soft">
-          <span>
-            <ExclamationTriangleIcon className="size-4 inline" /> No plottable
-            frames are available for "{vSignal}".
-          </span>
-        </div>
+        <LinePlot
+          xdata={xdata}
+          ydata={ydata}
+          xlabel={labels.x}
+          ylabel={labels.y}
+          title={plotTitle}
+          subtitle={plotSubtitle}
+          activePoint={activeFrame}
+        />
+      )}
+
+      <div>
+        <label className="input w-130">
+          <span className="label">Current frame:</span>
+          <span>{activeFrame}</span>
+          <input
+            type="range"
+            min={0}
+            max={lastFrame}
+            value={activeFrame}
+            onChange={(e) => {
+              setActiveFrame(Number(e.target.value));
+            }}
+            className="range"
+            step="1"
+          />
+          <span>{lastFrame}</span>
+        </label>
+      </div>
+
+      {imData != null ? (
+        <FramePlot frame={imData} />
+      ) : (
+        <div className="skeleton h-[457px] w-[700px]"></div>
       )}
     </>
   );

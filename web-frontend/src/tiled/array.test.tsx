@@ -7,7 +7,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import { ReadyState } from "react-use-websocket";
 import { useQuery } from "@tanstack/react-query";
 
-import { getArray, useArray } from "./array";
+import { getArray, useArray, useArrayStats, reduceArrayStats } from "./array";
 import { mockUrl, tiledServer } from "../mocks/";
 import { useTiledWebSocket } from "./streaming";
 
@@ -60,17 +60,21 @@ vi.mock("@tanstack/react-query", async () => {
     useQuery: vi.fn(() => {
       return {
         isLoading: false,
-        data: [1, 2, 3],
+        data: [
+          [1, 2, 3],
+          [4, 5, 6],
+        ],
       };
     }),
   };
 });
 
+let client: AxiosInstance;
+beforeEach(() => {
+  client = axios.create({ baseURL: mockUrl });
+});
+
 describe("getArray() function", () => {
-  let client: AxiosInstance;
-  beforeEach(() => {
-    client = axios.create({ baseURL: mockUrl });
-  });
   it("returns slices", async () => {
     const array = await getArray("my_run/primary/bdet", [0, 1], {
       client: client,
@@ -100,7 +104,7 @@ describe("useArray", () => {
   };
   it("returns all array frames by default", () => {
     render(<MockComponent slices={null} />);
-    expect(screen.getByText("Array: 123")).toBeInTheDocument();
+    expect(screen.getByText("Array: 123456")).toBeInTheDocument();
     // Check which slices were requested by inspecting the query key
     const lastKey = (useQuery as Mock).mock.lastCall?.[0].queryKey;
     const allSlices = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -109,7 +113,7 @@ describe("useArray", () => {
 
   it("returns the requested array frame", () => {
     render(<MockComponent slices={null} />);
-    expect(screen.getByText("Array: 123")).toBeInTheDocument();
+    expect(screen.getByText("Array: 123456")).toBeInTheDocument();
   });
   it("returns array metadata from HTTP", () => {
     render(<MockComponent slices={null} />);
@@ -135,6 +139,129 @@ describe("useArray", () => {
     expect(screen.getByText("Shape: 25,240,320,")).toBeInTheDocument();
     expect(screen.getByText("readyState: 1")).toBeInTheDocument();
   });
+});
+
+describe("useArrayStats", () => {
+  const MockComponent = () => {
+    const { max, min, sum } = useArrayStats("my_run/primary/bdet", {
+      client: client,
+    });
+    return (
+      <>
+        <div>Max: {JSON.stringify(max)}</div>
+        <div>Min: {JSON.stringify(min)}</div>
+        <div>Sum: {JSON.stringify(sum)}</div>
+      </>
+    );
+  };
+  it("calculates the stats", () => {
+    render(<MockComponent />);
+    // They're all null on the first pass, need to figure out a better test
+    expect(
+      screen.getByText(`Sum: [${Array(25).fill("null").join(",")}]`),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(`Min: [${Array(25).fill("null").join(",")}]`),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(`Max: [${Array(25).fill("null").join(",")}]`),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("the arrayStatsReducer() function", () => {
+  it("updates the shape state", () => {
+    const oldStats = {
+      sum: [],
+      max: [],
+      min: [],
+      shape: [],
+    };
+    const action = {
+      type: "update_shape",
+      shape: [3, 1024, 1024],
+      index: 0,
+      data: [],
+    };
+    const newStats = reduceArrayStats(oldStats, action);
+    expect(newStats.shape).toEqual([3, 1024, 1024]);
+  });
+  it("creates empty arrays", () => {
+    const oldStats = {
+      sum: [],
+      max: [],
+      min: [],
+      shape: [1],
+    };
+    const action = {
+      type: "update_shape",
+      shape: [3, 1024, 1024],
+      data: [] as number[][],
+      index: 0,
+    };
+    const newStats = reduceArrayStats(oldStats, action);
+    expect(newStats.sum).toEqual([null, null, null]);
+    expect(newStats.max).toEqual([null, null, null]);
+    expect(newStats.min).toEqual([null, null, null]);
+  });
+  it("extends existing arrays", () => {
+    const oldStats = {
+      sum: [null, null],
+      max: [null],
+      min: [],
+      shape: [],
+    };
+    const action = {
+      type: "update_shape",
+      shape: [3, 1024, 1024],
+      data: [] as number[][],
+      index: 0,
+    };
+    const newStats = reduceArrayStats(oldStats, action);
+    expect(newStats.sum).toEqual([null, null, null]);
+    expect(newStats.max).toEqual([null, null, null]);
+    expect(newStats.min).toEqual([null, null, null]);
+  });
+  it("adds new slice stats", () => {
+    const oldStats = {
+      sum: [null],
+      max: [null],
+      min: [null],
+      shape: [1],
+    };
+    const action = {
+      type: "add_slice",
+      data: [[1, 2, 3]],
+      index: 0,
+      shape: [] as number[],
+    };
+    const newStats = reduceArrayStats(oldStats, action);
+    expect(newStats.sum).toEqual([6]);
+    expect(newStats.max).toEqual([3]);
+    expect(newStats.min).toEqual([1]);
+  });
+  // it("goes fast (vrooom!)", () => {
+  //   const oldStats = {
+  //     sum: [null],
+  //     max: [null],
+  //     min: [null],
+  //     shape: [1],
+  //   };
+  //   const [nCol, nRow] = [2048, 1840];
+  //   const sliceData = [...Array(nRow).keys()].map((row) => {
+  //     return [...Array(nCol).keys()].map((col) => col + nCol * nRow);
+  //   });
+  //   const action = {
+  //     type: "add_slice",
+  //     data: sliceData,
+  //     index: 0,
+  //     shape: [] as number[],
+  //   };
+  //   const t0 = performance.now();
+  //   const newStats = reduceArrayStats(oldStats, action);
+  //   const runTime = performance.now() - t0;
+  //   expect(runTime).toBeLessThan(100);
+  // });
 });
 
 // // {"detail":"None of the media types requested by the client are supported. Supported: text/plain, image/tiff, image/png, text/csv, text/x-comma-separated-values, application/octet-stream, application/vnd.ms-excel, application/json, text/html. Requested: blah."}%

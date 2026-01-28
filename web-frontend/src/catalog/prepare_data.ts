@@ -5,7 +5,7 @@ const multiply = (a: number, b: number) => a * b;
 const divide = (a: number, b: number) => a / b;
 
 export function prepareYData(
-  vdata: number[] | null,
+  vdata: (number | null)[] | null,
   rdata: number[] | null,
   operation: string,
   { inverted, logarithm }: { inverted?: boolean; logarithm?: boolean } = {},
@@ -39,7 +39,12 @@ export function prepareYData(
   }
   const ydata = vdata.map(function (num, idx) {
     const rval = rdata != null ? rdata[idx] : 0;
-    let val = op(num, rval);
+    let val: number;
+    if (operation === "") {
+      val = num ?? NaN;
+    } else {
+      val = num != null ? op(num, rval) : NaN;
+    }
     if (inverted) {
       val = 1 / val;
     }

@@ -1,6 +1,8 @@
 import { tableFromIPC } from "apache-arrow";
 import axios from "axios";
 import type { AxiosInstance } from "axios";
+// import { setupCache, buildWebStorage } from "axios-cache-interceptor";
+
 import type { DataKey, Stream } from "../catalog/types";
 import type { Spec as BlueskySpec } from "./types";
 import qs from "qs";
@@ -9,9 +11,13 @@ const envHost = import.meta.env.VITE_TILED_URI;
 export const tiledHost = envHost ?? "http://127.0.0.1:0";
 export const tiledUri = tiledHost + "/api/v1/";
 
-export const v1Client = axios.create({
+const instance = axios.create({
   baseURL: tiledUri,
 });
+// export const v1Client = setupCache(instance, {
+//   storage: buildWebStorage(localStorage, 'axios-cache:')
+// });
+export const v1Client = instance;
 
 // Retrieve the info about API accepted formats, etc.
 export const getApiInfo = async ({
@@ -67,16 +73,14 @@ export const getTableData = async (
   return table;
 };
 
-type APIStream = {
-  data: {
-    id: string;
-    attributes: {
-      metadata: { [key: string]: object | string | number };
-      ancestors: string[];
-      structure_family: string;
-      specs: BlueskySpec[];
-    };
-  }[];
+type APIDatum = {
+  id: string;
+  attributes: {
+    metadata: { [key: string]: object | string | number };
+    ancestors: string[];
+    structure_family: string;
+    specs: BlueskySpec[];
+  };
 };
 
 export const getStreams = async (
@@ -84,17 +88,17 @@ export const getStreams = async (
   { client }: { client?: AxiosInstance } = {},
 ): Promise<{ [key: string]: Stream }> => {
   const client_ = client ?? v1Client;
-  const { data } = await client_.get<APIStream>(`search/${uid}`);
+  const { data } = await client_.get<{ data: APIDatum[] }>(`search/${uid}`);
   // Check if we are reading a legacy run with the old "streams" namespace
   let streamData = data.data;
-  const streamNames = streamData.map((child) => child.id);
+  const streamNames = streamData.map((child: APIDatum) => child.id);
   const hasStreamsNamespace = JSON.stringify(streamNames) === '["streams"]';
   if (hasStreamsNamespace) {
     const { data } = await client_.get(`search/${uid}/streams`);
     streamData = data.data;
   }
   // Convert to the internal Stream interface
-  const streamEntries = streamData.map((datum) => {
+  const streamEntries = streamData.map((datum: APIDatum) => {
     const attrs = datum.attributes;
 
     const key = datum.id;
