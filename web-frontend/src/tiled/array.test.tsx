@@ -240,28 +240,40 @@ describe("the arrayStatsReducer() function", () => {
     expect(newStats.max).toEqual([3]);
     expect(newStats.min).toEqual([1]);
   });
-  // it("goes fast (vrooom!)", () => {
-  //   const oldStats = {
-  //     sum: [null],
-  //     max: [null],
-  //     min: [null],
-  //     shape: [1],
-  //   };
-  //   const [nCol, nRow] = [2048, 1840];
-  //   const sliceData = [...Array(nRow).keys()].map((row) => {
-  //     return [...Array(nCol).keys()].map((col) => col + nCol * nRow);
-  //   });
-  //   const action = {
-  //     type: "add_slice",
-  //     data: sliceData,
-  //     index: 0,
-  //     shape: [] as number[],
-  //   };
-  //   const t0 = performance.now();
-  //   const newStats = reduceArrayStats(oldStats, action);
-  //   const runTime = performance.now() - t0;
-  //   expect(runTime).toBeLessThan(100);
-  // });
+  it("goes fast (☇ vrooom!)", () => {
+    // See how long we can expect to take on this platform
+    const t0 = performance.now();
+    let sum = 0;
+    for (let i = 0; i < 1e6; i++) {
+      sum += i;
+    }
+    const maxTime = (performance.now() - t0) * 80;
+    expect(sum).toEqual(499999500000);
+    // Now do the test with a big array
+    const oldStats = {
+      sum: [null],
+      max: [null],
+      min: [null],
+      shape: [1],
+    };
+    const [nCol, nRow] = [2048, 1840];
+    const sliceData = [...Array(nRow).keys()].map((row) => {
+      return [...Array(nCol).keys()].map((col) => col + nCol * row);
+    });
+    const action = {
+      type: "add_slice",
+      data: sliceData,
+      index: 0,
+      shape: [] as number[],
+    };
+    const t2 = performance.now();
+    const newStats = reduceArrayStats(oldStats, action);
+    const runTime = performance.now() - t2;
+    expect(newStats.sum).toEqual([7100115927040]);
+    expect(newStats.min).toEqual([0]);
+    expect(newStats.max).toEqual([2048 * 1840 - 1]);
+    expect(runTime).toBeLessThan(maxTime);
+  });
 });
 
 // // {"detail":"None of the media types requested by the client are supported. Supported: text/plain, image/tiff, image/png, text/csv, text/x-comma-separated-values, application/octet-stream, application/vnd.ms-excel, application/json, text/html. Requested: blah."}%

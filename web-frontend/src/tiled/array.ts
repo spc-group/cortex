@@ -224,16 +224,17 @@ export const reduceArrayStats = (
     case "add_slice": {
       // const t0 = performance.now();
       const data = action.data.flat();
-      const newSum = data.reduce(
-        (sum: number, value: number) => sum + value,
-        0,
+      const cumulative = data.reduce(
+        (stats, value: number) => {
+          return {
+            sum: stats.sum + value,
+            min: value < stats.min ? value : stats.min,
+            max: value > stats.max ? value : stats.max,
+          };
+        },
+        { sum: 0, max: -Infinity, min: Infinity },
       );
-      const newMin = data.reduce((min: number, value: number) =>
-        value < min ? value : min,
-      );
-      const newMax = data.reduce((max: number, value: number) =>
-        value > max ? value : max,
-      );
+      const { sum: newSum, min: newMin, max: newMax } = cumulative;
       // console.log(`Math took ${performance.now() - t0} milliseconds`);
       const newStats = {
         sum: [
