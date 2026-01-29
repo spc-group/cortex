@@ -50,6 +50,16 @@ const dtypeToArray = (dtype: DataType) => {
   const klass = {
     // '[kind, size]': ArrayClass
     '["u",1]': Uint8Array,
+    '["u",2]': Uint16Array,
+    '["u",4]': Uint32Array,
+    '["u",8]': BigUint64Array,
+    '["i",1]': Int8Array,
+    '["i",2]': Int16Array,
+    '["i",4]': Int32Array,
+    '["i",8]': BigInt64Array,
+    '["f",2]': Float16Array,
+    '["f",4]': Float32Array,
+    '["f",8]': Float64Array,
   }[JSON.stringify([dtype.kind, dtype.itemsize])];
   if (klass == null) {
     if (dtype.itemsize !== 0) {
