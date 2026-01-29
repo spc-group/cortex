@@ -6,7 +6,13 @@ import type { ReadyState } from "react-use-websocket";
 import { useMetadata } from "./metadata";
 import { useTiledWebSocket } from "./streaming";
 import { v1Client } from "./tiled_api";
-import type { ArrayStructure, WebSocketArray } from "./types";
+import type {
+  ArrayStructure,
+  WebSocketArray,
+  DataType,
+  TypedArray,
+  TypedArrayConstructor,
+} from "./types";
 
 // Hit the API over HTTP to get a given array slice
 // @param path - The Tiled URI path for this array
@@ -15,26 +21,45 @@ import type { ArrayStructure, WebSocketArray } from "./types";
 export const getArraySlice = async (
   path: string,
   sliceNum: number,
+  ArrayClass: TypedArrayConstructor,
   { client }: { client?: AxiosInstance } = {},
-) => {
+): Promise<TypedArray> => {
   const client_ = client ?? v1Client;
   const response = await client_.get(`array/full/${path}`, {
-    params: { slice: sliceNum, format: "application/json" },
-    // responseType: "arraybuffer",
+    params: { slice: sliceNum, format: "application/octet-stream" },
+    responseType: "arraybuffer",
   });
-  return response.data;
+  const buff = new ArrayClass(response.data);
+  return buff;
 };
 
 // Retrieve multiple slices in parallel over HTTP GET
 export const getArray = async (
   path: string,
   slices: number[],
+  ArrayClass: TypedArrayConstructor,
   { client }: { client?: AxiosInstance } = {},
 ) => {
   const promises = slices.map((slice) =>
-    getArraySlice(path, slice, { client }),
+    getArraySlice(path, slice, ArrayClass, { client }),
   );
   return await Promise.all(promises);
+};
+
+const dtypeToArray = (dtype: DataType) => {
+  const klass = {
+    // '[kind, size]': ArrayClass
+    '["u",1]': Uint8Array,
+  }[JSON.stringify([dtype.kind, dtype.itemsize])];
+  if (klass == null) {
+    if (dtype.itemsize !== 0) {
+      console.log(JSON.stringify([dtype.kind, dtype.itemsize]));
+      console.error(`Could not pick an array type for ${dtype}.`);
+    }
+    return Uint8Array;
+  }
+
+  return klass;
 };
 
 // A hook that provides slices from a given array.
@@ -45,13 +70,11 @@ export const useArray = (
   path: string,
   slices: number[] | null = null,
 ): {
-  array: number[][] | null;
+  array: TypedArray[][] | null;
   isLoading: boolean;
   readyState: ReadyState;
   shape: number[];
-  endianness: string;
-  kind: string;
-  itemsize: number;
+  dataType: DataType;
 } => {
   // Get array information via HTTP request
   const shapeRef = useRef<number[]>([]);
@@ -59,16 +82,17 @@ export const useArray = (
     object,
     ArrayStructure
   >(path);
-  let endianness: string, kind: string, itemsize: number;
+  let dataType: DataType;
   if (isLoadingMetadata || metadata == null) {
-    endianness = "";
-    kind = "";
-    itemsize = 0;
+    dataType = {
+      endianness: "",
+      kind: "",
+      itemsize: 0,
+      dt_units: null,
+    };
   } else {
     const structure = metadata.attributes.structure;
-    endianness = structure.data_type.endianness;
-    kind = structure.data_type.kind;
-    itemsize = structure.data_type.itemsize;
+    dataType = structure.data_type;
     // Only update the shape if it hasn't been initialized yet
     if (shapeRef.current.length === 0) {
       shapeRef.current = structure.shape;
@@ -82,11 +106,12 @@ export const useArray = (
     realSlices = slices;
   }
   // Get the past data with a regular HTTP GET request
-  const { isLoading: isLoadingData, data: array } = useQuery<number[][]>({
+  const ArrayClass = dtypeToArray(dataType);
+  const { isLoading: isLoadingData, data: buffers } = useQuery<TypedArray[]>({
     queryFn: async () => {
-      return await getArray(path, realSlices);
+      return await getArray(path, realSlices, ArrayClass);
     },
-    queryKey: ["array", path, ...realSlices],
+    queryKey: ["array", path, ...realSlices, ArrayClass],
   });
   // Watch for shape updates via websockets
   const { payload, readyState } = useTiledWebSocket<WebSocketArray>(path);
@@ -96,15 +121,33 @@ export const useArray = (
   ) {
     shapeRef.current = payload.data_source.structure.shape;
   }
+  // Reshape the buffer arrays to match the expected shape
+  const array =
+    buffers != null ? reshapeArray(buffers, shapeRef.current) : null;
+
   return {
-    array: array ?? null,
+    array,
     isLoading: isLoadingData || isLoadingMetadata,
     readyState,
     shape: shapeRef.current,
-    endianness: endianness,
-    kind: kind,
-    itemsize: itemsize,
+    dataType,
   };
+};
+
+// Reshape the buffer arrays to match the expected shape
+const reshapeArray = (
+  buffers: TypedArray[],
+  shape: number[],
+): TypedArray[][] | null => {
+  if (buffers == null) {
+    return null;
+  }
+  return buffers.map((buff) => {
+    const [nRows, nCols] = [shape[1], shape[2]];
+    return [...Array(nRows).keys()].map((row) => {
+      return buff.slice(row * nCols, (row + 1) * nCols);
+    });
+  });
 };
 
 interface Stats {
@@ -131,15 +174,21 @@ export const useArrayStats = (
     shape: [],
   });
   // Update the stats to make the new shape of the array
-  const { isLoading, readyState, shape } = useArray(path, []);
+  const { isLoading, readyState, shape, dataType } = useArray(path, []);
   if (shape !== arrayStats.shape) {
-    dispatch({ type: "update_shape", shape: shape, data: [], index: 0 });
+    dispatch({
+      type: "update_shape",
+      shape: shape,
+      data: new Uint8Array(),
+      index: 0,
+    });
   }
 
   // A simple lock to make sure we don't get the same array multiple times
   const pendingArrays = useRef<number[]>([]);
 
   // Update the stats for each slices
+  const ArrayClass = dtypeToArray(dataType);
   useEffect(() => {
     const getArrays = async () => {
       const checkArray = async (slice: number) => {
@@ -151,7 +200,9 @@ export const useArrayStats = (
         if (oldStats.includes(null) && !pendingArrays.current.includes(slice)) {
           // We need to get a fresh copy of this array to do stats
           pendingArrays.current.push(slice); // Acquire lock
-          const data = await getArraySlice(path, slice, { client: client });
+          const data = await getArraySlice(path, slice, ArrayClass, {
+            client: client,
+          });
           const action = {
             type: "add_slice",
             data: data,
@@ -184,6 +235,7 @@ export const useArrayStats = (
     arrayStats.min,
     arrayStats.shape,
     client,
+    ArrayClass,
   ]);
   return {
     isLoading: isLoading,
@@ -194,7 +246,7 @@ export const useArrayStats = (
 
 export const reduceArrayStats = (
   oldStats: Stats,
-  action: { type: string; shape: number[]; data: number[][]; index: number },
+  action: { type: string; shape: number[]; data: TypedArray; index: number },
 ) => {
   switch (action.type) {
     case "update_shape": {
@@ -223,9 +275,9 @@ export const reduceArrayStats = (
     }
     case "add_slice": {
       // const t0 = performance.now();
-      const data = action.data.flat();
-      const cumulative = data.reduce(
-        (stats, value: number) => {
+      const data = action.data;
+      const cumulative = (data as unknown as number[]).reduce(
+        (stats: { sum: number; min: number; max: number }, value: number) => {
           return {
             sum: stats.sum + value,
             min: value < stats.min ? value : stats.min,

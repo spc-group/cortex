@@ -1,11 +1,13 @@
 import type { Data } from "plotly.js";
 import Plot from "react-plotly.js";
 
-export const FramePlot = ({ frame }: { frame: number[][] }) => {
+import type { TypedArray } from "../tiled/types";
+
+export const FramePlot = ({ frame }: { frame: TypedArray[] }) => {
   // E.g. /api/v1/array/block/04d28613-b2c4-4b5c-ba31-6aff5c49922d/streams/primary/ge_13element?block=10%2C0%2C0&expected_shape=1%2C13%2C4096
   const plotData: Data[] = [
     {
-      z: frame?.[0],
+      z: frame as unknown as number[][],
       type: "heatmap",
       colorscale: "Viridis",
       zmin: 0,

@@ -46,7 +46,7 @@ vi.mock("./metadata", async () => {
                 dt_units: null,
               },
               chunks: [[8], [240], [320]],
-              shape: [8, 240, 320],
+              shape: [2, 3, 1],
             },
           },
         },
@@ -76,7 +76,7 @@ beforeEach(() => {
 
 describe("getArray() function", () => {
   it("returns slices", async () => {
-    const array = await getArray("my_run/primary/bdet", [0, 1], {
+    const array = await getArray("my_run/primary/bdet", [0, 1], Uint8Array, {
       client: client,
     });
     expect(array.length).toEqual(2);
@@ -87,37 +87,34 @@ describe("useArray", () => {
   const MockComponent = (
     { slices }: { slices: number[] | null } = { slices: [0] },
   ) => {
-    const { array, shape, endianness, kind, itemsize, readyState } = useArray(
+    const { array, shape, dataType, readyState } = useArray(
       "my_run/primary/bdet",
       slices,
     );
     return (
       <>
-        <div>Array: {array}</div>
+        <div>Array: {JSON.stringify(array)}</div>
         <div>Shape: {shape.map((len) => `${len},`)}</div>
-        <div>Endianness: {endianness}</div>
-        <div>Kind: {kind}</div>
-        <div>Itemsize: {itemsize}</div>
+        <div>Endianness: {dataType.endianness}</div>
+        <div>Kind: {dataType.kind}</div>
+        <div>Itemsize: {dataType.itemsize}</div>
         <div>readyState: {readyState}</div>
       </>
     );
   };
   it("returns all array frames by default", () => {
     render(<MockComponent slices={null} />);
-    expect(screen.getByText("Array: 123456")).toBeInTheDocument();
+    expect(
+      screen.getByText("Array: [[[1],[2],[3]],[[4],[5],[6]]]"),
+    ).toBeInTheDocument();
     // Check which slices were requested by inspecting the query key
     const lastKey = (useQuery as Mock).mock.lastCall?.[0].queryKey;
-    const allSlices = [0, 1, 2, 3, 4, 5, 6, 7];
-    expect(lastKey.slice(2)).toEqual(allSlices);
-  });
-
-  it("returns the requested array frame", () => {
-    render(<MockComponent slices={null} />);
-    expect(screen.getByText("Array: 123456")).toBeInTheDocument();
+    const allSlices = [0, 1];
+    expect(lastKey.slice(2, -1)).toEqual(allSlices);
   });
   it("returns array metadata from HTTP", () => {
     render(<MockComponent slices={null} />);
-    expect(screen.getByText("Shape: 8,240,320,")).toBeInTheDocument();
+    expect(screen.getByText("Shape: 2,3,1,")).toBeInTheDocument();
     expect(screen.getByText("Endianness: not_applicable")).toBeInTheDocument();
     expect(screen.getByText("Kind: u")).toBeInTheDocument();
     expect(screen.getByText("Itemsize: 1")).toBeInTheDocument();
@@ -181,7 +178,7 @@ describe("the arrayStatsReducer() function", () => {
       type: "update_shape",
       shape: [3, 1024, 1024],
       index: 0,
-      data: [],
+      data: Uint8Array.from([]),
     };
     const newStats = reduceArrayStats(oldStats, action);
     expect(newStats.shape).toEqual([3, 1024, 1024]);
@@ -196,7 +193,7 @@ describe("the arrayStatsReducer() function", () => {
     const action = {
       type: "update_shape",
       shape: [3, 1024, 1024],
-      data: [] as number[][],
+      data: Uint8Array.from([]),
       index: 0,
     };
     const newStats = reduceArrayStats(oldStats, action);
@@ -214,7 +211,7 @@ describe("the arrayStatsReducer() function", () => {
     const action = {
       type: "update_shape",
       shape: [3, 1024, 1024],
-      data: [] as number[][],
+      data: Uint8Array.from([]),
       index: 0,
     };
     const newStats = reduceArrayStats(oldStats, action);
@@ -231,7 +228,7 @@ describe("the arrayStatsReducer() function", () => {
     };
     const action = {
       type: "add_slice",
-      data: [[1, 2, 3]],
+      data: Uint8Array.from([1, 2, 3]),
       index: 0,
       shape: [] as number[],
     };
@@ -262,7 +259,7 @@ describe("the arrayStatsReducer() function", () => {
     });
     const action = {
       type: "add_slice",
-      data: sliceData,
+      data: Uint32Array.from(sliceData.flat()),
       index: 0,
       shape: [] as number[],
     };
@@ -273,6 +270,7 @@ describe("the arrayStatsReducer() function", () => {
     expect(newStats.min).toEqual([0]);
     expect(newStats.max).toEqual([2048 * 1840 - 1]);
     expect(runTime).toBeLessThan(maxTime);
+    // console.log(runTime);
   });
 });
 

@@ -48,13 +48,15 @@ export interface WebSocketArray extends WebSocketMessage {
   management: string;
 }
 
+export interface DataType {
+  endianness: string;
+  kind: string;
+  itemsize: number;
+  dt_units: string | null;
+}
+
 export interface ArrayStructure {
-  data_type: {
-    endianness: string;
-    kind: string;
-    itemsize: number;
-    dt_units: string | null;
-  };
+  data_type: DataType;
   chunks: number[][];
   shape: number[];
   dims: null;
@@ -67,4 +69,21 @@ export interface Query {
   key?: string;
   operator?: string;
   case_sensitive?: boolean;
+}
+
+export type TypedArray =
+  | Int8Array
+  | Uint8Array
+  | Uint8ClampedArray
+  | Int16Array
+  | Uint16Array
+  | Int32Array
+  | Uint32Array
+  | Float32Array
+  | Float64Array
+  | BigInt64Array
+  | BigUint64Array;
+
+export interface TypedArrayConstructor {
+  new (buffer: ArrayBuffer): TypedArray;
 }

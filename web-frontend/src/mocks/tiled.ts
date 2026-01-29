@@ -3649,7 +3649,9 @@ export const handlers = [
     return HttpResponse.json(streamsMetadata);
   }),
   http.get(`${mockUrl}/array/full/my_run/primary/bdet`, () => {
-    return HttpResponse.json(arrayJson);
+    return HttpResponse.arrayBuffer(Uint8Array.from(arrayJson.flat()), {
+      headers: { "Content-Type": "application/octet-stream" },
+    });
   }),
 ];
 

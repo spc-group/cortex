@@ -16,6 +16,7 @@ import {
   useArrayStats,
 } from "../tiled";
 import { axisLabels, OPERATIONS } from "./axis_labels";
+import type { TypedArray } from "../tiled/types";
 import type { Run, Stream, RunMetadata } from "../catalog/types";
 import { useLastChoice } from "../plots/last_choice.ts";
 
@@ -475,14 +476,14 @@ export function ArrayPlots({
 
   const arrayPath = [...stream.ancestors, stream.key, vSignal].join("/");
   const [activeFrame, setActiveFrame] = useState(0);
-  const previousFrame = useRef<number[][] | null>(null);
+  const previousFrame = useRef<TypedArray[] | null>(null);
   const { array: frameData, shape: frameShape } = useArray(arrayPath, [
     activeFrame,
   ]);
   const { sum, isLoading: isLoadingStats } = useArrayStats(arrayPath);
   const lastFrame = (frameShape?.[0] ?? 1) - 1;
   if (frameData != null) {
-    previousFrame.current = frameData;
+    previousFrame.current = frameData[0];
   }
 
   // Process data into a form consumable by the plots
@@ -514,7 +515,7 @@ export function ArrayPlots({
     operation,
   });
 
-  const imData = frameData ?? previousFrame.current;
+  const imData = frameData?.[0] ?? previousFrame.current;
 
   return (
     <>
