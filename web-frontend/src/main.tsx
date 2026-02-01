@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import { RunList, RunDetail } from "./catalog";
 import Navbar from "./navbar.tsx";
 import BeamlinePanels from "./beamlines/panels.tsx";
+import BeamlineStatus from "./beamlines/status.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/catalog" element={<RunList />} />
           <Route path="/catalog/:uid" element={<RunDetail />} />
           <Route path="/beamlines" element={<BeamlinePanels />} />
+          <Route path="/beamlines/status" element={<BeamlineStatus />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
