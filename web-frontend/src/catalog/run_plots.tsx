@@ -480,7 +480,7 @@ export function ArrayPlots({
   const { array: frameData, shape: frameShape } = useArray(arrayPath, [
     activeFrame,
   ]);
-  const { sum, isLoading: isLoadingStats } = useArrayStats(arrayPath);
+  const { sum, max, min, isLoading: isLoadingStats } = useArrayStats(arrayPath);
   const lastFrame = (frameShape?.[0] ?? 1) - 1;
   if (frameData != null) {
     previousFrame.current = frameData[0];
@@ -516,6 +516,27 @@ export function ArrayPlots({
   });
 
   const imData = frameData?.[0] ?? previousFrame.current;
+
+  // Prepare color range for the frame plot
+  const reduceStat = (
+    arr: (number | null)[] | null,
+    compare: (...values: number[]) => number,
+    defaultValue: number,
+  ) => {
+    if (arr == null) {
+      return null;
+    } else {
+      return arr.reduce(
+        (cumulative, next) =>
+          compare(cumulative ?? defaultValue, next ?? defaultValue),
+        defaultValue,
+      );
+    }
+  };
+  const vMin = reduceStat(min, Math.min, Infinity);
+  const vMax = reduceStat(max, Math.max, -Infinity);
+  // const vMin = (min == null) ? null : min.reduce((min, value) => Math.min(min ?? Infinity, value ?? Infinity), Infinity);
+  // const vMax = (max == null) ? null : max.reduce((max, value) => Math.max(max ?? -Infinity, value ?? -Infinity), -Infinity);
 
   return (
     <>
@@ -555,8 +576,10 @@ export function ArrayPlots({
         </label>
       </div>
 
-      {imData != null ? (
-        <FramePlot frame={imData} />
+      {imData != null && vMin != null && vMax != null ? (
+        <>
+          <FramePlot frame={imData} vMin={vMin} vMax={vMax} />
+        </>
       ) : (
         <div className="skeleton h-[457px] w-[700px]"></div>
       )}
