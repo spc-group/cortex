@@ -45,8 +45,6 @@ export const RangePicker = ({
     };
   };
 
-  const className = disable ? "opacity-20" : "";
-
   return (
     <div className="space-y-2">
       <div className="flex space-x-1">
@@ -62,7 +60,13 @@ export const RangePicker = ({
             disabled={disable}
           />
         </label>
-        <span className={className}>{bottom}</span>
+        <input
+          className="input"
+          disabled={disable}
+          type="number"
+          value={bottom}
+          onChange={updateRange("bottom")}
+        />
       </div>
       <div className="flex space-x-1">
         <label className="label">
@@ -77,7 +81,13 @@ export const RangePicker = ({
             disabled={disable}
           />
         </label>
-        <span className={className}>{top}</span>
+        <input
+          className="input"
+          disabled={disable}
+          type="number"
+          value={top}
+          onChange={updateRange("top")}
+        />
       </div>
       <div className="flex space-x-1">
         <label className="label">
@@ -92,7 +102,13 @@ export const RangePicker = ({
             disabled={disable}
           />
         </label>
-        <span className={className}>{center}</span>
+        <input
+          className="input"
+          disabled={disable}
+          type="number"
+          value={center}
+          onChange={updateRange("center")}
+        />
       </div>
       <div className="flex space-x-1">
         <label className="label">
@@ -108,7 +124,13 @@ export const RangePicker = ({
             disabled={disable}
           />
         </label>
-        <span className={className}>{width}</span>
+        <input
+          className="input"
+          disabled={disable}
+          type="number"
+          value={width}
+          onChange={updateRange("width")}
+        />
       </div>
     </div>
   );

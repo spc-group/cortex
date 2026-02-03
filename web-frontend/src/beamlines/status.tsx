@@ -1,6 +1,9 @@
 import { OphydProvider } from "../ophyd/provider";
 import { usePV } from "../ophyd/pv";
 
+const envHost = import.meta.env.VITE_OPHYD_URI;
+const ophydUri = envHost ?? "ws://127.0.0.1:8001";
+
 const IonPumpChannel = ({ prefix }: { prefix: string }) => {
   const pumpNum = {
     a: 1,
@@ -20,6 +23,7 @@ const IonPumpChannel = ({ prefix }: { prefix: string }) => {
       </div>
       <StatusItem pv={`${prefix}Pressure`} units={units} logarithm={true} />
       <StatusItem pv={`${prefix}Current`} logarithm={true} />
+      <StatusItem pv={`${prefix}Voltage`} logarithm={false} />
     </li>
   );
 };
@@ -70,26 +74,65 @@ const Thermocouple = ({
 };
 
 const CryoCooler = ({ prefix, label }: { prefix: string; label: string }) => {
+  const { value: ready } = usePV(`${prefix}CC_READY`);
   return (
     <>
+      <h2>
+        {label}
+        {ready === "On" ? (
+          <div
+            aria-label="success"
+            className={`status status-success m-1`}
+          ></div>
+        ) : (
+          <div className="inline-grid *:[grid-area:1/1]">
+            <div
+              aria-label="success"
+              className={`status status-error m-1`}
+            ></div>
+            <div
+              aria-label="success"
+              className={`status status-error animate-ping m-1`}
+            ></div>
+          </div>
+        )}
+      </h2>
       <li className="list-row">
         <div className="w-40">
-          <div className="font-bold">Temperatures</div>
-          <div className="text-xs uppercase font-semibold opacity-40">
-            {label}
-          </div>
+          <div className="font-bold">Temperature</div>
         </div>
         <StatusItem pv={`${prefix}PV_T5`} />
         <StatusItem pv={`${prefix}PV_T6`} />
+        {/* Wish list */}
+        {/* - 25idVac:LerixCC:CC_READY */}
+        {/* - Heater vessel (HV) liquid level: 25idVac:LerixCC:PV_LT23 */}
+        {/* - Sub-cooler level: 25idVac:LerixCC:PV_LT19 */}
+        {/* - HV Pressure: 25idVac:LerixCC:PV_PT3 */}
+        {/* - Closed loop pressure: 25idVac:LerixCC:PV_PT1 */}
       </li>
       <li className="list-row">
         <div className="w-40">
-          <div className="font-bold">Cooling Power</div>
-          <div className="text-xs uppercase font-semibold opacity-40">
-            {label}
-          </div>
+          <div className="font-bold">Heater Vessel Level</div>
         </div>
-        <StatusItem pv={`${prefix}POWER`} />
+        <StatusItem pv={`${prefix}PV_LT23`} />
+      </li>
+      <li className="list-row">
+        <div className="w-40">
+          <div className="font-bold">Sub-cooler Level</div>
+        </div>
+        <StatusItem pv={`${prefix}PV_LT19`} />
+      </li>
+      <li className="list-row">
+        <div className="w-40">
+          <div className="font-bold">Heater Vessel Pressure</div>
+        </div>
+        <StatusItem pv={`${prefix}PV_PT3`} />
+      </li>
+      <li className="list-row">
+        <div className="w-40">
+          <div className="font-bold">Closed-loop Pressure</div>
+        </div>
+        <StatusItem pv={`${prefix}PV_PT1`} />
       </li>
     </>
   );
@@ -160,8 +203,8 @@ const StatusItem = ({
 
 export default function BeamlineStatus() {
   return (
-    <OphydProvider uri="ws://localhost:8001">
-      <div className="card w-130 bg-base-100 card-md shadow-md m-3">
+    <OphydProvider uri={ophydUri}>
+      <div className="card w-160 bg-base-100 card-md shadow-md m-3">
         <div className="card-body">
           <h2 className="card-title">25-ID-A Vacuum</h2>
           <ul className="list bg-base-100">
@@ -177,7 +220,7 @@ export default function BeamlineStatus() {
           </ul>
         </div>
       </div>
-      <div className="card w-130 bg-base-100 card-md shadow-md m-3">
+      <div className="card w-160 bg-base-100 card-md shadow-md m-3">
         <div className="card-body">
           <h2 className="card-title">25-ID-B Vacuum</h2>
           <ul className="list bg-base-100">
@@ -195,7 +238,7 @@ export default function BeamlineStatus() {
         </div>
       </div>
 
-      <div className="card w-120 bg-base-100 card-md shadow-md">
+      <div className="card w-120 bg-base-100 card-md shadow-md m-3">
         <div className="card-body">
           <h2 className="card-title">25-ID-B Cryo-Coolers</h2>
           <ul className="list bg-base-100">
