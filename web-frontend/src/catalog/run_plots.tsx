@@ -185,6 +185,15 @@ export const StreamPlots = ({
         </span>
       </div>
     );
+  } else if (stream.data_keys == null) {
+    return (
+      <div role="alert" className="m-2 alert alert-warning alert-soft">
+        <span>
+          <ExclamationTriangleIcon className="size-4 inline" /> Stream contains
+          no data keys.
+        </span>
+      </div>
+    );
   }
 
   let infoWidget;
