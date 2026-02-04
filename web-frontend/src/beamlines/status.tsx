@@ -1,10 +1,24 @@
+import { useState } from "react";
+import type { ChangeEvent } from "react";
+
 import { OphydProvider } from "../ophyd/provider";
 import { usePV } from "../ophyd/pv";
 
 const envHost = import.meta.env.VITE_OPHYD_URI;
 const ophydUri = envHost ?? "ws://127.0.0.1:8001";
 
-const IonPumpChannel = ({ prefix }: { prefix: string }) => {
+type Notation = (
+  "log10" |
+  "scientific"
+)
+
+const IonPumpChannel = ({
+  prefix,
+  notation,
+}: {
+  prefix: string;
+  notation?: Notation;
+}) => {
   const pumpNum = {
     a: 1,
     b: 2,
@@ -21,9 +35,9 @@ const IonPumpChannel = ({ prefix }: { prefix: string }) => {
           Ion-pump
         </div>
       </div>
-      <StatusItem pv={`${prefix}Pressure`} units={units} logarithm={true} />
-      <StatusItem pv={`${prefix}Current`} logarithm={true} />
-      <StatusItem pv={`${prefix}Voltage`} logarithm={false} />
+      <StatusItem pv={`${prefix}Pressure`} units={units} notation={notation} />
+      <StatusItem pv={`${prefix}Current`} notation={notation} />
+      <StatusItem pv={`${prefix}Voltage`} />
     </li>
   );
 };
@@ -31,9 +45,11 @@ const IonPumpChannel = ({ prefix }: { prefix: string }) => {
 const VacuumGauge = ({
   prefix,
   sublabel,
+  notation,
 }: {
   prefix: string;
   sublabel?: string;
+  notation?: Notation;
 }) => {
   const { value: name } = usePV(`${prefix}.DESC`);
   const { value: units } = usePV(`${prefix}.EGU`);
@@ -45,7 +61,7 @@ const VacuumGauge = ({
           {sublabel ?? "Vacuum"}
         </div>
       </div>
-      <StatusItem pv={`${prefix}.VAL`} units={units} logarithm={true} />
+      <StatusItem pv={`${prefix}.VAL`} units={units} notation={notation} />
     </li>
   );
 };
@@ -77,22 +93,22 @@ const CryoCooler = ({ prefix, label }: { prefix: string; label: string }) => {
   const { value: ready } = usePV(`${prefix}CC_READY`);
   return (
     <>
-      <h2>
+      <h2 className="text-lg">
         {label}
         {ready === "On" ? (
           <div
             aria-label="success"
-            className={`status status-success m-1`}
+            className={`status status-success status-lg m-2`}
           ></div>
         ) : (
           <div className="inline-grid *:[grid-area:1/1]">
             <div
               aria-label="success"
-              className={`status status-error m-1`}
+              className={`status status-error status-lg m-2`}
             ></div>
             <div
               aria-label="success"
-              className={`status status-error animate-ping m-1`}
+              className={`status status-error status-lg animate-ping m-2`}
             ></div>
           </div>
         )}
@@ -141,11 +157,12 @@ const CryoCooler = ({ prefix, label }: { prefix: string; label: string }) => {
 const StatusItem = ({
   pv,
   units,
-  logarithm,
+  notation,
 }: {
   pv: string;
   units?: string | null;
   logarithm?: boolean;
+  notation?: Notation;
 }) => {
   const { value, timestamp, precision, connected } = usePV(pv);
   const { value: pvUnits } = usePV(`${pv}.EGU`);
@@ -163,18 +180,35 @@ const StatusItem = ({
   let toDisplay;
   if (!connected) {
     toDisplay = <div className="skeleton h-5 w-28"></div>;
-  } else if (logarithm) {
+  } else if (value == null) {
+    toDisplay = <span>N/A</span>;
+  } else if (notation === "log10") {
     const exponent = Math.log10(value ?? NaN).toFixed(precision);
     toDisplay = (
       <span>
-        <span className="text-xs">10</span>
-        <sup className="text-base">{exponent}</sup> {units ?? pvUnits}
+        <span className="text-xs opacity-60">10</span>
+        <sup className="text-sm">{exponent.replace("-", "−")}</sup>
+        <span className="opacity-60">&thinsp;{units ?? pvUnits}</span>
+      </span>
+    );
+  } else if (notation === "scientific") {
+    const exponent = Math.floor(Math.log10(value ?? NaN));
+    const significand = (value / 10 ** exponent).toFixed(precision);
+    toDisplay = (
+      <span>
+        <span className="">{significand.replace("-", "−")}</span>
+        <span className="text-xs opacity-60">×10</span>
+        <span>
+          <sup className="text-sm">{String(exponent).replace("-", "−")}</sup>
+          <span className="opacity-60">&thinsp;{units ?? pvUnits}</span>
+        </span>
       </span>
     );
   } else if (typeof value === "number") {
+    const value_ = (value as number).toFixed(precision).replace("-", "−");
     toDisplay = (
       <span>
-        {(value as number).toFixed(precision)}&thinsp;{units}
+        {value_}&thinsp;{units}
       </span>
     );
   } else {
@@ -202,65 +236,98 @@ const StatusItem = ({
 };
 
 export default function BeamlineStatus() {
+  const defaultNotation = localStorage.getItem("vacuumNotation");
+  const [notation, setNotation] = useState<Notation>(defaultNotation as Notation ?? "log10");
+  const toggleNotation = (event: ChangeEvent<HTMLInputElement>) => {
+    const newNotation = event.currentTarget.checked ? "log10" : "scientific";
+    localStorage.setItem("vacuumNotation", newNotation);
+    setNotation(newNotation);
+  };
   return (
-    <OphydProvider uri={ophydUri}>
-      <div className="card w-160 bg-base-100 card-md shadow-md m-3">
-        <div className="card-body">
-          <h2 className="card-title">25-ID-A Vacuum</h2>
-          <ul className="list bg-base-100">
-            <IonPumpChannel prefix="25idVac:qpc02a:" />
-            <IonPumpChannel prefix="25idVac:qpc02b:" />
-            <IonPumpChannel prefix="25idVac:qpc02c:" />
-            <IonPumpChannel prefix="25idVac:qpc02d:" />
-            <IonPumpChannel prefix="25idVac:mpc02a:" />
-            <IonPumpChannel prefix="25idVac:mpc02b:" />
+    <>
+      <div className="ml-3 mt-3">
+        <span className="ml-5 text-sm">
+          Notation: scientific
+          <input
+            type="checkbox"
+            className="toggle mx-1"
+            checked={notation === "log10"}
+            onChange={toggleNotation}
+          />
+          logarithmic
+        </span>
+      </div>
+      <OphydProvider uri={ophydUri}>
+        <div></div>
+        <div className="lg:columns-3">
+          <div className="card w-160 bg-base-100 card-md shadow-md m-3">
+            <div className="card-body break-inside-avoid-column">
+              <h2 className="card-title">25-ID-A Vacuum</h2>
+              <ul className="list bg-base-100">
+                <IonPumpChannel prefix="25idVac:qpc02a:" notation={notation} />
+                <IonPumpChannel prefix="25idVac:qpc02b:" notation={notation} />
+                <IonPumpChannel prefix="25idVac:qpc02c:" notation={notation} />
+                <IonPumpChannel prefix="25idVac:qpc02d:" notation={notation} />
+                <IonPumpChannel prefix="25idVac:mpc02a:" notation={notation} />
+                {/* <IonPumpChannel prefix="25idVac:mpc02b:" /> */}
 
-            <VacuumGauge prefix="25idVac:VSA6" />
-            <VacuumGauge prefix="25idVac:VSA7" />
-          </ul>
-        </div>
-      </div>
-      <div className="card w-160 bg-base-100 card-md shadow-md m-3">
-        <div className="card-body">
-          <h2 className="card-title">25-ID-B Vacuum</h2>
-          <ul className="list bg-base-100">
-            <IonPumpChannel prefix="25idVac:qpc03a:" />
-            <IonPumpChannel prefix="25idVac:qpc03b:" />
-            <IonPumpChannel prefix="25idVac:qpc03c:" />
-            <IonPumpChannel prefix="25idVac:qpc03d:" />
-            <IonPumpChannel prefix="25idVac:qpc04a:" />
-            <IonPumpChannel prefix="25idVac:qpc04b:" />
-            <IonPumpChannel prefix="25idVac:qpc04c:" />
-            <IonPumpChannel prefix="25idVac:qpc04d:" />
-            <VacuumGauge prefix="25idVac:VSB5" />
-            <VacuumGauge prefix="25idVac:VSB7" />
-          </ul>
-        </div>
-      </div>
+                <VacuumGauge prefix="25idVac:VSA6" />
+                <VacuumGauge prefix="25idVac:VSA7" />
+              </ul>
+            </div>
+          </div>
 
-      <div className="card w-120 bg-base-100 card-md shadow-md m-3">
-        <div className="card-body">
-          <h2 className="card-title">25-ID-B Cryo-Coolers</h2>
-          <ul className="list bg-base-100">
-            <CryoCooler prefix="25idVac:UprobeCC:" label="Microprobe" />
-            <CryoCooler prefix="25idVac:LerixCC:" label="Lerix" />
-          </ul>
-        </div>
-      </div>
+          <div className="card w-130 bg-base-100 card-md shadow-md m-3">
+            <div className="card-body break-inside-avoid-column">
+              <h2 className="card-title">25-ID-C/D</h2>
+              <ul className="list bg-base-100">
+                <VacuumGauge
+                  prefix="25idVac:MX4:C1:Pressure"
+                  sublabel="25-ID-C"
+                  notation={notation}
+                />
+                <VacuumGauge
+                  prefix="25idVac:MX4:D1:Pressure"
+                  sublabel="25-ID-D"
+                  notation={notation}
+                />
+                <Thermocouple prefix="BL25ID-Metasys:TC:CHutchTempM" />
+                <Thermocouple prefix="BL25ID-Metasys:TC:DHutchTempM" />
+                {/* <Thermocouple prefix="BL25ID-Metasys:TC:EHutchTempM" /> */}
+              </ul>
+            </div>
+          </div>
 
-      <div className="card w-130 bg-base-100 card-md shadow-md m-3">
-        <div className="card-body">
-          <h2 className="card-title">25-ID-C/D</h2>
-          <ul className="list bg-base-100">
-            <VacuumGauge prefix="25idVac:MX4:C1:Pressure" sublabel="25-ID-C" />
-            <VacuumGauge prefix="25idVac:MX4:D1:Pressure" sublabel="25-ID-D" />
-            <Thermocouple prefix="BL25ID-Metasys:TC:CHutchTempM" />
-            <Thermocouple prefix="BL25ID-Metasys:TC:DHutchTempM" />
-            {/* <Thermocouple prefix="BL25ID-Metasys:TC:EHutchTempM" /> */}
-          </ul>
+          <div className="card w-160 bg-base-100 card-md shadow-md m-3">
+            <div className="card-body break-inside-avoid-column">
+              <h2 className="card-title">25-ID-B Vacuum</h2>
+              <ul className="list bg-base-100 ">
+                <IonPumpChannel prefix="25idVac:qpc03a:" notation={notation} />
+                <IonPumpChannel prefix="25idVac:qpc03b:" notation={notation} />
+                <IonPumpChannel prefix="25idVac:qpc03c:" notation={notation} />
+                <IonPumpChannel prefix="25idVac:qpc03d:" notation={notation} />
+                <IonPumpChannel prefix="25idVac:qpc04a:" notation={notation} />
+                <IonPumpChannel prefix="25idVac:qpc04b:" notation={notation} />
+                {/* <IonPumpChannel prefix="25idVac:qpc04c:" /> */}
+                {/* <IonPumpChannel prefix="25idVac:qpc04d:" /> */}
+                <VacuumGauge prefix="25idVac:VSB5" notation={notation} />
+                <VacuumGauge prefix="25idVac:VSB7" notation={notation} />
+              </ul>
+            </div>
+          </div>
+
+          <div className="card w-120 bg-base-100 card-md shadow-md m-3">
+            <div className="card-body break-inside-avoid-column">
+              <h2 className="card-title">25-ID-B Cryo-Coolers</h2>
+              <ul className="list bg-base-100 break-inside-avoid-column">
+                <CryoCooler prefix="25idVac:UprobeCC:" label="Microprobe" />
+                <CryoCooler prefix="25idVac:LerixCC:" label="Lerix" />
+              </ul>
+            </div>
+          </div>
         </div>
-      </div>
-    </OphydProvider>
+      </OphydProvider>
+    </>
   );
 }
 // 25idVac:qpc03a:Pressure
