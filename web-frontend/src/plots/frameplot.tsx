@@ -44,7 +44,6 @@ export const RangePicker = ({
       }
     };
   };
-
   return (
     <div className="space-y-2">
       <div className="flex space-x-1">
@@ -97,7 +96,7 @@ export const RangePicker = ({
             className="range"
             min={min}
             max={max}
-            value={center}
+            value={String(center)}
             onChange={updateRange("center")}
             disabled={disable}
           />
@@ -106,7 +105,7 @@ export const RangePicker = ({
           className="input"
           disabled={disable}
           type="number"
-          value={center}
+          value={String(center)}
           onChange={updateRange("center")}
         />
       </div>
@@ -154,7 +153,7 @@ export const FramePlot = ({
   // State to keep track of plotting parameters
   const [zMin, setZMin] = useState(vMin);
   const [zMax, setZMax] = useState(vMax);
-  const [autoZ, setAutoZ] = useState(false);
+  const [autoZ, setAutoZ] = useState(true);
   const zRange = autoZ
     ? {}
     : {
@@ -196,7 +195,7 @@ export const FramePlot = ({
           type="checkbox"
           className="toggle"
           checked={autoZ}
-          onClick={(e) => setAutoZ(e.currentTarget.checked)}
+          onChange={(e) => setAutoZ(e.currentTarget.checked)}
         />{" "}
         Auto
       </label>

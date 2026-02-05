@@ -19,6 +19,7 @@ import { axisLabels, OPERATIONS } from "./axis_labels";
 import type { TypedArray } from "../tiled/types";
 import type { Run, Stream, RunMetadata } from "../catalog/types";
 import { useLastChoice } from "../plots/last_choice.ts";
+import { signalNames } from "./signal";
 
 const NULL_SIGNAL = "---";
 
@@ -88,26 +89,41 @@ export const RunPlots = ({ run }: { run: Run }) => {
       return stream_ === streamName.split("/").slice(-1)[0] ? hints : [];
     })
     .flat();
+  // Make sure we have data to plot
+  const stream = streams?.[streamName] ?? null;
+  if (stream?.data_keys == null) {
+    return (
+      <div role="alert" className="m-2 alert alert-warning alert-soft">
+        <span>
+          <ExclamationTriangleIcon className="size-4 inline" /> Stream contains
+          no data keys.
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="m-4">
       {/* Widget to pick a stream */}
       <div>
-        Stream:
-        <select
-          className="select"
-          value={streamName}
-          title="Select a data stream"
-          onChange={(e) => {
-            setStream(e.target.value);
-          }}
-        >
-          {streamNames.map((stream) => {
-            return <option key={stream}>{stream}</option>;
-          })}
-        </select>
+        <label className="select">
+          <span className="label">Stream:</span>
+          <select
+            className="select"
+            value={streamName}
+            title="Select a data stream"
+            onChange={(e) => {
+              setStream(e.target.value);
+            }}
+          >
+            {streamNames.map((stream) => {
+              return <option key={stream}>{stream}</option>;
+            })}
+          </select>
+        </label>
       </div>
       <StreamPlots
-        stream={streams?.[streamName] ?? null}
+        stream={stream}
         runHints={hints}
         plotTitle={plotTitle}
         plotSubtitle={plotSubtitle}
@@ -131,12 +147,55 @@ export const StreamPlots = ({
   plotSubtitle: string;
   runHints: string[];
 }) => {
-  const [xSignal, setXSignal] = useState<string | null>(null);
-  const [vSignal, setVSignal] = useState<string | null>(null);
-  const [rSignal, setRSignal] = useState<string | null>(null);
-  const [inverted, setInverted] = useState(false);
-  const [logarithm, setLogarithm] = useState(false);
-  const [gradient, setGradient] = useState(false);
+  // Figure out which options we can even choose from
+  const iHints = Object.entries(stream?.hints ?? {})
+    .map(([, obj]) => obj.fields)
+    .flat();
+  const [hintedOnly, setHintedOnly] = useLastChoice<boolean>(
+    true,
+    [true, false],
+    "hinted",
+  );
+  const xSignals = signalNames(stream.data_keys, hintedOnly ? runHints : null);
+  if (!hintedOnly) {
+    xSignals.push("seq_num", "time");
+  }
+  const ySignals = signalNames(stream.data_keys, hintedOnly ? iHints : null);
+  if (!hintedOnly) {
+    ySignals.push("seq_num", "time");
+  }
+
+  // State management
+  const [xSignal, setXSignal] = useLastChoice<string>(
+    xSignals[0],
+    xSignals,
+    "xSignal",
+  );
+  const [vSignal, setVSignal] = useLastChoice<string>(
+    ySignals[0],
+    ySignals,
+    "vSignal",
+  );
+  const [rSignal, setRSignal] = useLastChoice<string>(
+    ySignals[0],
+    ySignals,
+    "rSignal",
+  );
+  const [inverted, setInverted] = useLastChoice<boolean>(
+    false,
+    [true, false],
+    "inverted",
+  );
+  const [logarithm, setLogarithm] = useLastChoice<boolean>(
+    false,
+    [true, false],
+    "logarithm",
+  );
+  const [gradient, setGradient] = useLastChoice<boolean>(
+    false,
+    [true, false],
+    "gradient",
+  );
   const [operation, setOperation] = useLastChoice<string>(
     "",
     ["", ...OPERATIONS],
@@ -150,16 +209,13 @@ export const StreamPlots = ({
     if (vSignal == null) setVSignal(dataKeyNames[0]);
     if (rSignal == null) setRSignal(dataKeyNames[0]);
   }
-  const iHints = Object.entries(stream?.hints ?? {})
-    .map(([, obj]) => obj.fields)
-    .flat();
 
   // Check for error conditions due to missing data signals
   const needsVSignal = vSignal === NULL_SIGNAL;
   const needsRSignal =
     rSignal === NULL_SIGNAL && OPERATIONS.includes(operation ?? "");
 
-  // Handlers for preset configuration
+  // Handlers for preset configurations
   const normalMode = () => {
     setInverted(false);
     setLogarithm(false);
@@ -185,17 +241,7 @@ export const StreamPlots = ({
         </span>
       </div>
     );
-  } else if (stream.data_keys == null) {
-    return (
-      <div role="alert" className="m-2 alert alert-warning alert-soft">
-        <span>
-          <ExclamationTriangleIcon className="size-4 inline" /> Stream contains
-          no data keys.
-        </span>
-      </div>
-    );
   }
-
   let infoWidget;
   if (needsVSignal || needsRSignal) {
     infoWidget = (
@@ -247,44 +293,51 @@ export const StreamPlots = ({
   return (
     <>
       <div className="overflow-x-auto">
-        <table className="table table-sm max-w-md">
-          <tbody>
-            <tr>
-              <th>Horizontal:</th>
-              <th>
-                <div
-                  className="tooltip"
-                  data-tip="Horizontal signal used for plotting."
-                >
-                  <SignalPicker
-                    dataKeys={stream.data_keys}
-                    onSignalChange={setXSignal}
-                    localKey={"xSignal"}
-                    hints={runHints}
-                  />
-                </div>
-              </th>
-            </tr>
-            <tr>
-              <th>Signal (S):</th>
-              <th className="flex">
-                <div
-                  className="tooltip"
-                  data-tip="Primary data signal (S) used for plotting."
-                >
-                  <SignalPicker
-                    dataKeys={stream.data_keys}
-                    error={needsVSignal}
-                    onSignalChange={setVSignal}
-                    localKey={"vSignal"}
-                    hints={iHints}
-                  />
-                </div>
-              </th>
-            </tr>
-            <tr>
-              <th>Reference (R):</th>
-              <th>
+        <ul className="list mt-3 mb-3 md:grid md:grid-cols-2 lg:grid-cols-3">
+          <li className="list-row p-0">
+            <label className="label">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={hintedOnly}
+                onChange={(e) => setHintedOnly(e.target.checked)}
+              />
+              Hints only
+            </label>
+          </li>
+          <li className="list-row p-0">
+            <div
+              className="tooltip"
+              data-tip="Horizontal signal used for plotting."
+            >
+              <SignalPicker
+                signals={xSignals}
+                signal={xSignal}
+                onSignalChange={setXSignal}
+                localKey={"xSignal"}
+                label="Horizontal"
+              />
+            </div>
+          </li>
+          <li className="list-row p-0">
+            <div
+              className="tooltip"
+              data-tip="Primary data signal (S) used for plotting."
+            >
+              <SignalPicker
+                signals={ySignals}
+                signal={vSignal}
+                error={needsVSignal}
+                onSignalChange={setVSignal}
+                localKey={"vSignal"}
+                label="Signal (S)"
+              />
+            </div>
+          </li>
+          <li className="list-row p-0">
+            <div className="block">
+              <label className="select">
+                <span className="label">Operator</span>
                 <select
                   className="select w-18 float-left"
                   value={operation ?? ""}
@@ -299,72 +352,76 @@ export const StreamPlots = ({
                   <option>×</option>
                   <option>÷</option>
                 </select>
-                <div
-                  className="tooltip"
-                  data-tip="Reference signal (R) used for plotting."
-                >
-                  <SignalPicker
-                    disabled={referenceDisabled}
-                    dataKeys={stream.data_keys}
-                    error={needsRSignal}
-                    onSignalChange={setRSignal}
-                    localKey={"rSignal"}
-                    hints={iHints}
+              </label>
+              <div
+                className="tooltip"
+                data-tip="Reference signal (R) used for plotting."
+              >
+                <SignalPicker
+                  signals={ySignals}
+                  signal={rSignal}
+                  disabled={referenceDisabled}
+                  error={needsRSignal}
+                  onSignalChange={setRSignal}
+                  localKey={"rSignal"}
+                  label="Reference (R)"
+                />
+              </div>
+            </div>
+          </li>
+          <li className="list-row">
+            <div className="w-30">Presets: </div>
+            <div className="space-x-2">
+              <button className="btn btn-soft" onClick={normalMode}>
+                <InlineMath math="S" />
+              </button>
+              <button className="btn btn-soft" onClick={fluoroMode}>
+                <InlineMath math="\frac{S}{R}" />
+              </button>
+              <button className="btn btn-soft" onClick={transMode}>
+                <InlineMath math="\ln \frac{R}{S}" />
+              </button>
+            </div>
+          </li>
+          <li className="col-span-2">
+            <div className="space-x-4 m-2 ">
+              <label className="label">
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={inverted}
+                  onChange={(e) => setInverted(e.target.checked)}
+                />
+                Inverted <InlineMath math="\big(\frac{1}{y}\big)" />
+              </label>
+              <label className="label">
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={logarithm}
+                  onChange={(e) => setLogarithm(e.target.checked)}
+                />
+                Natural logarithm
+              </label>
+              {/* Need to get a good gradient function. */}
+              <div
+                className="tooltip"
+                data-tip="This feature is in development. Stay tuned."
+              >
+                <label className="label disabled">
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    disabled
+                    checked={gradient}
+                    onChange={(e) => setGradient(e.target.checked)}
                   />
-                </div>
-              </th>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div className="space-x-2">
-        <span>Presets: </span>
-        <button className="btn btn-soft" onClick={normalMode}>
-          <InlineMath math="S" />
-        </button>
-        <button className="btn btn-soft" onClick={fluoroMode}>
-          <InlineMath math="\frac{S}{R}" />
-        </button>
-        <button className="btn btn-soft" onClick={transMode}>
-          <InlineMath math="\ln \frac{R}{S}" />
-        </button>
-      </div>
-
-      <div className="space-x-4 m-2">
-        <label className="label">
-          <input
-            type="checkbox"
-            className="checkbox"
-            checked={inverted}
-            onChange={(e) => setInverted(e.target.checked)}
-          />
-          Inverted <InlineMath math="\big(\frac{1}{y}\big)" />
-        </label>
-        <label className="label">
-          <input
-            type="checkbox"
-            className="checkbox"
-            checked={logarithm}
-            onChange={(e) => setLogarithm(e.target.checked)}
-          />
-          Natural logarithm
-        </label>
-        {/* Need to get a good gradient function. */}
-        <div
-          className="tooltip"
-          data-tip="This feature is in development. Stay tuned."
-        >
-          <label className="label disabled">
-            <input
-              type="checkbox"
-              className="checkbox"
-              disabled
-              checked={gradient}
-              onChange={(e) => setGradient(e.target.checked)}
-            />
-            Derivative
-          </label>
-        </div>
+                  Derivative
+                </label>
+              </div>
+            </div>
+          </li>
+        </ul>
       </div>
 
       {infoWidget}
@@ -546,52 +603,60 @@ export function ArrayPlots({
   const vMax = reduceStat(max, Math.max, -Infinity);
   // const vMin = (min == null) ? null : min.reduce((min, value) => Math.min(min ?? Infinity, value ?? Infinity), Infinity);
   // const vMax = (max == null) ? null : max.reduce((max, value) => Math.max(max ?? -Infinity, value ?? -Infinity), -Infinity);
-
   return (
     <>
-      <div className="m-2">
-        <LiveBadge readyState={readyState} />
-      </div>
-      {isLoadingTable || isLoadingStats ? (
-        <div className="skeleton h-112 w-175"></div>
-      ) : (
-        <LinePlot
-          xdata={xdata}
-          ydata={ydata}
-          xlabel={labels.x}
-          ylabel={labels.y}
-          title={plotTitle}
-          subtitle={plotSubtitle}
-          activePoint={activeFrame}
-        />
-      )}
+      <div className="lg:grid lg:grid-cols-2">
+        <div>
+          <div className="m-2">
+            <LiveBadge readyState={readyState} />
+          </div>
 
-      <div>
-        <label className="input w-130">
-          <span className="label">Current frame:</span>
-          <span>{activeFrame}</span>
-          <input
-            type="range"
-            min={0}
-            max={lastFrame}
-            value={activeFrame}
-            onChange={(e) => {
-              setActiveFrame(Number(e.target.value));
-            }}
-            className="range"
-            step="1"
-          />
-          <span>{lastFrame}</span>
-        </label>
-      </div>
+          {isLoadingTable || isLoadingStats ? (
+            <div className="skeleton h-112 w-175"></div>
+          ) : (
+            <LinePlot
+              xdata={xdata}
+              ydata={ydata}
+              xlabel={labels.x}
+              ylabel={labels.y}
+              title={plotTitle}
+              subtitle={plotSubtitle}
+              activePoint={activeFrame}
+            />
+          )}
+        </div>
 
-      {imData != null && vMin != null && vMax != null ? (
-        <>
-          <FramePlot frame={imData} vMin={vMin} vMax={vMax} />
-        </>
-      ) : (
-        <div className="skeleton h-[457px] w-[700px]"></div>
-      )}
+        <div>
+          <label className="input w-130">
+            <span className="label">Current frame:</span>
+            <span>{activeFrame}</span>
+            <input
+              type="range"
+              min={0}
+              max={lastFrame}
+              value={activeFrame}
+              onChange={(e) => {
+                setActiveFrame(Number(e.target.value));
+              }}
+              className="range"
+              step="1"
+            />
+            <span>{lastFrame}</span>
+          </label>
+
+          {imData != null && vMin != null && vMax != null ? (
+            <>
+              <FramePlot
+                frame={imData}
+                vMin={isNaN(vMin) ? 0 : vMin}
+                vMax={isNaN(vMax) ? 1 : vMax}
+              />
+            </>
+          ) : (
+            <div className="skeleton h-[457px] w-[700px]"></div>
+          )}
+        </div>
+      </div>
     </>
   );
 }

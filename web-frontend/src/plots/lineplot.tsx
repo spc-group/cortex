@@ -66,9 +66,11 @@ export const LinePlot = ({
           title: { text: title, subtitle: { text: subtitle } },
           xaxis: { title: { text: xtext } },
           yaxis: { title: { text: ylabel } },
+          /* autosize: true, */
         }}
         config={{
           editable: true,
+          /* responsive: true, */
         }}
       />
     </>

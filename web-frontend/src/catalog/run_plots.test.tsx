@@ -118,6 +118,16 @@ describe("the StreamPlots component", () => {
   it("populates signal pickers", () => {
     expect(screen.getAllByText("sim_motor_2").length).toEqual(3);
   });
+  // it("adds 'seq_num' and 'time' signals when unhinted", async () => {
+  //   const checkbox = screen.getByLabelText("Hints only");
+  //   await fireEvent.change(checkbox, {target: {checked: false}});
+  //   expect(screen.getAllByText("seq_num").length).toEqual(3);
+  //   expect(screen.getAllByText("time").length).toEqual(3);
+  // });
+  it("skips 'seq_num' and 'time' signals when hinted", () => {
+    expect(screen.queryByText("seq_num")).toBeNull();
+    expect(screen.queryByText("time")).toBeNull();
+  });
 });
 
 const renderRouter = async (element) => {

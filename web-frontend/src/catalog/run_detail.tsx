@@ -49,11 +49,13 @@ export function RunDetail() {
     return (
       <>
         <h1>{run.metadata.start?.scan_name}</h1>
-        <h2>UID: {run.uid}</h2>
         <div>
-          Exit status: <ExitStatus status={run.metadata?.stop?.exit_status} />
+          <h2>UID: {run.uid}</h2>
+          <div>
+            Exit status: <ExitStatus status={run.metadata?.stop?.exit_status} />
+          </div>
+          <RunPlots run={run} />
         </div>
-        <RunPlots run={run} />
       </>
     );
   }

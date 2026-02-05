@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const MAX_HISTORY = 50;
 
@@ -14,33 +14,31 @@ export const lastPreference = <T>(
 // A hook that keeps track of the last choice that was made for this
 // *localKey* and returns that by default
 //
-// @param choices - The valid choices for this invocation
+// @param defaultValue - What to return before anything specific is set
+// @param choices - A list of valid choices for this preference
 // @param localKey - What to name this value in the local storage
-// @returns lastChoice - The most recently selected value from these choices
-// @returns addChoice - A callable that will insert a new choice into the history
 export const useLastChoice = <T>(
   defaultValue: T,
   choices: T[],
   localKey: string,
-): [T | null, (value: T) => void] => {
+): [T, (value: T) => void] => {
   const pastPreferences = JSON.parse(localStorage.getItem(localKey) ?? "[]");
+  // const hasChangedRef = useReference(false);
   // Set up some state to keep track of past choices
   const [lastChoice, setLastChoice] = useState<T>(() => {
     return lastPreference<T>(choices, pastPreferences) ?? defaultValue;
   });
-  // Update the history when a new choice is made
-  useEffect(() => {
-    if (lastChoice === defaultValue) {
-      return;
-    }
-    const prefIndex = pastPreferences.indexOf(lastChoice);
+  const setter = (newValue: T) => {
+    const prefIndex = pastPreferences.indexOf(newValue);
     if (prefIndex !== -1) {
       // Remove the previous preference
       pastPreferences.splice(prefIndex, 1);
     }
     // Insert the new preference
-    const newArray = [lastChoice, ...pastPreferences.slice(0, MAX_HISTORY)];
+    const newArray = [newValue, ...pastPreferences.slice(0, MAX_HISTORY)];
     localStorage.setItem(localKey, JSON.stringify(newArray));
-  }, [lastChoice, defaultValue, localKey, pastPreferences]);
-  return [lastChoice, setLastChoice];
+    // Tracker whether we should update the list of preference
+    return setLastChoice(newValue);
+  };
+  return [lastChoice, setter];
 };

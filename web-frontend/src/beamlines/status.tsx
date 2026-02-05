@@ -7,10 +7,7 @@ import { usePV } from "../ophyd/pv";
 const envHost = import.meta.env.VITE_OPHYD_URI;
 const ophydUri = envHost ?? "ws://127.0.0.1:8001";
 
-type Notation = (
-  "log10" |
-  "scientific"
-)
+type Notation = "log10" | "scientific";
 
 const IonPumpChannel = ({
   prefix,
@@ -237,7 +234,9 @@ const StatusItem = ({
 
 export default function BeamlineStatus() {
   const defaultNotation = localStorage.getItem("vacuumNotation");
-  const [notation, setNotation] = useState<Notation>(defaultNotation as Notation ?? "log10");
+  const [notation, setNotation] = useState<Notation>(
+    (defaultNotation as Notation) ?? "log10",
+  );
   const toggleNotation = (event: ChangeEvent<HTMLInputElement>) => {
     const newNotation = event.currentTarget.checked ? "log10" : "scientific";
     localStorage.setItem("vacuumNotation", newNotation);
