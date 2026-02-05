@@ -42,9 +42,19 @@ function App() {
               data are being collected.
             </p>
             <div className="card-actions">
-              <Link to="/beamlines" className="btn btn-primary text-white">
+              <Link
+                to="/beamlines/25idc"
+                className="btn btn-primary text-white"
+              >
                 <RadioIcon className="size-6 text-white" />
-                Beamlines
+                25-ID-C
+              </Link>
+              <Link
+                to="/beamlines/25idd"
+                className="btn btn-primary text-white"
+              >
+                <RadioIcon className="size-6 text-white" />
+                25-ID-D
               </Link>
             </div>
           </div>

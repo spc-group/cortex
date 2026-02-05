@@ -335,24 +335,21 @@ export const StreamPlots = ({
             </div>
           </li>
           <li className="list-row p-0">
-            <div className="block">
-              <label className="select">
-                <span className="label">Operator</span>
-                <select
-                  className="select w-18 float-left"
-                  value={operation ?? ""}
-                  role="listbox"
-                  onChange={(e) => {
-                    setOperation((e.target as HTMLSelectElement).value);
-                  }}
-                >
-                  <option></option>
-                  <option>+</option>
-                  <option>−</option>
-                  <option>×</option>
-                  <option>÷</option>
-                </select>
-              </label>
+            <div className="join">
+              <select
+                className="select w-18 float-left join-item"
+                value={operation ?? ""}
+                role="listbox"
+                onChange={(e) => {
+                  setOperation((e.target as HTMLSelectElement).value);
+                }}
+              >
+                <option></option>
+                <option>+</option>
+                <option>−</option>
+                <option>×</option>
+                <option>÷</option>
+              </select>
               <div
                 className="tooltip"
                 data-tip="Reference signal (R) used for plotting."
@@ -371,14 +368,14 @@ export const StreamPlots = ({
           </li>
           <li className="list-row">
             <div className="w-30">Presets: </div>
-            <div className="space-x-2">
-              <button className="btn btn-soft" onClick={normalMode}>
+            <div className="join">
+              <button className="btn btn-soft join-item" onClick={normalMode}>
                 <InlineMath math="S" />
               </button>
-              <button className="btn btn-soft" onClick={fluoroMode}>
+              <button className="btn btn-soft join-item" onClick={fluoroMode}>
                 <InlineMath math="\frac{S}{R}" />
               </button>
-              <button className="btn btn-soft" onClick={transMode}>
+              <button className="btn btn-soft join-item" onClick={transMode}>
                 <InlineMath math="\ln \frac{R}{S}" />
               </button>
             </div>

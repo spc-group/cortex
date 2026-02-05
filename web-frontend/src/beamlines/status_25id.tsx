@@ -3,6 +3,7 @@ import type { ChangeEvent } from "react";
 
 import { OphydProvider } from "../ophyd/provider";
 import { usePV } from "../ophyd/pv";
+import { BeamlineHeader } from "./header";
 
 const envHost = import.meta.env.VITE_OPHYD_URI;
 const ophydUri = envHost ?? "ws://127.0.0.1:8001";
@@ -244,6 +245,7 @@ export default function BeamlineStatus() {
   };
   return (
     <>
+      <BeamlineHeader title={"25-ID"} />
       <div className="ml-3 mt-3">
         <span className="ml-5 text-sm">
           Notation: scientific

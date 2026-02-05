@@ -60,7 +60,7 @@ describe("the livePlot component", () => {
       render(
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
-            <LivePlot beamlineId="25-ID-C" />
+            <LivePlot />
           </QueryClientProvider>
         </BrowserRouter>,
       );

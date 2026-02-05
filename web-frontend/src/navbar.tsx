@@ -19,6 +19,46 @@ export default function Navbar() {
   ];
 
   return (
+    <div className="navbar bg-base-100 shadow-sm">
+      <div className="">
+        <a className="btn btn-ghost text-xl" href="/">
+          <img
+            alt="Spectroscopy group logo"
+            src={logoUrl}
+            className="h-8 w-auto"
+            /* Make the logo look different so we can tell if we're in the dev server */
+            style={
+              import.meta.env.MODE == "development"
+                ? { filter: "invert(1)" }
+                : {}
+            }
+          />
+          Cortex
+        </a>
+      </div>
+      <div className="grow justify-end px-2">
+        <div className="items-stretch">
+          <NavLink to="/catalog" className="btn btn-ghost rounded-field">
+            Catalog
+          </NavLink>
+          <NavLink
+            to="/beamlines/25-ID-C/plots"
+            className="btn btn-ghost rounded-field"
+          >
+            25-ID-C
+          </NavLink>
+          <NavLink
+            to="/beamlines/25-ID-D/plots"
+            className="btn btn-ghost rounded-field"
+          >
+            25-ID-D
+          </NavLink>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
     <Disclosure as="nav" className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
