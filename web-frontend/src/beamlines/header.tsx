@@ -1,7 +1,8 @@
 import { NavLink } from "react-router";
 
 export const BeamlineHeader = ({ title }: { title: string }) => {
-  const toClassName = ({ isActive }: {isActive: boolean}) => (isActive ? "tab tab-active" : "tab");
+  const toClassName = ({ isActive }: { isActive: boolean }) =>
+    isActive ? "tab tab-active" : "tab";
   return (
     <>
       <h1 className="m-4 text-2xl font-bold tracking-tight text-heading">

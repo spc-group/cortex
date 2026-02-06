@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import { RunList, RunDetail } from "./catalog";
 import Navbar from "./navbar.tsx";
 import BeamlineStatus25ID from "./beamlines/status_25id.tsx";
+import { BeamlineSummary } from "./beamlines/summary";
 import { LivePlot } from "./beamlines/liveplot";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -21,6 +22,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/catalog" element={<RunList />} />
           <Route path="/catalog/:uid" element={<RunDetail />} />
           {/* <Route path="/beamline/:beamlineId" element={<BeamlineStatus />} /> */}
+          <Route path="/beamlines/:beamlineId" element={<BeamlineSummary />} />
           <Route path="/beamlines/:beamlineId/plots" element={<LivePlot />} />
           <Route
             path="/beamlines/25-ID-C/equipment"
