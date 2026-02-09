@@ -152,12 +152,13 @@ export const useSearch = <M>(
   error: unknown;
   count: number;
   readyState: ReadyState;
+  timestamp: number,
 } => {
   // References to return past results during re-loading
   const countRef = useRef(0);
   const nodesRef = useRef(null);
   // Subscribe to websocket to know if we should refresh the query
-  const { payload, readyState } =
+  const { payload, readyState, timestamp } =
     useTiledWebSocket<WebSocketContainer<M>>(path);
   const webSocketSequence = payload?.sequence;
   // Get full search results over HTTP
@@ -194,5 +195,6 @@ export const useSearch = <M>(
     error,
     count: countRef.current,
     readyState,
+    timestamp,
   };
 };

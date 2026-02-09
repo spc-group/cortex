@@ -35,6 +35,8 @@ const toNumberArray = (intArray: BigInt64Array) => {
 };
 
 export const RunPlots = ({ run }: { run: Run }) => {
+  const renderNumRef = useRef(0);
+  renderNumRef.current += 1;
   const uid = run.uid;
   // Get the valid streams for this run
   const [streamName, setStream] = useState(NULL_SIGNAL);
@@ -101,7 +103,6 @@ export const RunPlots = ({ run }: { run: Run }) => {
       </div>
     );
   }
-
   return (
     <div className="m-4">
       {/* Widget to pick a stream */}

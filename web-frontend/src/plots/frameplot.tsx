@@ -25,7 +25,6 @@ export const RangePicker = ({
 }) => {
   const center = (top + bottom) / 2;
   const width = top - bottom;
-
   const updateRange = (kind: string) => {
     return (event: ChangeEvent<HTMLInputElement>) => {
       const value = Number(event.currentTarget.value);
@@ -53,7 +52,7 @@ export const RangePicker = ({
             type="range"
             className="range"
             min={min}
-            max={max}
+            max={max - 1}
             value={bottom}
             onChange={updateRange("bottom")}
             disabled={disable}
@@ -64,6 +63,8 @@ export const RangePicker = ({
           disabled={disable}
           type="number"
           value={bottom}
+          min={min}
+          max={max - 1}
           onChange={updateRange("bottom")}
         />
       </div>
@@ -73,7 +74,7 @@ export const RangePicker = ({
           <input
             type="range"
             className="range"
-            min={min}
+            min={min + 1}
             max={max}
             value={top}
             onChange={updateRange("top")}
@@ -85,6 +86,8 @@ export const RangePicker = ({
           disabled={disable}
           type="number"
           value={top}
+          min={min + 1}
+          max={max}
           onChange={updateRange("top")}
         />
       </div>
@@ -106,6 +109,8 @@ export const RangePicker = ({
           disabled={disable}
           type="number"
           value={String(center)}
+          min={min}
+          max={max}
           onChange={updateRange("center")}
         />
       </div>
@@ -128,6 +133,8 @@ export const RangePicker = ({
           disabled={disable}
           type="number"
           value={width}
+          min={1}
+          max={max - min}
           onChange={updateRange("width")}
         />
       </div>
@@ -151,14 +158,16 @@ export const FramePlot = ({
 }) => {
   // E.g. /api/v1/array/block/04d28613-b2c4-4b5c-ba31-6aff5c49922d/streams/primary/ge_13element?block=10%2C0%2C0&expected_shape=1%2C13%2C4096
   // State to keep track of plotting parameters
-  const [zMin, setZMin] = useState(vMin);
-  const [zMax, setZMax] = useState(vMax);
+  const [zMin, setZMin] = useState<number | null>(null);
+  const [zMax, setZMax] = useState<number | null>(null);
+  const [zMin_, zMax_] = [zMin ?? vMin, zMax ?? vMax];
   const [autoZ, setAutoZ] = useState(true);
+
   const zRange = autoZ
     ? {}
     : {
-        zmin: zMin,
-        zmax: zMax,
+        zmin: zMin_,
+        zmax: zMax_,
       };
 
   const plotData: Data[] = [
@@ -202,8 +211,8 @@ export const FramePlot = ({
       <RangePicker
         min={vMin}
         max={vMax}
-        bottom={zMin}
-        top={zMax}
+        bottom={zMin_}
+        top={zMax_}
         setBottom={setZMin}
         setTop={setZMax}
         disable={autoZ}

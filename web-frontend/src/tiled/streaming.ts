@@ -57,18 +57,30 @@ export const useTiledWebSocket = <T>(path: string) => {
   const wsUrl = makeWebsocketUrl(
     `${tiledUri}stream/single/${path}?envelope_format=msgpack`,
   );
-  const { lastMessage, readyState } = useWebSocket<T>(wsUrl);
+  const { lastMessage, readyState } = useWebSocket<T>(wsUrl, {
+    retryOnError: true,
+    reconnectAttempts: 10,
+    reconnectInterval: (attemptNumber) =>
+      // Exponential increase in reconnect internal
+      Math.min(Math.pow(2, attemptNumber) * 100, 10000),
+  });
   // Hacky useEffect to decode the blob asynchronously
   const [blob, setBlob] = useState<Blob>(new Blob());
   const [payload, setPayload] = useState<T>();
+  const [timestamp, setTimestamp] = useState<number>(0);
   if (lastMessage?.data !== blob) {
     setBlob(lastMessage?.data);
+    const newTimestamp = lastMessage?.timeStamp ?? timestamp;
+    if (newTimestamp > timestamp) {
+      setTimestamp(newTimestamp);
+    }
   }
   useDecodeBlob(blob, setPayload);
   const result = {
     lastMessage,
     payload,
     readyState,
+    timestamp,
   };
   return result;
 };

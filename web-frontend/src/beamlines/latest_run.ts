@@ -12,7 +12,7 @@ export const useLatestRun = (beamlineId?: string) => {
             value: beamlineId,
           },
         ];
-  const { runs, isLoading, readyState, count } = useRuns({
+  const { runs, isLoading, readyState, count, timestamp } = useRuns({
     sortField: "-start.time",
     filters: filters,
     pageLimit: 1,
@@ -20,7 +20,7 @@ export const useLatestRun = (beamlineId?: string) => {
   });
 
   let run;
-  if (isLoading || count === 0) {
+  if (count === 0) {
     run = null;
   } else {
     run = runs[0];
@@ -30,5 +30,6 @@ export const useLatestRun = (beamlineId?: string) => {
     run: run,
     readyState: readyState,
     isLoading: isLoading,
+    timestamp: timestamp,
   };
 };

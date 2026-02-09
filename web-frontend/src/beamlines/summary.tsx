@@ -6,5 +6,5 @@ export const BeamlineSummary = () => {
   useEffect(() => {
     navigate("plots");
   });
-  return (<></>);
+  return <></>;
 };

@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router";
 
+import { useRef } from "react";
 import { RunPlots } from "../catalog/run_plots";
 import { useLatestRun } from "./latest_run";
 import { BeamlineHeader } from "./header";
@@ -13,6 +14,8 @@ export const LivePlot = () => {
     run?.metadata?.start.time != null
       ? new Date(run.metadata.start.time * 1000).toLocaleString()
       : "";
+  const renderNumRef = useRef(0);
+  renderNumRef.current += 1;
   return (
     <>
       <BeamlineHeader title={beamlineId ?? "No beamline"} />
