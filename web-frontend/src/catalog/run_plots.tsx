@@ -3,8 +3,7 @@ import { InlineMath } from "react-katex";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { useState, useRef } from "react";
 
-import { LinePlot } from "../plots";
-import { FramePlot } from "../plots";
+import { LinePlot, FramePlot, SpectraPlot } from "../plots";
 import { SignalPicker } from "../plots/signal_picker";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
@@ -256,6 +255,8 @@ export const StreamPlots = ({
   }
 
   const vKey = vSignal != null ? stream?.data_keys?.[vSignal] : null;
+  const evPerBin =
+    stream.configuration?.[vSignal]?.data?.[`${vSignal}-ev_per_bin`];
   let plotWidget;
   if (stream == null) {
     plotWidget = <></>;
@@ -269,6 +270,7 @@ export const StreamPlots = ({
         operation={operation ?? ""}
         inverted={inverted}
         logarithm={logarithm}
+        evPerBin={evPerBin}
         plotTitle={plotTitle}
         plotSubtitle={plotSubtitle}
         key={stream.uid}
@@ -510,12 +512,20 @@ export function TablePlots({
   );
 }
 
+// Component that shows plots for an array data structure family.
+//
+// If *evPerBin* is present, this means a summed line plot alongside
+// plots for the individua spectra. Otherwise, this means a summed
+// line plot alongside plots for the individual frames as images.
+//
+// @param evPerBin - The energy width of each pixel in electron-volts.
 export function ArrayPlots({
   stream,
   xSignal,
   vSignal,
   rSignal,
   operation,
+  evPerBin,
   inverted,
   logarithm,
   plotTitle,
@@ -526,6 +536,7 @@ export function ArrayPlots({
   vSignal: string | null;
   rSignal: string | null;
   operation: string;
+  evPerBin?: number;
   inverted: boolean;
   logarithm: boolean;
   plotTitle?: string;
@@ -599,8 +610,33 @@ export function ArrayPlots({
   };
   const vMin = reduceStat(min, Math.min, Infinity);
   const vMax = reduceStat(max, Math.max, -Infinity);
-  // const vMin = (min == null) ? null : min.reduce((min, value) => Math.min(min ?? Infinity, value ?? Infinity), Infinity);
-  // const vMax = (max == null) ? null : max.reduce((max, value) => Math.max(max ?? -Infinity, value ?? -Infinity), -Infinity);
+  // Decide how to plot the individual frames
+  let framePlot;
+  if (imData != null && vMin != null && vMax != null) {
+    if (evPerBin != null) {
+      // Fluorescence spectra
+      framePlot = (
+        <>
+          <SpectraPlot frame={imData} evPerBin={evPerBin} />
+        </>
+      );
+    } else {
+      // Some other area detector frame
+      framePlot = (
+        <>
+          <FramePlot
+            frame={imData}
+            vMin={isNaN(vMin) ? 0 : vMin}
+            vMax={isNaN(vMax) ? 1 : vMax}
+          />
+        </>
+      );
+    }
+  } else {
+    // Data are not done loading yet
+    framePlot = <div className="skeleton h-[457px] w-[700px]"></div>;
+  }
+
   return (
     <>
       <div className="lg:grid lg:grid-cols-2">
@@ -642,17 +678,7 @@ export function ArrayPlots({
             <span>{lastFrame}</span>
           </label>
 
-          {imData != null && vMin != null && vMax != null ? (
-            <>
-              <FramePlot
-                frame={imData}
-                vMin={isNaN(vMin) ? 0 : vMin}
-                vMax={isNaN(vMax) ? 1 : vMax}
-              />
-            </>
-          ) : (
-            <div className="skeleton h-[457px] w-[700px]"></div>
-          )}
+          {framePlot}
         </div>
       </div>
     </>

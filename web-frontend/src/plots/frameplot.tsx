@@ -192,6 +192,7 @@ export const FramePlot = ({
             title: { text: title, subtitle: { text: subtitle } },
             xaxis: { title: { text: xtext } },
             yaxis: { title: { text: ylabel } },
+            uirevision: "true",
           }}
           config={{
             editable: true,

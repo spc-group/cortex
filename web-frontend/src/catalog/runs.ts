@@ -23,7 +23,7 @@ export const useRuns = ({
   error: unknown;
   count: number;
   readyState: ReadyState;
-  timestamp: number,
+  timestamp: number;
 } => {
   const path = "";
   const { data, ...rest } = useSearch<RunMetadata>(path, {

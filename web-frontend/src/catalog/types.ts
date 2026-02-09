@@ -80,7 +80,7 @@ export interface StreamMetadata {
   uid: string;
   time: number;
   hints: { [key: string]: { fields: string[] } };
-  configuration: { [key: string]: object };
+  configuration: { [key: string]: {data?: {[key: string]: any} } };
 }
 
 export interface Stream {
@@ -88,7 +88,7 @@ export interface Stream {
   structure_family: string;
   specs: Spec[];
   data_keys: { [key: string]: DataKey };
-  configuration: { [key: string]: object };
+  configuration: { [key: string]: {data?: {[key: string]: any} } };
   hints: { [key: string]: { fields: string[] } };
   time: number;
   uid: string;

@@ -152,7 +152,7 @@ export const useSearch = <M>(
   error: unknown;
   count: number;
   readyState: ReadyState;
-  timestamp: number,
+  timestamp: number;
 } => {
   // References to return past results during re-loading
   const countRef = useRef(0);
