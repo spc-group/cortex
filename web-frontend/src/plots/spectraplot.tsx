@@ -14,11 +14,7 @@ export const SpectraPlot = ({
   // E.g. /api/v1/array/block/04d28613-b2c4-4b5c-ba31-6aff5c49922d/streams/primary/ge_13element?block=10%2C0%2C0&expected_shape=1%2C13%2C4096
   // State to keep track of plotting parameters
   const plotData: Data[] = frame.map((line) => {
-    const xs = [
-      ...Array(line.length)
-        .keys()]
-        .map((bin) => evPerBin * bin)
-    ;
+    const xs = [...Array(line.length).keys()].map((bin) => evPerBin * bin);
     return {
       x: [...xs],
       y: line as unknown as number[],

@@ -44,22 +44,23 @@ const VacuumGauge = ({
   prefix,
   sublabel,
   notation,
+  units,
 }: {
   prefix: string;
   sublabel?: string;
   notation?: Notation;
+  units?: string;
 }) => {
   const { value: name } = usePV(`${prefix}.DESC`);
-  const { value: units } = usePV(`${prefix}.EGU`);
   return (
     <li className="list-row">
       <div className="w-40">
         <div className="font-bold">{name}</div>
-        <div className="text-xs uppercase font-semibold opacity-40">
+        <div className="text-xs font-semibold opacity-40">
           {sublabel ?? "Vacuum"}
         </div>
       </div>
-      <StatusItem pv={`${prefix}.VAL`} units={units} notation={notation} />
+      <StatusItem pv={`${prefix}`} units={units} notation={notation} />
     </li>
   );
 };
@@ -206,13 +207,15 @@ const StatusItem = ({
     const value_ = (value as number).toFixed(precision).replace("-", "−");
     toDisplay = (
       <span>
-        {value_}&thinsp;{units}
+        {value_}
+        <span className="opacity-60">&thinsp;{units ?? pvUnits}</span>
       </span>
     );
   } else {
     toDisplay = (
       <span>
-        {value}&thinsp;{units}
+        {value}
+        <span className="opacity-60">&thinsp;{units ?? pvUnits}</span>
       </span>
     );
   }
@@ -272,8 +275,18 @@ export default function BeamlineStatus() {
                 <IonPumpChannel prefix="25idVac:mpc02a:" notation={notation} />
                 {/* <IonPumpChannel prefix="25idVac:mpc02b:" /> */}
 
-                <VacuumGauge prefix="25idVac:VSA6" />
-                <VacuumGauge prefix="25idVac:VSA7" />
+                <VacuumGauge
+                  prefix="25idVac:VSA6"
+                  notation={notation}
+                  sublabel="Televac IG"
+                  units="TORR"
+                />
+                <VacuumGauge
+                  prefix="25idVac:VSA7"
+                  notation={notation}
+                  sublabel="Televac IG"
+                  units="TORR"
+                />
               </ul>
             </div>
           </div>
@@ -311,8 +324,18 @@ export default function BeamlineStatus() {
                 <IonPumpChannel prefix="25idVac:qpc04b:" notation={notation} />
                 {/* <IonPumpChannel prefix="25idVac:qpc04c:" /> */}
                 {/* <IonPumpChannel prefix="25idVac:qpc04d:" /> */}
-                <VacuumGauge prefix="25idVac:VSB5" notation={notation} />
-                <VacuumGauge prefix="25idVac:VSB7" notation={notation} />
+                <VacuumGauge
+                  prefix="25idVac:VSB5"
+                  notation={notation}
+                  sublabel="Televac IG"
+                  units="TORR"
+                />
+                <VacuumGauge
+                  prefix="25idVac:VSB7"
+                  notation={notation}
+                  sublabel="Televac IG"
+                  units="TORR"
+                />
               </ul>
             </div>
           </div>
