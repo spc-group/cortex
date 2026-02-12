@@ -3,7 +3,7 @@
 import "@testing-library/jest-dom/vitest";
 import * as React from "react";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Table } from "apache-arrow";
@@ -160,9 +160,26 @@ describe("the ArrayPlots component", () => {
     const stream = {
       ancestors: ["12345-6789"],
     };
-    await renderRouter(<ArrayPlots stream={stream} />);
+    await renderRouter(<ArrayPlots stream={stream} vSignal="bdet" />);
+  });
+  afterEach(() => {
+    localStorage.removeItem("rois-bdet");
   });
   it("shows the 'live' badge", () => {
     expect(screen.getByText("Live")).toBeInTheDocument();
+  });
+  it("adds an ROI", async () => {
+    const button = screen.getByText("Add ROI");
+    expect(screen.queryAllByRole("row")).toHaveLength(2);
+    await fireEvent.click(button);
+    expect(screen.queryAllByRole("row")).toHaveLength(3);
+  });
+  it("removes ROIs", async () => {
+    const addButton = screen.getByText("Add ROI");
+    await fireEvent.click(addButton);
+    expect(screen.queryAllByRole("row")).toHaveLength(3);
+    const removeButton = screen.getByTitle("Remove ROI 1");
+    await fireEvent.click(removeButton);
+    expect(screen.queryAllByRole("row")).toHaveLength(2);
   });
 });

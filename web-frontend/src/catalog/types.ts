@@ -80,7 +80,7 @@ export interface StreamMetadata {
   uid: string;
   time: number;
   hints: { [key: string]: { fields: string[] } };
-  configuration: { [key: string]: { data?: { [key: string]: any } } };
+  configuration: { [key: string]: { data?: { [key: string]: object } } };
 }
 
 export interface Stream {
@@ -88,9 +88,27 @@ export interface Stream {
   structure_family: string;
   specs: Spec[];
   data_keys: { [key: string]: DataKey };
-  configuration: { [key: string]: { data?: { [key: string]: any } } };
+  configuration: { [key: string]: { data?: { [key: string]: object } } };
   hints: { [key: string]: { fields: string[] } };
   time: number;
   uid: string;
   key: string;
+}
+
+export interface ROI {
+  name: string;
+  isActive: boolean;
+  x0: number | null;
+  x1: number | null;
+  y0: number | null;
+  y1: number | null;
+}
+
+export interface ROIUpdate {
+  name?: string;
+  isActive?: boolean;
+  x0?: number;
+  x1?: number;
+  y0?: number;
+  y1?: number;
 }

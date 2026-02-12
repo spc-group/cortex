@@ -2,10 +2,7 @@ import type { Data } from "plotly.js";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import Plot from "react-plotly.js";
 
-const COLORS = {
-  "tab:blue": "#1f77b4",
-  "tab:red": "#d62728",
-};
+import { COLORS } from "./colors";
 
 export const LinePlot = ({
   xdata,

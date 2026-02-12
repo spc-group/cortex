@@ -1,9 +1,13 @@
 import { useState } from "react";
 import type { ChangeEvent } from "react";
-import type { Data } from "plotly.js";
+import type { PlotRelayoutEvent, Data, Shape } from "plotly.js";
 import Plot from "react-plotly.js";
 
+import { COLORS } from "./colors";
 import type { TypedArray } from "../tiled/types";
+import type { ROI, ROIUpdate } from "../catalog/types";
+
+const colorCycle = [...Object.values(COLORS)];
 
 // A component that lets the user selected a range by min/max or center/width
 export const RangePicker = ({
@@ -151,11 +155,29 @@ export const FramePlot = ({
   frame,
   vMin,
   vMax,
+  rois,
+  updateRoi,
 }: {
   frame: TypedArray[];
   vMin: number;
   vMax: number;
+  rois: ROI[];
+  updateRoi: (index: number, update: ROIUpdate) => void;
 }) => {
+  // const [rois, onChangeROIs] = useState([
+  //   {
+  //     x0: 50,
+  //     y0: 50,
+  //     x1: 100,
+  //     y1: 100,
+  //   },
+  //   {
+  //     x0: 150,
+  //     y0: 150,
+  //     x1: 200,
+  //     y1: 200,
+  //   },
+  // ]);
   // E.g. /api/v1/array/block/04d28613-b2c4-4b5c-ba31-6aff5c49922d/streams/primary/ge_13element?block=10%2C0%2C0&expected_shape=1%2C13%2C4096
   // State to keep track of plotting parameters
   const [zMin, setZMin] = useState<number | null>(null);
@@ -183,6 +205,61 @@ export const FramePlot = ({
   const xtext = "XLABEL";
   const ylabel = "YLABEL";
 
+  const updateROIs = (update: PlotRelayoutEvent) => {
+    // Build a list of indexes and parameters to update
+    const updates: { [key: string]: ROIUpdate } = {};
+    Object.entries(update).map(([key, value]) => {
+      const match = key.match(/shapes\[(\d+)\]\.([xy][0-9]+)/);
+      if (match != null) {
+        const [, index, roiKey] = match as [string, string, keyof ROIUpdate];
+        const update: ROIUpdate = updates[index] || (updates[index] = {});
+        update[roiKey] = value;
+      }
+    });
+    // Apply the updated ROI parameters
+    Object.entries(updates).map(([index, update]) => {
+      updateRoi(Number(index), update);
+    });
+  };
+
+  const roiShapes = rois.map((roi, index): Shape => {
+    const color = colorCycle[index % colorCycle.length];
+    return {
+      type: "rect",
+      layer: "above",
+      path: "",
+      xsizemode: "scaled",
+      xanchor: "auto",
+      ysizemode: "scaled",
+      yanchor: "auto",
+      name: "",
+      templateitemname: "",
+      showlegend: false,
+      legendgroup: "",
+      legendgrouptitle: { text: "" },
+      legendrank: 1000,
+      xref: "x",
+      yref: "y",
+      x0: roi.x0,
+      y0: roi.y0,
+      x1: roi.x1,
+      y1: roi.y1,
+      fillcolor: roi.isActive ? "#d3d3d350" : "#d3d3d300",
+      opacity: roi.isActive ? 1 : 0.15,
+      line: {
+        color: color,
+      },
+      label: {
+        text: roi.name,
+        font: {
+          color: roi.isActive ? color : `${color}40`,
+        },
+        textposition: "top left",
+      },
+      visible: index > 0,
+    };
+  });
+
   return (
     <>
       <div>
@@ -193,31 +270,42 @@ export const FramePlot = ({
             xaxis: { title: { text: xtext } },
             yaxis: { title: { text: ylabel } },
             uirevision: "true",
+            shapes: roiShapes,
           }}
           config={{
             editable: true,
           }}
+          onRelayout={updateROIs}
         />
       </div>
-      <div>Color: </div>
-      <label className="label">
-        <input
-          type="checkbox"
-          className="toggle"
-          checked={autoZ}
-          onChange={(e) => setAutoZ(e.currentTarget.checked)}
-        />{" "}
-        Auto
-      </label>
-      <RangePicker
-        min={vMin}
-        max={vMax}
-        bottom={zMin_}
-        top={zMax_}
-        setBottom={setZMin}
-        setTop={setZMax}
-        disable={autoZ}
-      />
+
+      <div
+        tabIndex={0}
+        className="collapse collapse-arrow bg-base-100 border-base-300 border"
+      >
+        <input type="checkbox" />
+        <div className="collapse-title font-semibold">Colors</div>
+        <div className="collapse-content text-sm">
+          <label className="label">
+            <input
+              type="checkbox"
+              className="toggle"
+              checked={autoZ}
+              onChange={(e) => setAutoZ(e.currentTarget.checked)}
+            />{" "}
+            Auto
+          </label>
+          <RangePicker
+            min={vMin}
+            max={vMax}
+            bottom={zMin_}
+            top={zMax_}
+            setBottom={setZMin}
+            setTop={setZMax}
+            disable={autoZ}
+          />
+        </div>
+      </div>
     </>
   );
 };

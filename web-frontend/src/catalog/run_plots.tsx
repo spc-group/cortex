@@ -17,8 +17,11 @@ import {
 import { axisLabels, OPERATIONS } from "./axis_labels";
 import type { TypedArray } from "../tiled/types";
 import type { Run, Stream, RunMetadata } from "../catalog/types";
+import type { ROI, ROIUpdate } from "./types";
 import { useLastChoice } from "../plots/last_choice.ts";
 import { signalNames } from "./signal";
+import { RoiTable } from "./roi_table";
+import { useLocalStorage } from "../local_storage";
 
 const NULL_SIGNAL = "---";
 
@@ -255,8 +258,9 @@ export const StreamPlots = ({
   }
 
   const vKey = vSignal != null ? stream?.data_keys?.[vSignal] : null;
-  const evPerBin =
-    stream.configuration?.[vSignal]?.data?.[`${vSignal}-ev_per_bin`];
+  const evPerBin = stream.configuration?.[vSignal]?.data?.[
+    `${vSignal}-ev_per_bin`
+  ] as number | undefined;
   let plotWidget;
   if (stream == null) {
     plotWidget = <></>;
@@ -551,6 +555,9 @@ export function ArrayPlots({
 
   const arrayPath = [...stream.ancestors, stream.key, vSignal].join("/");
   const [activeFrame, setActiveFrame] = useState(0);
+  const [viewMode, setViewMode] = useState<"frame" | "spectra">(
+    evPerBin == null ? "frame" : "spectra",
+  );
   const previousFrame = useRef<TypedArray[] | null>(null);
   const { array: frameData, shape: frameShape } = useArray(arrayPath, [
     activeFrame,
@@ -560,7 +567,50 @@ export function ArrayPlots({
   if (frameData != null) {
     previousFrame.current = frameData[0];
   }
-
+  // Keep track of chosen ROIs
+  const [rois, setRois] = useLocalStorage<ROI[]>(`rois-${vSignal}`, [
+    {
+      name: "Total",
+      isActive: true,
+      x0: null,
+      x1: null,
+      y0: null,
+      y1: null,
+    },
+  ]);
+  const addRoi = () => {
+    if (rois.length === 1) {
+      rois[0].isActive = false;
+    }
+    setRois([
+      ...rois,
+      {
+        isActive: true,
+        name: "",
+        x0: 0,
+        y0: 0,
+        x1: 50,
+        y1: 50,
+      },
+    ]);
+  };
+  const removeRoi = (index: number) => {
+    if (rois.length === 2) {
+      // Reactive the total ROI so there's no empty plot
+      rois[0].isActive = true;
+    }
+    setRois([...rois.slice(0, index), ...rois.slice(index + 1)]);
+  };
+  const updateRoi = (index: number, update: ROIUpdate) => {
+    setRois([
+      ...rois.slice(0, index),
+      {
+        ...rois[index],
+        ...update,
+      },
+      ...rois.slice(index + 1),
+    ]);
+  };
   // Process data into a form consumable by the plots
   let xdata, vdata, rdata;
   if (isLoadingTable || data == null || isLoadingStats) {
@@ -613,11 +663,17 @@ export function ArrayPlots({
   // Decide how to plot the individual frames
   let framePlot;
   if (imData != null && vMin != null && vMax != null) {
-    if (evPerBin != null) {
+    if (viewMode === "spectra") {
       // Fluorescence spectra
       framePlot = (
         <>
-          <SpectraPlot frame={imData} evPerBin={evPerBin} />
+          <SpectraPlot
+            frame={imData}
+            binSize={evPerBin ?? 1}
+            xlabel={evPerBin != null ? "Energy /eV" : "Bin"}
+            rois={rois}
+            updateRoi={updateRoi}
+          />
         </>
       );
     } else {
@@ -628,6 +684,8 @@ export function ArrayPlots({
             frame={imData}
             vMin={isNaN(vMin) ? 0 : vMin}
             vMax={isNaN(vMax) ? 1 : vMax}
+            rois={rois}
+            updateRoi={updateRoi}
           />
         </>
       );
@@ -636,7 +694,6 @@ export function ArrayPlots({
     // Data are not done loading yet
     framePlot = <div className="skeleton h-[457px] w-[700px]"></div>;
   }
-
   return (
     <>
       <div className="lg:grid lg:grid-cols-2">
@@ -662,7 +719,7 @@ export function ArrayPlots({
 
         <div>
           <label className="input w-130">
-            <span className="label">Current frame:</span>
+            <span className="label">Current frame</span>
             <span>{activeFrame}</span>
             <input
               type="range"
@@ -677,8 +734,37 @@ export function ArrayPlots({
             />
             <span>{lastFrame}</span>
           </label>
+          <label className="label px-2">
+            <input
+              type="checkbox"
+              checked={viewMode === "spectra"}
+              onChange={(e) => {
+                setViewMode(e.currentTarget.checked ? "spectra" : "frame");
+              }}
+              className="toggle"
+            />
+            Spectra
+          </label>
 
           {framePlot}
+        </div>
+
+        <div
+          tabIndex={0}
+          className="collapse collapse-arrow bg-base-100 border-base-300 border"
+        >
+          <input type="checkbox" />
+          <div className="collapse-title font-semibold">
+            Regions of Interest (ROIs)
+          </div>
+          <div className="collapse-content text-sm">
+            <RoiTable
+              rois={rois}
+              addRoi={addRoi}
+              updateRoi={updateRoi}
+              removeRoi={removeRoi}
+            />
+          </div>
         </div>
       </div>
     </>
