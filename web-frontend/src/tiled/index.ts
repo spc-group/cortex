@@ -14,3 +14,4 @@ export { useArray, useArrayStats } from "./array";
 export { useStreams } from "./use_streams";
 export { useMetadata } from "./metadata";
 export { useSearch } from "./search";
+export type { Stats } from "./types";

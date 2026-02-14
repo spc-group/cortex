@@ -1,3 +1,5 @@
+import type { ROI } from "../plots";
+
 // Type and interface declarations for the Tiled API client
 
 export interface Spec {
@@ -87,4 +89,18 @@ export type TypedArray =
 
 export interface TypedArrayConstructor {
   new (buffer: ArrayBuffer): TypedArray;
+}
+
+export interface Stats {
+  sum: (number | null)[];
+  max: (number | null)[];
+  min: (number | null)[];
+  shape: number[];
+  roi: ROI;
+}
+
+export interface StatsResult {
+  stats: Stats[];
+  isLoading: boolean;
+  readyState: ReadyState;
 }

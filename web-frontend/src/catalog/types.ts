@@ -94,21 +94,3 @@ export interface Stream {
   uid: string;
   key: string;
 }
-
-export interface ROI {
-  name: string;
-  isActive: boolean;
-  x0: number | null;
-  x1: number | null;
-  y0: number | null;
-  y1: number | null;
-}
-
-export interface ROIUpdate {
-  name?: string;
-  isActive?: boolean;
-  x0?: number;
-  x1?: number;
-  y0?: number;
-  y1?: number;
-}

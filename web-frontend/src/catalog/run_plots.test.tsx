@@ -65,7 +65,7 @@ vi.mock("../tiled/array", () => {
     },
     useArrayStats: () => {
       return {
-        sum: [],
+        stats: [],
         readyState: ReadyState.OPEN,
       };
     },

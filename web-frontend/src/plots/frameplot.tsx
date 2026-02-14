@@ -5,7 +5,7 @@ import Plot from "react-plotly.js";
 
 import { COLORS } from "./colors";
 import type { TypedArray } from "../tiled/types";
-import type { ROI, ROIUpdate } from "../catalog/types";
+import type { ROI, ROIUpdate } from "./types";
 
 const colorCycle = [...Object.values(COLORS)];
 

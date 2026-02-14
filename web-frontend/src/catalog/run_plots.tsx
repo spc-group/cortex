@@ -4,6 +4,7 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { useState, useRef } from "react";
 
 import { LinePlot, FramePlot, SpectraPlot } from "../plots";
+import type { LineData } from "../plots";
 import { SignalPicker } from "../plots/signal_picker";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
@@ -15,9 +16,9 @@ import {
   useArrayStats,
 } from "../tiled";
 import { axisLabels, OPERATIONS } from "./axis_labels";
-import type { TypedArray } from "../tiled/types";
+import type { TypedArray, Stats } from "../tiled/types";
 import type { Run, Stream, RunMetadata } from "../catalog/types";
-import type { ROI, ROIUpdate } from "./types";
+import type { ROI, ROIUpdate } from "../plots";
 import { useLastChoice } from "../plots/last_choice.ts";
 import { signalNames } from "./signal";
 import { RoiTable } from "./roi_table";
@@ -463,25 +464,28 @@ export function TablePlots({
   } = useDataTable(stream);
 
   // Process data into a form consumable by the plots
-  let xdata, vdata, rdata;
+  let xdata, vdata, dataSets: LineData[];
   if (isLoadingData || data == null) {
-    xdata = null;
-    vdata = null;
-    rdata = null;
+    dataSets = [];
   } else {
     xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
     xdata = toNumberArray(xdata);
     vdata = vSignal != null ? data.getChild(vSignal)?.toArray() : null;
     vdata = toNumberArray(vdata);
-    rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
-    rdata = toNumberArray(rdata);
+    const rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
+    dataSets =
+      vdata == null
+        ? []
+        : [{ x: xdata, y: vdata }].map(({ x, y }) => {
+            return {
+              x,
+              y: prepareYData(y, toNumberArray(rdata), operation, {
+                inverted: inverted,
+                logarithm: logarithm,
+              }),
+            };
+          });
   }
-
-  // Apply reference correction and processing steps
-  const ydata = prepareYData(vdata, rdata, operation, {
-    inverted: inverted,
-    logarithm: logarithm,
-  });
 
   // Decide on plot annotations based on data processing
   // Decide what kind of thing to show
@@ -497,7 +501,6 @@ export function TablePlots({
     logarithm,
     operation,
   });
-
   return (
     <>
       <div className="m-2">
@@ -505,8 +508,7 @@ export function TablePlots({
       </div>
 
       <LinePlot
-        xdata={xdata}
-        ydata={ydata}
+        data={dataSets}
         xlabel={labels.x}
         ylabel={labels.y}
         title={plotTitle}
@@ -562,7 +564,6 @@ export function ArrayPlots({
   const { array: frameData, shape: frameShape } = useArray(arrayPath, [
     activeFrame,
   ]);
-  const { sum, max, min, isLoading: isLoadingStats } = useArrayStats(arrayPath);
   const lastFrame = (frameShape?.[0] ?? 1) - 1;
   if (frameData != null) {
     previousFrame.current = frameData[0];
@@ -572,10 +573,10 @@ export function ArrayPlots({
     {
       name: "Total",
       isActive: true,
-      x0: null,
-      x1: null,
-      y0: null,
-      y1: null,
+      x0: 0,
+      x1: Infinity,
+      y0: 0,
+      y1: Infinity,
     },
   ]);
   const addRoi = () => {
@@ -611,25 +612,38 @@ export function ArrayPlots({
       ...rois.slice(index + 1),
     ]);
   };
+  const { stats, isLoading: isLoadingStats } = useArrayStats(arrayPath, rois);
   // Process data into a form consumable by the plots
-  let xdata, vdata, rdata;
-  if (isLoadingTable || data == null || isLoadingStats) {
-    xdata = null;
-    vdata = null;
-    rdata = null;
+  let dataSets: LineData[];
+  if (isLoadingTable || stats.length === 0 || isLoadingStats) {
+    dataSets = [];
   } else {
-    xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
-    xdata = toNumberArray(xdata);
-    vdata = sum;
-    rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
-    rdata = toNumberArray(rdata);
-  }
+    const xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
+    dataSets = stats.map((s, i) => {
+      return {
+        x: toNumberArray(xdata),
+        y: s.sum,
+        name: rois[i].name,
+        color: `c${i}`,
+      };
+    });
+    const rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
+    // Filter out hidden ROIs
+    dataSets = dataSets.filter((_, index) => rois[index].isActive);
 
-  // Apply reference correction and processing steps
-  const ydata = prepareYData(vdata, rdata, operation, {
-    inverted: inverted,
-    logarithm: logarithm,
-  });
+    // Apply reference correction and processing steps
+    dataSets = dataSets.map(({ x, y, name, color }) => {
+      return {
+        x,
+        y: prepareYData(y, toNumberArray(rdata), operation, {
+          inverted: inverted,
+          logarithm: logarithm,
+        }),
+        name,
+        color,
+      };
+    });
+  }
 
   const labels = axisLabels({
     xSignal: [xSignal ?? "", null],
@@ -644,10 +658,12 @@ export function ArrayPlots({
 
   // Prepare color range for the frame plot
   const reduceStat = (
-    arr: (number | null)[] | null,
+    stats: Stats[],
+    attr: "min" | "max",
     compare: (...values: number[]) => number,
     defaultValue: number,
   ) => {
+    const arr = stats.map((s) => s?.[attr]).flat();
     if (arr == null) {
       return null;
     } else {
@@ -658,8 +674,8 @@ export function ArrayPlots({
       );
     }
   };
-  const vMin = reduceStat(min, Math.min, Infinity);
-  const vMax = reduceStat(max, Math.max, -Infinity);
+  const vMin = reduceStat(stats, "min", Math.min, Infinity);
+  const vMax = reduceStat(stats, "max", Math.max, -Infinity);
   // Decide how to plot the individual frames
   let framePlot;
   if (imData != null && vMin != null && vMax != null) {
@@ -706,8 +722,7 @@ export function ArrayPlots({
             <div className="skeleton h-112 w-175"></div>
           ) : (
             <LinePlot
-              xdata={xdata}
-              ydata={ydata}
+              data={dataSets}
               xlabel={labels.x}
               ylabel={labels.y}
               title={plotTitle}

@@ -5,7 +5,7 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/solid";
 
-import type { ROI } from "./types";
+import type { ROI } from "../plots";
 import { COLORS } from "../plots/colors";
 
 const colorCycle = [...Object.values(COLORS)];
@@ -90,7 +90,7 @@ export const RoiTable = ({
                 </td>
                 <td>
                   {index === 0 ? (
-                    <span>&mdash;</span>
+                    <span>0 &mdash; &infin;</span>
                   ) : (
                     <div className="join">
                       <input
@@ -119,7 +119,7 @@ export const RoiTable = ({
                 </td>
                 <td>
                   {index === 0 ? (
-                    <span>&mdash;</span>
+                    <span>0 &mdash; &infin;</span>
                   ) : (
                     <div className="join">
                       <input

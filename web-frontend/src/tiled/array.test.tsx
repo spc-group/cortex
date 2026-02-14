@@ -139,15 +139,16 @@ describe("useArray", () => {
 });
 
 describe("useArrayStats", () => {
+  const rois = [{ x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" }];
   const MockComponent = () => {
-    const { max, min, sum } = useArrayStats("my_run/primary/bdet", {
+    const { stats } = useArrayStats("my_run/primary/bdet", rois, {
       client: client,
     });
     return (
       <>
-        <div>Max: {JSON.stringify(max)}</div>
-        <div>Min: {JSON.stringify(min)}</div>
-        <div>Sum: {JSON.stringify(sum)}</div>
+        <div>Max: {JSON.stringify(stats[0]?.max)}</div>
+        <div>Min: {JSON.stringify(stats[0]?.min)}</div>
+        <div>Sum: {JSON.stringify(stats[0]?.sum)}</div>
       </>
     );
   };
@@ -167,75 +168,193 @@ describe("useArrayStats", () => {
 });
 
 describe("the arrayStatsReducer() function", () => {
-  it("updates the shape state", () => {
-    const oldStats = {
-      sum: [],
-      max: [],
-      min: [],
+  it("clears arrays", () => {
+    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+    const oldStats = [
+      {
+        sum: [1, 2, 3],
+        max: [9, 4, 5],
+        min: [6, 7, 8],
+        shape: [],
+        roi: roi,
+      },
+    ];
+    const action = {
+      type: "clear_stats",
+      rois: [roi, roi],
       shape: [],
+      data: new Uint8Array(),
+      index: 0,
     };
+    const newStats = reduceArrayStats(oldStats, action);
+    expect(newStats).toHaveLength(2);
+    expect(newStats[0].sum).toEqual([]);
+  });
+  it("resets ROIs", () => {
+    const oldStats = [
+      {
+        // ROI that does not change
+        sum: [1, 2, 3],
+        max: [9, 4, 5],
+        min: [6, 7, 8],
+        shape: [],
+        roi: { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" },
+      },
+      {
+        // ROI that does change
+        sum: [1, 2, 3],
+        max: [9, 4, 5],
+        min: [6, 7, 8],
+        shape: [],
+        roi: { x0: 25, x1: 40, y0: 50, y1: 57, isActive: true, name: "" },
+      },
+    ];
+    const action = {
+      type: "reset_rois",
+      rois: [
+        { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" },
+        { x0: 20, x1: 40, y0: 50, y1: 57, isActive: true, name: "" },
+        { x0: 1, x1: 2, y0: 3, y1: 4, isActive: true, name: "" },
+      ],
+      shape: [],
+      data: new Uint8Array(),
+      index: 0,
+    };
+    const newStats = reduceArrayStats(oldStats, action);
+    expect(newStats).toHaveLength(3);
+    expect(newStats[0].sum).toEqual([1, 2, 3]);
+    expect(newStats[1].sum).toEqual([]);
+  });
+  it("updates the shape state", () => {
+    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+    const oldStats = [
+      {
+        sum: [],
+        max: [],
+        min: [],
+        shape: [],
+        roi: roi,
+      },
+    ];
     const action = {
       type: "update_shape",
       shape: [3, 1024, 1024],
       index: 0,
       data: Uint8Array.from([]),
+      rois: [],
     };
     const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats.shape).toEqual([3, 1024, 1024]);
+    expect(newStats[0].shape).toEqual([3, 1024, 1024]);
   });
   it("creates empty arrays", () => {
-    const oldStats = {
-      sum: [],
-      max: [],
-      min: [],
-      shape: [1],
-    };
+    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+    const oldStats = [
+      {
+        sum: [],
+        max: [],
+        min: [],
+        shape: [1],
+        roi,
+      },
+    ];
     const action = {
       type: "update_shape",
       shape: [3, 1024, 1024],
       data: Uint8Array.from([]),
       index: 0,
+      rois: [],
     };
     const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats.sum).toEqual([null, null, null]);
-    expect(newStats.max).toEqual([null, null, null]);
-    expect(newStats.min).toEqual([null, null, null]);
+    expect(newStats[0].sum).toEqual([null, null, null]);
+    expect(newStats[0].max).toEqual([null, null, null]);
+    expect(newStats[0].min).toEqual([null, null, null]);
   });
   it("extends existing arrays", () => {
-    const oldStats = {
-      sum: [null, null],
-      max: [null],
-      min: [],
-      shape: [],
-    };
+    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+    const oldStats = [
+      {
+        sum: [null, null],
+        max: [null],
+        min: [],
+        shape: [],
+        roi,
+      },
+    ];
     const action = {
       type: "update_shape",
       shape: [3, 1024, 1024],
       data: Uint8Array.from([]),
       index: 0,
+      rois: [],
     };
     const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats.sum).toEqual([null, null, null]);
-    expect(newStats.max).toEqual([null, null, null]);
-    expect(newStats.min).toEqual([null, null, null]);
+    expect(newStats[0].sum).toEqual([null, null, null]);
+    expect(newStats[0].max).toEqual([null, null, null]);
+    expect(newStats[0].min).toEqual([null, null, null]);
   });
   it("adds new slice stats", () => {
-    const oldStats = {
-      sum: [null],
-      max: [null],
-      min: [null],
-      shape: [1],
-    };
+    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+    const oldStats = [
+      {
+        sum: [null],
+        max: [null],
+        min: [null],
+        shape: [1],
+        roi,
+      },
+    ];
     const action = {
       type: "add_slice",
       data: Uint8Array.from([1, 2, 3]),
       index: 0,
-      shape: [] as number[],
+      shape: [1, 1, 3] as number[],
+      rois: [
+        {
+          x0: 0,
+          x1: Infinity,
+          y0: 0,
+          y1: Infinity,
+          isActive: true,
+          name: "",
+        },
+      ],
     };
     const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats.sum).toEqual([6]);
-    expect(newStats.max).toEqual([3]);
-    expect(newStats.min).toEqual([1]);
+    expect(newStats[0].sum).toEqual([6]);
+    expect(newStats[0].max).toEqual([3]);
+    expect(newStats[0].min).toEqual([1]);
+  });
+  it("calculates ROI stats", () => {
+    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+    const oldStats = [
+      {
+        sum: [null],
+        max: [null],
+        min: [null],
+        shape: [1],
+        roi,
+      },
+    ];
+    const action = {
+      type: "add_slice",
+      data: Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+      index: 0,
+      rois: [
+        {
+          x0: 1,
+          x1: 2,
+          y0: 0,
+          y1: 1,
+          isActive: true,
+          name: "",
+        },
+      ],
+      shape: [1, 3, 3] as number[],
+    };
+    const newStats = reduceArrayStats(oldStats, action);
+    expect(newStats[0].sum).toEqual([16]);
+    expect(newStats[0].max).toEqual([6]);
+    expect(newStats[0].min).toEqual([2]);
   });
   it("goes fast (☇ vrooom!)", () => {
     // See how long we can expect to take on this platform
@@ -247,12 +366,16 @@ describe("the arrayStatsReducer() function", () => {
     const maxTime = (performance.now() - t0) * 80;
     expect(sum).toEqual(499999500000);
     // Now do the test with a big array
-    const oldStats = {
-      sum: [null],
-      max: [null],
-      min: [null],
-      shape: [1],
-    };
+    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+    const oldStats = [
+      {
+        sum: [null],
+        max: [null],
+        min: [null],
+        shape: [1],
+        roi,
+      },
+    ];
     const [nCol, nRow] = [2048, 1840];
     const sliceData = [...Array(nRow).keys()].map((row) => {
       return [...Array(nCol).keys()].map((col) => col + nCol * row);
@@ -261,14 +384,24 @@ describe("the arrayStatsReducer() function", () => {
       type: "add_slice",
       data: Uint32Array.from(sliceData.flat()),
       index: 0,
-      shape: [] as number[],
+      shape: [1, 1840, 2048] as number[],
+      rois: [
+        {
+          x0: 0,
+          x1: Infinity,
+          y0: 0,
+          y1: Infinity,
+          isActive: true,
+          name: "",
+        },
+      ],
     };
     const t2 = performance.now();
     const newStats = reduceArrayStats(oldStats, action);
     const runTime = performance.now() - t2;
-    expect(newStats.sum).toEqual([7100115927040]);
-    expect(newStats.min).toEqual([0]);
-    expect(newStats.max).toEqual([2048 * 1840 - 1]);
+    expect(newStats[0].sum).toEqual([7100115927040]);
+    expect(newStats[0].min).toEqual([0]);
+    expect(newStats[0].max).toEqual([2048 * 1840 - 1]);
     expect(runTime).toBeLessThan(maxTime);
     // console.log(runTime);
   });
