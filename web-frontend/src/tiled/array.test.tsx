@@ -356,6 +356,48 @@ describe("the arrayStatsReducer() function", () => {
     expect(newStats[0].max).toEqual([6]);
     expect(newStats[0].min).toEqual([2]);
   });
+  it("skips inactive ROIs", () => {
+    const inactiveRoi = {
+      x0: 1,
+      x1: 2,
+      y0: 0,
+      y1: 1,
+      isActive: false,
+      name: "",
+    };
+    const activeRoi = { x0: 1, x1: 2, y0: 0, y1: 1, isActive: true, name: "" };
+    const oldStats = [
+      {
+        sum: [null],
+        max: [null],
+        min: [null],
+        shape: [1],
+        roi: inactiveRoi,
+      },
+      {
+        sum: [null],
+        max: [null],
+        min: [null],
+        shape: [1],
+        roi: activeRoi,
+      },
+    ];
+    const action = {
+      type: "add_slice",
+      data: Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+      index: 0,
+      rois: [inactiveRoi, activeRoi],
+      shape: [1, 3, 3] as number[],
+    };
+    const newStats = reduceArrayStats(oldStats, action);
+    expect(newStats[0].sum).toEqual([null]);
+    expect(newStats[0].max).toEqual([null]);
+    expect(newStats[0].min).toEqual([null]);
+    expect(newStats[1].sum).toEqual([16]);
+    expect(newStats[1].max).toEqual([6]);
+    expect(newStats[1].min).toEqual([2]);
+  });
+
   it("goes fast (☇ vrooom!)", () => {
     // See how long we can expect to take on this platform
     const t0 = performance.now();

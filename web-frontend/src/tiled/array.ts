@@ -213,16 +213,21 @@ export const useArrayStats = (
 
   // Update the stats for each slices
   const ArrayClass = dtypeToArray(dataType);
+  // path, shape, rois, arrayRoiString, client, ArrayClass, arrayStats
+  // useEffect(() => console.log("Changed"), [arrayStats])
   useEffect(() => {
     // Calculate stats for new slices
     const getArrays = async () => {
       const checkArray = async (slice: number) => {
         const oldStats = arrayStats.map((stats) => {
-          return [
-            stats.sum?.[slice] ?? null,
-            stats.max?.[slice] ?? null,
-            stats.min?.[slice] ?? null,
-          ];
+          // Check if any of the stats for this slice are missing
+          return !stats.roi.isActive
+            ? []
+            : [
+                stats.sum?.[slice] ?? null,
+                stats.max?.[slice] ?? null,
+                stats.min?.[slice] ?? null,
+              ];
         });
         if (
           shape.length === 3 &&
@@ -231,6 +236,8 @@ export const useArrayStats = (
         ) {
           // We need to get a fresh copy of this array to do stats
           pendingArrays.current.push(slice); // Acquire lock
+          // console.log(`Loading slice ${slice}`);
+          // console.log(myObj);
           const data = await getArraySlice(path, slice, ArrayClass, {
             client: client,
           });
@@ -343,6 +350,9 @@ export const reduceArrayStats = (
     case "add_slice": {
       // const t0 = performance.now();
       return action.rois.map((roi, index) => {
+        if (!roi.isActive) {
+          return oldStats[index];
+        }
         // Figure out how to crop the 1D typed array to the desired ROI
         const { x0, x1, y0, y1 } = roi;
         const x0_ = Math.floor(x0);

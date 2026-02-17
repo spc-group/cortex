@@ -1,6 +1,9 @@
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
+import {
+  ExclamationTriangleIcon,
+  CircleStackIcon,
+} from "@heroicons/react/24/solid";
 import { useState, useRef } from "react";
 
 import { LinePlot, FramePlot, SpectraPlot } from "../plots";
@@ -561,9 +564,11 @@ export function ArrayPlots({
     evPerBin == null ? "frame" : "spectra",
   );
   const previousFrame = useRef<TypedArray[] | null>(null);
-  const { array: frameData, shape: frameShape } = useArray(arrayPath, [
-    activeFrame,
-  ]);
+  const {
+    array: frameData,
+    shape: frameShape,
+    isLoading: isLoadingFrame,
+  } = useArray(arrayPath, [activeFrame]);
   const lastFrame = (frameShape?.[0] ?? 1) - 1;
   if (frameData != null) {
     previousFrame.current = frameData[0];
@@ -689,6 +694,7 @@ export function ArrayPlots({
             xlabel={evPerBin != null ? "Energy /eV" : "Bin"}
             rois={rois}
             updateRoi={updateRoi}
+            key={arrayPath}
           />
         </>
       );
@@ -702,6 +708,7 @@ export function ArrayPlots({
             vMax={isNaN(vMax) ? 1 : vMax}
             rois={rois}
             updateRoi={updateRoi}
+            key={arrayPath}
           />
         </>
       );
@@ -760,25 +767,32 @@ export function ArrayPlots({
             />
             Spectra
           </label>
-
+          {isLoadingFrame ? (
+            <div className="badge badge-soft badge-info s-3">
+              <CircleStackIcon className="size-4 inline" />
+              Loading…
+            </div>
+          ) : (
+            <></>
+          )}
           {framePlot}
-        </div>
 
-        <div
-          tabIndex={0}
-          className="collapse collapse-arrow bg-base-100 border-base-300 border"
-        >
-          <input type="checkbox" />
-          <div className="collapse-title font-semibold">
-            Regions of Interest (ROIs)
-          </div>
-          <div className="collapse-content text-sm">
-            <RoiTable
-              rois={rois}
-              addRoi={addRoi}
-              updateRoi={updateRoi}
-              removeRoi={removeRoi}
-            />
+          <div
+            tabIndex={0}
+            className="collapse collapse-arrow bg-base-100 border-base-300 border"
+          >
+            <input type="checkbox" />
+            <div className="collapse-title font-semibold">
+              Regions of Interest (ROIs)
+            </div>
+            <div className="collapse-content text-sm">
+              <RoiTable
+                rois={rois}
+                addRoi={addRoi}
+                updateRoi={updateRoi}
+                removeRoi={removeRoi}
+              />
+            </div>
           </div>
         </div>
       </div>

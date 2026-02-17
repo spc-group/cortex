@@ -56,9 +56,10 @@ export const SpectraPlot = ({
       legendrank: 1000,
       xref: "x",
       yref: "paper",
-      x0: roi.x0,
+      x0: roi.x0 * binSize,
       y0: 0,
-      x1: roi.x1,
+      // Only "Total" will have x1 == null, but we need a default for type checking
+      x1: (roi.x1 ?? 1) * binSize,
       y1: 1,
       fillcolor: color,
       opacity: roi.isActive ? 0.15 : 0.05,
