@@ -624,17 +624,24 @@ export function ArrayPlots({
     dataSets = [];
   } else {
     const xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
-    dataSets = stats.map((s, i) => {
-      return {
-        x: toNumberArray(xdata),
-        y: s.sum,
-        name: rois[i].name,
-        color: `c${i}`,
-      };
-    });
+    dataSets = stats
+      .map((s, i) => {
+        return i >= rois.length
+          ? null
+          : {
+              x: toNumberArray(xdata),
+              y: s.sum,
+              name: rois[i].name,
+              color: `c${i}`,
+            };
+      })
+      .filter((stats, index) => {
+        const roiIsActive = rois?.[index]?.isActive;
+        return stats != null && roiIsActive;
+      }) as LineData[];
     const rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
     // Filter out hidden ROIs
-    dataSets = dataSets.filter((_, index) => rois[index].isActive);
+    // dataSets = dataSets.filter((_, index) => rois?.[index]?.isActive);
 
     // Apply reference correction and processing steps
     dataSets = dataSets.map(({ x, y, name, color }) => {

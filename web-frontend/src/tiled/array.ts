@@ -392,6 +392,16 @@ export const reduceArrayStats = (
         // Merge the stats for this slice in with the other stats
         const { sum: newSum, min: newMin, max: newMax } = cumulative;
         // console.log(`Math took ${performance.now() - t0} milliseconds`);
+        if (index >= oldStats.length) {
+          // We have a newly added ROI that hasn't had space allocated yet
+          return {
+            sum: [],
+            max: [],
+            min: [],
+            shape: action.shape,
+            roi: action.rois[index],
+          };
+        }
         const newStats = {
           sum: [
             ...oldStats[index].sum.slice(0, action.index),
