@@ -6,9 +6,9 @@ const MAX_HISTORY = 50;
 export const lastPreference = <T>(
   options: T[],
   pastPreferences: T[],
-): T | null => {
+): T | undefined => {
   const validPrefs = pastPreferences.filter((val) => options.includes(val));
-  return validPrefs?.[0] ?? null;
+  return validPrefs?.[0];
 };
 
 // A hook that keeps track of the last choice that was made for this

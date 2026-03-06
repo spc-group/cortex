@@ -1,10 +1,11 @@
 import { useState } from "react";
+import unpack from "ndarray-unpack";
+import type { NdArray } from "ndarray";
 import type { ChangeEvent } from "react";
 import type { PlotRelayoutEvent, Data, Shape } from "plotly.js";
 import Plot from "react-plotly.js";
 
 import { COLORS } from "./colors";
-import type { TypedArray } from "../tiled/types";
 import type { ROI, ROIUpdate } from "./types";
 
 const colorCycle = [...Object.values(COLORS)];
@@ -158,7 +159,7 @@ export const FramePlot = ({
   rois,
   updateRoi,
 }: {
-  frame: TypedArray[];
+  frame: NdArray;
   vMin: number;
   vMax: number;
   rois: ROI[];
@@ -192,9 +193,12 @@ export const FramePlot = ({
         zmax: zMax_,
       };
 
+  // Convert from an ndarray to a nested array so react can consume it
+  const imData = unpack(frame);
+
   const plotData: Data[] = [
     {
-      z: frame as unknown as number[][],
+      z: imData,
       type: "heatmap",
       colorscale: "Viridis",
       ...zRange,

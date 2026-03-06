@@ -1,4 +1,11 @@
 import type { ROI } from "../plots";
+import { Location as ZarrLocation } from "zarrita";
+import type {
+  Readable as ZarrReadable,
+  Array as ZarrArray,
+  DataType as ZarrDataType,
+  BigintDataType,
+} from "zarrita";
 
 // Type and interface declarations for the Tiled API client
 
@@ -104,3 +111,7 @@ export interface StatsResult {
   isLoading: boolean;
   readyState: ReadyState;
 }
+
+// export type ZarrRoot = ZarrLocation<Map<string, TypedArray> | FetchStore>;
+export type ZarrRoot = ZarrLocation<ZarrReadable>;
+export type ZArray = ZarrArray<ZarrDataType | BigintDataType>;

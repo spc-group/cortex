@@ -1,15 +1,11 @@
+import * as zarr from "zarrita";
 import "@testing-library/jest-dom/vitest";
-import axios from "axios";
-import type { AxiosInstance } from "axios";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Mock } from "vitest";
+import { describe, it, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
-import { ReadyState } from "react-use-websocket";
-import { useQuery } from "@tanstack/react-query";
 
-import { getArray, useArray, useArrayStats, reduceArrayStats } from "./array";
-import { mockUrl, tiledServer } from "../mocks/";
-import { useTiledWebSocket } from "./streaming";
+import { useArrayData } from "./array";
+import { TiledProvider } from "./provider";
+import { tiledServer } from "../mocks/";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -69,385 +65,494 @@ vi.mock("@tanstack/react-query", async () => {
   };
 });
 
-let client: AxiosInstance;
-beforeEach(() => {
-  client = axios.create({ baseURL: mockUrl });
-});
-
-describe("getArray() function", () => {
-  it("returns slices", async () => {
-    const array = await getArray("my_run/primary/bdet", [0, 1], Uint8Array, {
-      client: client,
-    });
-    expect(array.length).toEqual(2);
+let root: zarr.Location<zarr.Mutable>;
+beforeEach(async () => {
+  root = zarr.root(new Map());
+  await zarr.create(root);
+  await zarr.create(root.resolve("spam"), {
+    data_type: "int32",
+    shape: [11, 24, 32],
+    chunk_shape: [1, 24, 32],
   });
 });
 
-describe("useArray", () => {
-  const MockComponent = (
-    { slices }: { slices: number[] | null } = { slices: [0] },
-  ) => {
-    const { array, shape, dataType, readyState } = useArray(
-      "my_run/primary/bdet",
-      slices,
-    );
-    return (
-      <>
-        <div>Array: {JSON.stringify(array)}</div>
-        <div>Shape: {shape.map((len) => `${len},`)}</div>
-        <div>Endianness: {dataType.endianness}</div>
-        <div>Kind: {dataType.kind}</div>
-        <div>Itemsize: {dataType.itemsize}</div>
-        <div>readyState: {readyState}</div>
-      </>
-    );
+// describe("the useArray() hook", () => {
+//   const MockComponent = () => {
+//     const array = useArrayZ("spam");
+//     return (
+//       <>
+//         <div>Shape: {array?.shape}</div>
+//       </>
+//     );
+//   };
+//   it("returns the array shape", async () => {
+//     render(
+//       <TiledProvider zarrRoot={root}>
+//         <MockComponent slices={null} />
+//       </TiledProvider>,
+//     );
+//     await waitFor(() => {
+//       expect(screen.queryByText("Shape: 11 24 32")).toBeDefined();
+//     });
+//   });
+// });
+
+describe("the useArrayData() hook", () => {
+  const MockComponent = ({ slice }: { slice?: null | number | zarr.Slice }) => {
+    const array = useArrayData("spam", slice);
+    return <div>Length: {array?.data?.length}</div>;
   };
-  it("returns all array frames by default", () => {
-    render(<MockComponent slices={null} />);
-    expect(
-      screen.getByText("Array: [[[1],[2],[3]],[[4],[5],[6]]]"),
-    ).toBeInTheDocument();
-    // Check which slices were requested by inspecting the query key
-    const lastKey = (useQuery as Mock).mock.lastCall?.[0].queryKey;
-    const allSlices = [0, 1];
-    expect(lastKey.slice(2, -1)).toEqual(allSlices);
-  });
-  it("returns array metadata from HTTP", () => {
-    render(<MockComponent slices={null} />);
-    expect(screen.getByText("Shape: 2,3,1,")).toBeInTheDocument();
-    expect(screen.getByText("Endianness: not_applicable")).toBeInTheDocument();
-    expect(screen.getByText("Kind: u")).toBeInTheDocument();
-    expect(screen.getByText("Itemsize: 1")).toBeInTheDocument();
-  });
-  it("updates the shape from websockets", () => {
-    const newMessage = {
-      payload: {
-        type: "array-ref",
-        data_source: {
-          structure: {
-            shape: [25, 240, 320],
-          },
-        },
-      },
-      readyState: ReadyState.OPEN,
-    };
-    (useTiledWebSocket as Mock).mockImplementation(() => newMessage);
-    render(<MockComponent slices={null} />);
-    expect(screen.getByText("Shape: 25,240,320,")).toBeInTheDocument();
-    expect(screen.getByText("readyState: 1")).toBeInTheDocument();
-  });
-});
-
-describe("useArrayStats", () => {
-  const rois = [{ x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" }];
-  const MockComponent = () => {
-    const { stats } = useArrayStats("my_run/primary/bdet", rois, {
-      client: client,
-    });
-    return (
-      <>
-        <div>Max: {JSON.stringify(stats[0]?.max)}</div>
-        <div>Min: {JSON.stringify(stats[0]?.min)}</div>
-        <div>Sum: {JSON.stringify(stats[0]?.sum)}</div>
-      </>
+  it("loads all data", async () => {
+    render(
+      <TiledProvider zarrRoot={root}>
+        <MockComponent slice={null} />
+      </TiledProvider>,
     );
-  };
-  it("calculates the stats", () => {
-    render(<MockComponent />);
-    // They're all null on the first pass, need to figure out a better test
-    expect(
-      screen.getByText(`Sum: [${Array(25).fill("null").join(",")}]`),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(`Min: [${Array(25).fill("null").join(",")}]`),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(`Max: [${Array(25).fill("null").join(",")}]`),
-    ).toBeInTheDocument();
+    await screen.findByText("Length: 8448");
+  });
+  it("loads a single slice", async () => {
+    render(
+      <TiledProvider zarrRoot={root}>
+        <MockComponent slice={3} />
+      </TiledProvider>,
+    );
+    await screen.findByText("Length: 768");
+  });
+  it("loads multiple slices", async () => {
+    render(
+      <TiledProvider zarrRoot={root}>
+        <MockComponent slice={zarr.slice(2, 4)} />
+      </TiledProvider>,
+    );
+    await screen.findByText("Length: 1536");
   });
 });
 
-describe("the arrayStatsReducer() function", () => {
-  it("clears arrays", () => {
-    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
-    const oldStats = [
-      {
-        sum: [1, 2, 3],
-        max: [9, 4, 5],
-        min: [6, 7, 8],
-        shape: [],
-        roi: roi,
-      },
-    ];
-    const action = {
-      type: "clear_stats",
-      rois: [roi, roi],
-      shape: [],
-      data: new Uint8Array(),
-      index: 0,
-    };
-    const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats).toHaveLength(2);
-    expect(newStats[0].sum).toEqual([]);
-  });
-  it("resets ROIs", () => {
-    const oldStats = [
-      {
-        // ROI that does not change
-        sum: [1, 2, 3],
-        max: [9, 4, 5],
-        min: [6, 7, 8],
-        shape: [],
-        roi: { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" },
-      },
-      {
-        // ROI that does change
-        sum: [1, 2, 3],
-        max: [9, 4, 5],
-        min: [6, 7, 8],
-        shape: [],
-        roi: { x0: 25, x1: 40, y0: 50, y1: 57, isActive: true, name: "" },
-      },
-    ];
-    const action = {
-      type: "reset_rois",
-      rois: [
-        { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" },
-        { x0: 20, x1: 40, y0: 50, y1: 57, isActive: true, name: "" },
-        { x0: 1, x1: 2, y0: 3, y1: 4, isActive: true, name: "" },
-      ],
-      shape: [],
-      data: new Uint8Array(),
-      index: 0,
-    };
-    const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats).toHaveLength(3);
-    expect(newStats[0].sum).toEqual([1, 2, 3]);
-    expect(newStats[1].sum).toEqual([]);
-  });
-  it("updates the shape state", () => {
-    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
-    const oldStats = [
-      {
-        sum: [],
-        max: [],
-        min: [],
-        shape: [],
-        roi: roi,
-      },
-    ];
-    const action = {
-      type: "update_shape",
-      shape: [3, 1024, 1024],
-      index: 0,
-      data: Uint8Array.from([]),
-      rois: [],
-    };
-    const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats[0].shape).toEqual([3, 1024, 1024]);
-  });
-  it("creates empty arrays", () => {
-    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
-    const oldStats = [
-      {
-        sum: [],
-        max: [],
-        min: [],
-        shape: [1],
-        roi,
-      },
-    ];
-    const action = {
-      type: "update_shape",
-      shape: [3, 1024, 1024],
-      data: Uint8Array.from([]),
-      index: 0,
-      rois: [],
-    };
-    const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats[0].sum).toEqual([null, null, null]);
-    expect(newStats[0].max).toEqual([null, null, null]);
-    expect(newStats[0].min).toEqual([null, null, null]);
-  });
-  it("extends existing arrays", () => {
-    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
-    const oldStats = [
-      {
-        sum: [null, null],
-        max: [null],
-        min: [],
-        shape: [],
-        roi,
-      },
-    ];
-    const action = {
-      type: "update_shape",
-      shape: [3, 1024, 1024],
-      data: Uint8Array.from([]),
-      index: 0,
-      rois: [],
-    };
-    const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats[0].sum).toEqual([null, null, null]);
-    expect(newStats[0].max).toEqual([null, null, null]);
-    expect(newStats[0].min).toEqual([null, null, null]);
-  });
-  it("adds new slice stats", () => {
-    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
-    const oldStats = [
-      {
-        sum: [null],
-        max: [null],
-        min: [null],
-        shape: [1],
-        roi,
-      },
-    ];
-    const action = {
-      type: "add_slice",
-      data: Uint8Array.from([1, 2, 3]),
-      index: 0,
-      shape: [1, 1, 3] as number[],
-      rois: [
-        {
-          x0: 0,
-          x1: Infinity,
-          y0: 0,
-          y1: Infinity,
-          isActive: true,
-          name: "",
-        },
-      ],
-    };
-    const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats[0].sum).toEqual([6]);
-    expect(newStats[0].max).toEqual([3]);
-    expect(newStats[0].min).toEqual([1]);
-  });
-  it("calculates ROI stats", () => {
-    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
-    const oldStats = [
-      {
-        sum: [null],
-        max: [null],
-        min: [null],
-        shape: [1],
-        roi,
-      },
-    ];
-    const action = {
-      type: "add_slice",
-      data: Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9]),
-      index: 0,
-      rois: [
-        {
-          x0: 1,
-          x1: 2,
-          y0: 0,
-          y1: 1,
-          isActive: true,
-          name: "",
-        },
-      ],
-      shape: [1, 3, 3] as number[],
-    };
-    const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats[0].sum).toEqual([16]);
-    expect(newStats[0].max).toEqual([6]);
-    expect(newStats[0].min).toEqual([2]);
-  });
-  it("skips inactive ROIs", () => {
-    const inactiveRoi = {
-      x0: 1,
-      x1: 2,
-      y0: 0,
-      y1: 1,
-      isActive: false,
-      name: "",
-    };
-    const activeRoi = { x0: 1, x1: 2, y0: 0, y1: 1, isActive: true, name: "" };
-    const oldStats = [
-      {
-        sum: [null],
-        max: [null],
-        min: [null],
-        shape: [1],
-        roi: inactiveRoi,
-      },
-      {
-        sum: [null],
-        max: [null],
-        min: [null],
-        shape: [1],
-        roi: activeRoi,
-      },
-    ];
-    const action = {
-      type: "add_slice",
-      data: Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9]),
-      index: 0,
-      rois: [inactiveRoi, activeRoi],
-      shape: [1, 3, 3] as number[],
-    };
-    const newStats = reduceArrayStats(oldStats, action);
-    expect(newStats[0].sum).toEqual([null]);
-    expect(newStats[0].max).toEqual([null]);
-    expect(newStats[0].min).toEqual([null]);
-    expect(newStats[1].sum).toEqual([16]);
-    expect(newStats[1].max).toEqual([6]);
-    expect(newStats[1].min).toEqual([2]);
-  });
+// describe("the useArrayStats() hook", () => {
+//   const rois = [{ x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" }];
+//   const MockComponent = () => {
+//     const { stats } = useArrayStatsZ("spam", rois, root);
+//     return (
+//       <>
+//         <div>Length: {stats.length}</div>
+//         <div>Max: {JSON.stringify(stats[0]?.max)}</div>
+//         <div>Min: {JSON.stringify(stats[0]?.min)}</div>
+//         <div>Sum: {JSON.stringify(stats[0]?.sum)}</div>
+//       </>
+//     );
+//   };
+//   it("includes stats for each ROI", async () => {
+//     render(<MockComponent />);
+//     await screen.findByText("Length: 1");
+//   });
+//   it("adds stats for each ROI", async () => {
+//     render(<MockComponent />);
+//     await screen.findByText("Length: 1");
+//   });
+// it("calculates the stats", async () => {
+//   render(<MockComponent />);
+//     // They're all null on the first pass, need to figure out a better test
+//   expect(
+//     screen.getByText(`Sum: [${Array(25).fill("null").join(",")}]`),
+//   ).toBeInTheDocument();
+//   expect(
+//     screen.getByText(`Min: [${Array(25).fill("null").join(",")}]`),
+//   ).toBeInTheDocument();
+//   expect(
+//     screen.getByText(`Max: [${Array(25).fill("null").join(",")}]`),
+//   ).toBeInTheDocument();
+// });
+// });
 
-  it("goes fast (☇ vrooom!)", () => {
-    // See how long we can expect to take on this platform
-    const t0 = performance.now();
-    let sum = 0;
-    for (let i = 0; i < 1e6; i++) {
-      sum += i;
-    }
-    const maxTime = (performance.now() - t0) * 80;
-    expect(sum).toEqual(499999500000);
-    // Now do the test with a big array
-    const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
-    const oldStats = [
-      {
-        sum: [null],
-        max: [null],
-        min: [null],
-        shape: [1],
-        roi,
-      },
-    ];
-    const [nCol, nRow] = [2048, 1840];
-    const sliceData = [...Array(nRow).keys()].map((row) => {
-      return [...Array(nCol).keys()].map((col) => col + nCol * row);
-    });
-    const action = {
-      type: "add_slice",
-      data: Uint32Array.from(sliceData.flat()),
-      index: 0,
-      shape: [1, 1840, 2048] as number[],
-      rois: [
-        {
-          x0: 0,
-          x1: Infinity,
-          y0: 0,
-          y1: Infinity,
-          isActive: true,
-          name: "",
-        },
-      ],
-    };
-    const t2 = performance.now();
-    const newStats = reduceArrayStats(oldStats, action);
-    const runTime = performance.now() - t2;
-    expect(newStats[0].sum).toEqual([7100115927040]);
-    expect(newStats[0].min).toEqual([0]);
-    expect(newStats[0].max).toEqual([2048 * 1840 - 1]);
-    expect(runTime).toBeLessThan(maxTime);
-    // console.log(runTime);
-  });
-});
+// it("returns array metadata from HTTP", () => {
+//   render(<MockComponent slices={null} />);
+//   expect(screen.getByText("Shape: 2,3,1,")).toBeInTheDocument();
+//   expect(screen.getByText("Endianness: not_applicable")).toBeInTheDocument();
+//   expect(screen.getByText("Kind: u")).toBeInTheDocument();
+//   expect(screen.getByText("Itemsize: 1")).toBeInTheDocument();
+// });
+// it("updates the shape from websockets", () => {
+//   const newMessage = {
+//     payload: {
+//       type: "array-ref",
+//       data_source: {
+//         structure: {
+//           shape: [25, 240, 320],
+//         },
+//       },
+//     },
+//     readyState: ReadyState.OPEN,
+//   };
+//   (useTiledWebSocket as Mock).mockImplementation(() => newMessage);
+//   render(<MockComponent slices={null} />);
+//   expect(screen.getByText("Shape: 25,240,320,")).toBeInTheDocument();
+//   expect(screen.getByText("readyState: 1")).toBeInTheDocument();
+// });
+// describe("useArray", () => {
+//   const MockComponent = (
+//     { slices }: { slices: number[] | null } = { slices: [0] },
+//   ) => {
+//     const { array, shape, dataType, readyState } = useArray(
+//       "my_run/primary/bdet",
+//       slices,
+//     );
+//     return (
+//       <>
+//         <div>Array: {JSON.stringify(array)}</div>
+//         <div>Shape: {shape.map((len) => `${len},`)}</div>
+//         <div>Endianness: {dataType.endianness}</div>
+//         <div>Kind: {dataType.kind}</div>
+//         <div>Itemsize: {dataType.itemsize}</div>
+//         <div>readyState: {readyState}</div>
+//       </>
+//     );
+//   };
+//   it("returns all array frames by default", () => {
+//     render(<MockComponent slices={null} />);
+//     expect(
+//       screen.getByText("Array: [[[1],[2],[3]],[[4],[5],[6]]]"),
+//     ).toBeInTheDocument();
+//     // Check which slices were requested by inspecting the query key
+//     const lastKey = (useQuery as Mock).mock.lastCall?.[0].queryKey;
+//     const allSlices = [0, 1];
+//     expect(lastKey.slice(2, -1)).toEqual(allSlices);
+//   });
+//   it("returns array metadata from HTTP", () => {
+//     render(<MockComponent slices={null} />);
+//     expect(screen.getByText("Shape: 2,3,1,")).toBeInTheDocument();
+//     expect(screen.getByText("Endianness: not_applicable")).toBeInTheDocument();
+//     expect(screen.getByText("Kind: u")).toBeInTheDocument();
+//     expect(screen.getByText("Itemsize: 1")).toBeInTheDocument();
+//   });
+//   it("updates the shape from websockets", () => {
+//     const newMessage = {
+//       payload: {
+//         type: "array-ref",
+//         data_source: {
+//           structure: {
+//             shape: [25, 240, 320],
+//           },
+//         },
+//       },
+//       readyState: ReadyState.OPEN,
+//     };
+//     (useTiledWebSocket as Mock).mockImplementation(() => newMessage);
+//     render(<MockComponent slices={null} />);
+//     expect(screen.getByText("Shape: 25,240,320,")).toBeInTheDocument();
+//     expect(screen.getByText("readyState: 1")).toBeInTheDocument();
+//   });
+// });
+
+// describe("useArrayStats", () => {
+//   const rois = [{ x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" }];
+//   const MockComponent = () => {
+//     const { stats } = useArrayStats("my_run/primary/bdet", rois, {
+//       client: client,
+//     });
+//     return (
+//       <>
+//         <div>Max: {JSON.stringify(stats[0]?.max)}</div>
+//         <div>Min: {JSON.stringify(stats[0]?.min)}</div>
+//         <div>Sum: {JSON.stringify(stats[0]?.sum)}</div>
+//       </>
+//     );
+//   };
+//   it("calculates the stats", () => {
+//     render(<MockComponent />);
+//     // They're all null on the first pass, need to figure out a better test
+//     expect(
+//       screen.getByText(`Sum: [${Array(25).fill("null").join(",")}]`),
+//     ).toBeInTheDocument();
+//     expect(
+//       screen.getByText(`Min: [${Array(25).fill("null").join(",")}]`),
+//     ).toBeInTheDocument();
+//     expect(
+//       screen.getByText(`Max: [${Array(25).fill("null").join(",")}]`),
+//     ).toBeInTheDocument();
+//   });
+// });
+
+// describe("the arrayStatsReducer() function", () => {
+//   it("clears arrays", () => {
+//     const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+//     const oldStats = [
+//       {
+//         sum: [1, 2, 3],
+//         max: [9, 4, 5],
+//         min: [6, 7, 8],
+//         shape: [],
+//         roi: roi,
+//       },
+//     ];
+//     const action = {
+//       type: "clear_stats",
+//       rois: [roi, roi],
+//       shape: [],
+//       data: new Uint8Array(),
+//       index: 0,
+//     };
+//     const newStats = reduceArrayStats(oldStats, action);
+//     expect(newStats).toHaveLength(2);
+//     expect(newStats[0].sum).toEqual([]);
+//   });
+//   it("resets ROIs", () => {
+//     const oldStats = [
+//       {
+//         // ROI that does not change
+//         sum: [1, 2, 3],
+//         max: [9, 4, 5],
+//         min: [6, 7, 8],
+//         shape: [],
+//         roi: { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" },
+//       },
+//       {
+//         // ROI that does change
+//         sum: [1, 2, 3],
+//         max: [9, 4, 5],
+//         min: [6, 7, 8],
+//         shape: [],
+//         roi: { x0: 25, x1: 40, y0: 50, y1: 57, isActive: true, name: "" },
+//       },
+//     ];
+//     const action = {
+//       type: "reset_rois",
+//       rois: [
+//         { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" },
+//         { x0: 20, x1: 40, y0: 50, y1: 57, isActive: true, name: "" },
+//         { x0: 1, x1: 2, y0: 3, y1: 4, isActive: true, name: "" },
+//       ],
+//       shape: [],
+//       data: new Uint8Array(),
+//       index: 0,
+//     };
+//     const newStats = reduceArrayStats(oldStats, action);
+//     expect(newStats).toHaveLength(3);
+//     expect(newStats[0].sum).toEqual([1, 2, 3]);
+//     expect(newStats[1].sum).toEqual([]);
+//   });
+//   it("updates the shape state", () => {
+//     const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+//     const oldStats = [
+//       {
+//         sum: [],
+//         max: [],
+//         min: [],
+//         shape: [],
+//         roi: roi,
+//       },
+//     ];
+//     const action = {
+//       type: "update_shape",
+//       shape: [3, 1024, 1024],
+//       index: 0,
+//       data: Uint8Array.from([]),
+//       rois: [],
+//     };
+//     const newStats = reduceArrayStats(oldStats, action);
+//     expect(newStats[0].shape).toEqual([3, 1024, 1024]);
+//   });
+//   it("creates empty arrays", () => {
+//     const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+//     const oldStats = [
+//       {
+//         sum: [],
+//         max: [],
+//         min: [],
+//         shape: [1],
+//         roi,
+//       },
+//     ];
+//     const action = {
+//       type: "update_shape",
+//       shape: [3, 1024, 1024],
+//       data: Uint8Array.from([]),
+//       index: 0,
+//       rois: [],
+//     };
+//     const newStats = reduceArrayStats(oldStats, action);
+//     expect(newStats[0].sum).toEqual([null, null, null]);
+//     expect(newStats[0].max).toEqual([null, null, null]);
+//     expect(newStats[0].min).toEqual([null, null, null]);
+//   });
+//   it("extends existing arrays", () => {
+//     const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+//     const oldStats = [
+//       {
+//         sum: [null, null],
+//         max: [null],
+//         min: [],
+//         shape: [],
+//         roi,
+//       },
+//     ];
+//     const action = {
+//       type: "update_shape",
+//       shape: [3, 1024, 1024],
+//       data: Uint8Array.from([]),
+//       index: 0,
+//       rois: [],
+//     };
+//     const newStats = reduceArrayStats(oldStats, action);
+//     expect(newStats[0].sum).toEqual([null, null, null]);
+//     expect(newStats[0].max).toEqual([null, null, null]);
+//     expect(newStats[0].min).toEqual([null, null, null]);
+//   });
+//   it("adds new slice stats", () => {
+//     const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+//     const oldStats = [
+//       {
+//         sum: [null],
+//         max: [null],
+//         min: [null],
+//         shape: [1],
+//         roi,
+//       },
+//     ];
+//     const action = {
+//       type: "add_slice",
+//       data: Uint8Array.from([1, 2, 3]),
+//       index: 0,
+//       shape: [1, 1, 3] as number[],
+//       rois: [
+//         {
+//           x0: 0,
+//           x1: Infinity,
+//           y0: 0,
+//           y1: Infinity,
+//           isActive: true,
+//           name: "",
+//         },
+//       ],
+//     };
+//     const newStats = reduceArrayStats(oldStats, action);
+//     expect(newStats[0].sum).toEqual([6]);
+//     expect(newStats[0].max).toEqual([3]);
+//     expect(newStats[0].min).toEqual([1]);
+//   });
+//   it("calculates ROI stats", () => {
+//     const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+//     const oldStats = [
+//       {
+//         sum: [null],
+//         max: [null],
+//         min: [null],
+//         shape: [1],
+//         roi,
+//       },
+//     ];
+//     const action = {
+//       type: "add_slice",
+//       data: Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+//       index: 0,
+//       rois: [
+//         {
+//           x0: 1,
+//           x1: 2,
+//           y0: 0,
+//           y1: 1,
+//           isActive: true,
+//           name: "",
+//         },
+//       ],
+//       shape: [1, 3, 3] as number[],
+//     };
+//     const newStats = reduceArrayStats(oldStats, action);
+//     expect(newStats[0].sum).toEqual([16]);
+//     expect(newStats[0].max).toEqual([6]);
+//     expect(newStats[0].min).toEqual([2]);
+//   });
+//   it("skips inactive ROIs", () => {
+//     const inactiveRoi = {
+//       x0: 1,
+//       x1: 2,
+//       y0: 0,
+//       y1: 1,
+//       isActive: false,
+//       name: "",
+//     };
+//     const activeRoi = { x0: 1, x1: 2, y0: 0, y1: 1, isActive: true, name: "" };
+//     const oldStats = [
+//       {
+//         sum: [null],
+//         max: [null],
+//         min: [null],
+//         shape: [1],
+//         roi: inactiveRoi,
+//       },
+//       {
+//         sum: [null],
+//         max: [null],
+//         min: [null],
+//         shape: [1],
+//         roi: activeRoi,
+//       },
+//     ];
+//     const action = {
+//       type: "add_slice",
+//       data: Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+//       index: 0,
+//       rois: [inactiveRoi, activeRoi],
+//       shape: [1, 3, 3] as number[],
+//     };
+//     const newStats = reduceArrayStats(oldStats, action);
+//     expect(newStats[0].sum).toEqual([null]);
+//     expect(newStats[0].max).toEqual([null]);
+//     expect(newStats[0].min).toEqual([null]);
+//     expect(newStats[1].sum).toEqual([16]);
+//     expect(newStats[1].max).toEqual([6]);
+//     expect(newStats[1].min).toEqual([2]);
+//   });
+
+//   it("goes fast (☇ vrooom!)", () => {
+//     // See how long we can expect to take on this platform
+//     const t0 = performance.now();
+//     let sum = 0;
+//     for (let i = 0; i < 1e6; i++) {
+//       sum += i;
+//     }
+//     const maxTime = (performance.now() - t0) * 80;
+//     expect(sum).toEqual(499999500000);
+//     // Now do the test with a big array
+//     const roi = { x0: 0, x1: null, y0: 0, y1: null, isActive: true, name: "" };
+//     const oldStats = [
+//       {
+//         sum: [null],
+//         max: [null],
+//         min: [null],
+//         shape: [1],
+//         roi,
+//       },
+//     ];
+//     const [nCol, nRow] = [2048, 1840];
+//     const sliceData = [...Array(nRow).keys()].map((row) => {
+//       return [...Array(nCol).keys()].map((col) => col + nCol * row);
+//     });
+//     const action = {
+//       type: "add_slice",
+//       data: Uint32Array.from(sliceData.flat()),
+//       index: 0,
+//       shape: [1, 1840, 2048] as number[],
+//       rois: [
+//         {
+//           x0: 0,
+//           x1: Infinity,
+//           y0: 0,
+//           y1: Infinity,
+//           isActive: true,
+//           name: "",
+//         },
+//       ],
+//     };
+//     const t2 = performance.now();
+//     const newStats = reduceArrayStats(oldStats, action);
+//     const runTime = performance.now() - t2;
+//     expect(newStats[0].sum).toEqual([7100115927040]);
+//     expect(newStats[0].min).toEqual([0]);
+//     expect(newStats[0].max).toEqual([2048 * 1840 - 1]);
+//     expect(runTime).toBeLessThan(maxTime);
+//     // console.log(runTime);
+//   });
+// });
 
 // // {"detail":"None of the media types requested by the client are supported. Supported: text/plain, image/tiff, image/png, text/csv, text/x-comma-separated-values, application/octet-stream, application/vnd.ms-excel, application/json, text/html. Requested: blah."}%
 

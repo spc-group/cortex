@@ -1,8 +1,9 @@
 import type { PlotRelayoutEvent, Data, Shape } from "plotly.js";
 import Plot from "react-plotly.js";
+import unpack from "ndarray-unpack";
+import type { NdArray } from "ndarray";
 
 import { COLORS } from "./colors";
-import type { TypedArray } from "../tiled/types";
 import type { ROI, ROIUpdate } from "./types";
 
 const colorCycle = [...Object.values(COLORS)];
@@ -15,7 +16,7 @@ export const SpectraPlot = ({
   rois,
   updateRoi,
 }: {
-  frame: TypedArray[];
+  frame: NdArray;
   binSize: number;
   xlabel: string;
   rois: ROI[];
@@ -23,11 +24,11 @@ export const SpectraPlot = ({
 }) => {
   // E.g. /api/v1/array/block/04d28613-b2c4-4b5c-ba31-6aff5c49922d/streams/primary/ge_13element?block=10%2C0%2C0&expected_shape=1%2C13%2C4096
   // State to keep track of plotting parameters
-  const plotData: Data[] = frame.map((line) => {
+  const plotData: Data[] = unpack(frame).map((line: number[]) => {
     const xs = [...Array(line.length).keys()].map((bin) => binSize * bin);
     return {
       x: [...xs],
-      y: line as unknown as number[],
+      y: line,
       type: "scatter",
       mode: "lines",
     };

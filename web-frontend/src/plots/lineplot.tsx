@@ -1,6 +1,7 @@
 import type { Data } from "plotly.js";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import Plot from "react-plotly.js";
+import unpack from "ndarray-unpack";
 
 import type { LineData } from "./types";
 import { COLORS } from "./colors";
@@ -39,15 +40,15 @@ export const LinePlot = ({
     if (ydata == null) {
       return null;
     }
-    const colors = Array(ydata.length).fill(color_);
-    const symbols = Array(ydata.length).fill("circle");
+    const colors = Array(ydata.shape[0]).fill(color_);
+    const symbols = Array(ydata.shape[0]).fill("circle");
     if (activePoint != null) {
       colors[activePoint] = COLORS["tab:red"];
       symbols[activePoint] = "cross";
     }
     const ds: Data = {
-      x: xdata ?? undefined,
-      y: ydata,
+      x: xdata == null ? undefined : unpack(xdata).map((v) => Number(v)),
+      y: ydata == null ? undefined : unpack(ydata).map((v) => Number(v)),
       name: name,
       type: "scatter",
       mode: "lines+markers",
@@ -55,10 +56,6 @@ export const LinePlot = ({
       marker: { color: colors, symbol: symbols },
     };
     return ds;
-    // if (xdata != null) {
-    //   ds.x = xdata;
-    // }
-    // plotData.push(ds);
   });
 
   const xtext = xlabel === "---" ? "Index" : xlabel;

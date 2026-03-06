@@ -2,11 +2,16 @@ import { SignalIcon, SignalSlashIcon } from "@heroicons/react/24/solid";
 
 import { ReadyState } from "react-use-websocket";
 
-export const LiveBadge = ({ readyState }: { readyState: ReadyState }) => {
+export const LiveBadge = ({
+  readyState,
+}: {
+  readyState: ReadyState | boolean;
+}) => {
   // Decide on a badge for the connection state
   let badgeVariant;
   let badgeContent;
   switch (readyState) {
+    case true:
     case ReadyState.OPEN:
       badgeVariant = "badge-success";
       badgeContent = (
@@ -23,9 +28,7 @@ export const LiveBadge = ({ readyState }: { readyState: ReadyState }) => {
         </span>
       );
       break;
-    case ReadyState.CLOSING:
-    case ReadyState.UNINSTANTIATED:
-    case ReadyState.CLOSED:
+    default:
       badgeVariant = "badge-warning";
       badgeContent = (
         <span>

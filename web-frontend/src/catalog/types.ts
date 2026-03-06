@@ -1,4 +1,5 @@
 import type { Spec } from "../tiled/types";
+import type { ROI } from "../plots";
 
 export interface Column {
   label: string;
@@ -69,9 +70,10 @@ export interface DataKey {
       high: number;
     };
   };
-  source: string;
-  precision?: number;
-  dtype_numpy?: string;
+  source: string; // E.g. "ca://25iddVME:3820:scaler1_netA.D"
+  external?: string;
+  precision?: number; // E.g. 3
+  dtype_numpy?: string; // E.g. "<f8"
   object_name?: string;
 }
 
@@ -93,4 +95,11 @@ export interface Stream {
   time: number;
   uid: string;
   key: string;
+}
+
+export interface DataSource {
+  // Describes a way to retrieve data from the API and produce a 1D array
+  path: string; // E.g. "<uid>/primary/internal/I0-count_rate"
+  dataKey: DataKey;
+  roi?: ROI; // Will be applied to the dataset after its retrieved
 }

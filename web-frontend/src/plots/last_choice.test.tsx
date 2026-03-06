@@ -25,7 +25,7 @@ describe("the lastPreference() function", () => {
     const options = ["spam", "eggs"];
     const pastPrefs = ["cheese", "bacon"];
     const result = lastPreference(options, pastPrefs);
-    expect(result).toEqual(null);
+    expect(result).not.toBeDefined();
   });
 });
 

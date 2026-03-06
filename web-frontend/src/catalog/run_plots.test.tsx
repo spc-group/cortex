@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import "@testing-library/jest-dom/vitest";
+import * as zarr from "zarrita";
 import * as React from "react";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
@@ -10,7 +11,8 @@ import { Table } from "apache-arrow";
 import { ReadyState } from "react-use-websocket";
 
 import mockMetadata from "../mocks/run_metadata.json";
-import { RunPlots, StreamPlots, TablePlots, ArrayPlots } from "./run_plots.tsx";
+import { RunPlots, StreamPlots, ArrayPlots } from "./run_plots.tsx";
+import { TiledProvider } from "../tiled";
 
 vi.mock("../tiled/metadata", () => {
   return {
@@ -55,22 +57,22 @@ vi.mock("../tiled/use_data_table", () => {
     },
   };
 });
-vi.mock("../tiled/array", () => {
-  return {
-    useArray: () => {
-      return {
-        array: [],
-        readyState: ReadyState.OPEN,
-      };
-    },
-    useArrayStats: () => {
-      return {
-        stats: [],
-        readyState: ReadyState.OPEN,
-      };
-    },
-  };
-});
+// vi.mock("../tiled/array", () => {
+//   return {
+//     useArray: () => {
+//       return {
+//         array: [],
+//         readyState: ReadyState.OPEN,
+//       };
+//     },
+//     useArrayStats: () => {
+//       return {
+//         stats: [],
+//         readyState: ReadyState.OPEN,
+//       };
+//     },
+//   };
+// });
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -143,24 +145,39 @@ const renderRouter = async (element) => {
   });
 };
 
-describe("the TablePlots component", () => {
-  beforeEach(async () => {
-    const stream = {
-      ancestors: ["12345-6789"],
-    };
-    await renderRouter(<TablePlots stream={stream} />);
-  });
-  it("shows the 'live' badge", () => {
-    expect(screen.getByText("Live")).toBeInTheDocument();
-  });
-});
-
 describe("the ArrayPlots component", () => {
+  let root;
   beforeEach(async () => {
     const stream = {
       ancestors: ["12345-6789"],
+      key: "primary",
     };
-    await renderRouter(<ArrayPlots stream={stream} vSignal="bdet" />);
+    // Use an in-memory zarr store for testing data fetching
+    root = zarr.root(new Map());
+    await zarr.create(root);
+    await zarr.create(root.resolve("spam"), {
+      data_type: "int32",
+      shape: [11],
+      chunk_shape: [11],
+    });
+    const zarray = await zarr.create(root.resolve("eggs"), {
+      data_type: "int32",
+      shape: [11, 24, 32],
+      chunk_shape: [1, 24, 32],
+    });
+    for (let i = 0; i < zarray.shape[0]; i++) {
+      zarr.set(zarray, [i, null, null], i);
+    }
+    await zarr.create(root.resolve("12345-6789/primary/bdet"), {
+      data_type: "int32",
+      shape: [11, 24, 32],
+      chunk_shape: [1, 24, 32],
+    });
+    await renderRouter(
+      <TiledProvider zarrRoot={root}>
+        <ArrayPlots stream={stream} signal="bdet" />
+      </TiledProvider>,
+    );
   });
   afterEach(() => {
     localStorage.removeItem("rois-bdet");
@@ -175,6 +192,7 @@ describe("the ArrayPlots component", () => {
     expect(screen.queryAllByRole("row")).toHaveLength(3);
   });
   it("removes ROIs", async () => {
+    expect(screen.queryAllByRole("row")).toHaveLength(2);
     const addButton = screen.getByText("Add ROI");
     await fireEvent.click(addButton);
     expect(screen.queryAllByRole("row")).toHaveLength(3);

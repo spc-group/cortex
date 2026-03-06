@@ -140,7 +140,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bc/be/86793717d388d46209d6f10947a891a4697d8c24d18a3a715924ec6122c2/suitcase-0.12.0.tar.gz
       - pypi: https://files.pythonhosted.org/packages/e5/30/643397144bfbfec6f6ef821f36f33e57d35946c44a2352d3c9f0ae847619/tenacity-9.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1b/fe/e59859aa1134fac065d36864752daf13215c98b379cb5d93f954dc0ec830/tifffile-2025.12.20-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/76/3c/5098fb82017078cd7324b78c34f136d389e44251719f6332abbad455815d/tiled-0.2.3-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/9e/2c/e631f7d8f24d774cba4cc392265e6d53df1b99e48ace6390330c653c887e/tiled-0.2.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/fb/12/5911ae3eeec47800503a238d971e51722ccea5feb8569b735184d5fcdbc0/toolz-1.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a0/1d/d9257dd49ff2ca23ea5f132edf1281a0c4f9de8a762b9ae399b670a59235/typer-0.21.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/18/67/36e9267722cc04a6b9f15c7f3441c2363321a3ea07da7ae0c0707beb2a9c/typing_extensions-4.15.0-py3-none-any.whl
@@ -340,7 +340,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bc/be/86793717d388d46209d6f10947a891a4697d8c24d18a3a715924ec6122c2/suitcase-0.12.0.tar.gz
       - pypi: https://files.pythonhosted.org/packages/e5/30/643397144bfbfec6f6ef821f36f33e57d35946c44a2352d3c9f0ae847619/tenacity-9.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1b/fe/e59859aa1134fac065d36864752daf13215c98b379cb5d93f954dc0ec830/tifffile-2025.12.20-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/76/3c/5098fb82017078cd7324b78c34f136d389e44251719f6332abbad455815d/tiled-0.2.3-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/9e/2c/e631f7d8f24d774cba4cc392265e6d53df1b99e48ace6390330c653c887e/tiled-0.2.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/fb/12/5911ae3eeec47800503a238d971e51722ccea5feb8569b735184d5fcdbc0/toolz-1.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/7a/882d99539b19b1490cac5d77c67338d126e4122c8276bf640e411650c830/twine-6.2.0-py3-none-any.whl
@@ -2564,10 +2564,10 @@ packages:
   - xarray ; extra == 'test'
   - zarr>=3.1.3 ; extra == 'test'
   requires_python: '>=3.11'
-- pypi: https://files.pythonhosted.org/packages/76/3c/5098fb82017078cd7324b78c34f136d389e44251719f6332abbad455815d/tiled-0.2.3-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/9e/2c/e631f7d8f24d774cba4cc392265e6d53df1b99e48ace6390330c653c887e/tiled-0.2.4-py3-none-any.whl
   name: tiled
-  version: 0.2.3
-  sha256: f926cd097a430739ad0baddb45540aaeeb868eba9650100e9ec0200ddb866ba5
+  version: 0.2.4
+  sha256: 4cf3c82e5578d793f31f5471d95fdfb58f74c3db5a1310df0a781cfb8c226db7
   requires_dist:
   - httpx>=0.20.0,!=0.23.1
   - json-merge-patch
@@ -2590,7 +2590,7 @@ packages:
   - asgi-correlation-id ; extra == 'all'
   - asyncpg ; extra == 'all'
   - awkward>=2.4.3 ; extra == 'all'
-  - blosc2 ; python_full_version >= '3.10' and extra == 'all'
+  - blosc2 ; extra == 'all'
   - cachetools ; extra == 'all'
   - canonicaljson ; extra == 'all'
   - dask ; extra == 'all'
@@ -2613,7 +2613,7 @@ packages:
   - obstore ; extra == 'all'
   - openpyxl ; extra == 'all'
   - packaging ; extra == 'all'
-  - pandas ; extra == 'all'
+  - pandas<3 ; extra == 'all'
   - pillow ; extra == 'all'
   - prometheus-client ; extra == 'all'
   - pyarrow>=14.0.1 ; extra == 'all'
@@ -2661,7 +2661,6 @@ packages:
   - aiohttp ; extra == 'dev'
   - coverage ; extra == 'dev'
   - flake8 ; extra == 'dev'
-  - importlib-resources ; python_full_version < '3.9' and extra == 'dev'
   - ipython ; extra == 'dev'
   - ldap3 ; extra == 'dev'
   - locust ; extra == 'dev'
@@ -2775,13 +2774,13 @@ packages:
   - pandas ; extra == 'xarray'
   - pyarrow ; extra == 'xarray'
   - xarray ; extra == 'xarray'
-  requires_python: '>=3.9'
+  requires_python: '>=3.10'
 - pypi: ./
   name: tiledspc
   version: 2024.8.0
-  sha256: d81cca462fa30320f7cfd6c2400a0704895cc821323bfbf474c9ede836030da6
+  sha256: 8fd76218d90cd513e4839c3f4ed17b32b768b49f033391108da04ac965b65ee4
   requires_dist:
-  - tiled[all]==0.2.3
+  - tiled[all]>=0.2.4,<0.3
   - area-detector-handlers
   - bluesky-tiled-plugins==2.0.0
   - event-model

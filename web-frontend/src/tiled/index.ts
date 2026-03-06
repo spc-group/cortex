@@ -10,8 +10,10 @@
 
 export { useTiledWebSocket } from "./streaming";
 export { useDataTable } from "./use_data_table";
-export { useArray, useArrayStats } from "./array";
+export { TiledProvider } from "./provider";
+export { ZarrRootContext, TiledContext } from "./context";
+export { useArrayZ, useArrayData } from "./array";
 export { useStreams } from "./use_streams";
 export { useMetadata } from "./metadata";
 export { useSearch } from "./search";
-export type { Stats } from "./types";
+export type { Stats, ZarrRoot, ZArray, TypedArray } from "./types";

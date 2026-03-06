@@ -5,39 +5,32 @@ import {
   CircleStackIcon,
 } from "@heroicons/react/24/solid";
 import { useState, useRef } from "react";
+import type { NdArray } from "ndarray";
 
 import { LinePlot, FramePlot, SpectraPlot } from "../plots";
 import type { LineData } from "../plots";
 import { SignalPicker } from "../plots/signal_picker";
-import { prepareYData } from "./prepare_data";
+// import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
-import {
-  useDataTable,
-  useStreams,
-  useMetadata,
-  useArray,
-  useArrayStats,
-} from "../tiled";
+import { useStreams, useMetadata, useArrayZ, useArrayData } from "../tiled";
 import { axisLabels, OPERATIONS } from "./axis_labels";
-import type { TypedArray, Stats } from "../tiled/types";
-import type { Run, Stream, RunMetadata } from "../catalog/types";
+import type { Run, Stream, RunMetadata, DataSource } from "../catalog/types";
 import type { ROI, ROIUpdate } from "../plots";
 import { useLastChoice } from "../plots/last_choice.ts";
 import { signalNames } from "./signal";
 import { RoiTable } from "./roi_table";
+import { useDatasets } from "./dataset";
 import { useLocalStorage } from "../local_storage";
 
 const NULL_SIGNAL = "---";
 
-const toNumberArray = (intArray: BigInt64Array) => {
-  const numberArray = [];
-  if (intArray == null) {
-    return intArray;
-  }
-  for (const n of intArray) {
-    numberArray.push(Number(n));
-  }
-  return numberArray;
+const LoadingBadge = () => {
+  return (
+    <div className="badge badge-soft badge-info s-3">
+      <CircleStackIcon className="size-4 inline" />
+      Loading…
+    </div>
+  );
 };
 
 export const RunPlots = ({ run }: { run: Run }) => {
@@ -261,16 +254,15 @@ export const StreamPlots = ({
     );
   }
 
-  const vKey = vSignal != null ? stream?.data_keys?.[vSignal] : null;
   const evPerBin = stream.configuration?.[vSignal]?.data?.[
     `${vSignal}-ev_per_bin`
   ] as number | undefined;
   let plotWidget;
   if (stream == null) {
     plotWidget = <></>;
-  } else if (vKey?.dtype === "array") {
+  } else {
     plotWidget = (
-      <ArrayPlots
+      <LinePlots
         stream={stream}
         xSignal={xSignal}
         vSignal={vSignal}
@@ -278,26 +270,20 @@ export const StreamPlots = ({
         operation={operation ?? ""}
         inverted={inverted}
         logarithm={logarithm}
-        evPerBin={evPerBin}
         plotTitle={plotTitle}
         plotSubtitle={plotSubtitle}
         key={stream.uid}
       />
     );
+  }
+  // Create a plot widget for the array frames if needed
+  const isArray = stream?.data_keys?.[vSignal]?.dtype === "array";
+  let frameWidget;
+  if (!isArray) {
+    frameWidget = <></>;
   } else {
-    plotWidget = (
-      <TablePlots
-        stream={stream}
-        xSignal={xSignal}
-        vSignal={vSignal}
-        rSignal={rSignal}
-        operation={operation ?? ""}
-        inverted={inverted}
-        logarithm={logarithm}
-        plotTitle={plotTitle}
-        plotSubtitle={plotSubtitle}
-        key={stream.uid}
-      />
+    frameWidget = (
+      <ArrayPlots stream={stream} signal={vSignal} evPerBin={evPerBin} />
     );
   }
 
@@ -434,11 +420,97 @@ export const StreamPlots = ({
 
       {infoWidget}
       {plotWidget}
+      {frameWidget}
     </>
   );
 };
 
-export function TablePlots({
+// export function TablePlots({
+//   stream,
+//   xSignal,
+//   vSignal,
+//   rSignal,
+//   operation,
+//   inverted,
+//   logarithm,
+//   plotTitle,
+//   plotSubtitle,
+// }: {
+//   stream: Stream;
+//   xSignal: string | null;
+//   vSignal: string | null;
+//   rSignal: string | null;
+//   operation: string;
+//   inverted: boolean;
+//   logarithm: boolean;
+//   plotTitle?: string;
+//   plotSubtitle?: string;
+// }) {
+//   // Open connections to listen for latest data
+//   const {
+//     isLoading: isLoadingData,
+//     readyState,
+//     table: data,
+//   } = useDataTable(stream);
+
+//   // Process data into a form consumable by the plots
+//   let xdata, vdata, dataSets: LineData[];
+//   if (isLoadingData || data == null) {
+//     dataSets = [];
+//   } else {
+//     xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
+//     xdata = toNumberArray(xdata);
+//     vdata = vSignal != null ? data.getChild(vSignal)?.toArray() : null;
+//     vdata = toNumberArray(vdata);
+//     const rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
+//     dataSets =
+//       vdata == null
+//         ? []
+//         : [{ x: xdata, y: vdata }].map(({ x, y }) => {
+//             return {
+//               x,
+//               y: prepareYData(y, toNumberArray(rdata), operation, {
+//                 inverted: inverted,
+//                 logarithm: logarithm,
+//               }),
+//             };
+//           });
+//   }
+
+//   // Decide on plot annotations based on data processing
+//   // Decide what kind of thing to show
+//   if (isLoadingData) {
+//     return <div className="skeleton h-112 w-175"></div>;
+//   }
+
+//   const labels = axisLabels({
+//     xSignal: [xSignal ?? "", null],
+//     vSignal: [vSignal ?? "", null],
+//     rSignal: [rSignal ?? "", null],
+//     inverted,
+//     logarithm,
+//     operation,
+//   });
+//   return (
+//     <>
+//       <div className="m-2">
+//         <LiveBadge readyState={readyState} />
+//       </div>
+
+//       <LinePlot
+//         data={dataSets}
+//         xlabel={labels.x}
+//         ylabel={labels.y}
+//         title={plotTitle}
+//         subtitle={plotSubtitle}
+//       />
+//     </>
+//   );
+// }
+
+// Component that shows signals as line. For an array data structure
+// family, arrays are reduced to scalar signales.
+export function LinePlots({
   stream,
   xSignal,
   vSignal,
@@ -450,51 +522,90 @@ export function TablePlots({
   plotSubtitle,
 }: {
   stream: Stream;
-  xSignal: string | null;
-  vSignal: string | null;
-  rSignal: string | null;
+  xSignal?: string;
+  vSignal: string;
+  rSignal?: string;
   operation: string;
   inverted: boolean;
   logarithm: boolean;
   plotTitle?: string;
   plotSubtitle?: string;
 }) {
-  // Open connections to listen for latest data
+  // Load data from various sources to plot it
+  const dataKeys = stream?.data_keys ?? {};
+  const toSource = (signal: string): DataSource => {
+    const ancestors = [...stream.ancestors, stream.key];
+    if (dataKeys[signal]?.external == null) {
+      ancestors.push("internal");
+    }
+    return {
+      path: [...ancestors, signal].join("/"),
+      dataKey: dataKeys[signal],
+    };
+  };
+  const signals = {
+    [vSignal]: toSource(vSignal),
+  };
+  if (xSignal != null) {
+    signals[xSignal] = toSource(xSignal);
+  }
+  if (rSignal != null) {
+    signals[rSignal] = toSource(rSignal);
+  }
   const {
+    datasets: plotData,
     isLoading: isLoadingData,
-    readyState,
-    table: data,
-  } = useDataTable(stream);
-
+    isStreaming,
+  } = useDatasets(signals);
   // Process data into a form consumable by the plots
-  let xdata, vdata, dataSets: LineData[];
-  if (isLoadingData || data == null) {
-    dataSets = [];
-  } else {
-    xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
-    xdata = toNumberArray(xdata);
-    vdata = vSignal != null ? data.getChild(vSignal)?.toArray() : null;
-    vdata = toNumberArray(vdata);
-    const rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
-    dataSets =
-      vdata == null
-        ? []
-        : [{ x: xdata, y: vdata }].map(({ x, y }) => {
-            return {
-              x,
-              y: prepareYData(y, toNumberArray(rdata), operation, {
-                inverted: inverted,
-                logarithm: logarithm,
-              }),
-            };
-          });
-  }
+  const lineData: LineData[] = [
+    {
+      x: xSignal == null ? undefined : plotData[xSignal],
+      y: vSignal == null ? undefined : plotData[vSignal],
+      name: vSignal,
+      color: "c0",
+    },
+  ];
 
-  // Decide on plot annotations based on data processing
-  // Decide what kind of thing to show
-  if (isLoadingData) {
-    return <div className="skeleton h-112 w-175"></div>;
-  }
+  // const { stats, isLoading: isLoadingStats } = useArrayStats(arrayPath, rois);
+  // Process data into a form consumable by the plots
+  // let dataSets: LineData[];
+  // if (isLoadingTable || stats.length === 0 || isLoadingStats) {
+  //   dataSets = [];
+  // } else {
+  //   const xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
+  //   dataSets = stats
+  //     .map((s, i) => {
+  //       return i >= rois.length
+  //         ? null
+  //         : {
+  //             x: toNumberArray(xdata),
+  //             y: s.sum,
+  //             name: rois[i].name,
+  //             color: `c${i}`,
+  //           };
+  //     })
+  //     .filter((stats, index) => {
+  //       const roiIsActive = rois?.[index]?.isActive;
+  //       return stats != null && roiIsActive;
+  //     }) as LineData[];
+  //   const rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
+  //   // Filter out hidden ROIs
+  //   // dataSets = dataSets.filter((_, index) => rois?.[index]?.isActive);
+
+  //   // Apply reference correction and processing steps
+  //   dataSets = dataSets.map(({ x, y, name, color }) => {
+  //     return {
+  //       x,
+  //       y: prepareYData(y, toNumberArray(rdata), operation, {
+  //         inverted: inverted,
+  //         logarithm: logarithm,
+  //       }),
+  //       name,
+  //       color,
+  //     };
+  //   });
+  // }
 
   const labels = axisLabels({
     xSignal: [xSignal ?? "", null],
@@ -504,77 +615,62 @@ export function TablePlots({
     logarithm,
     operation,
   });
+
   return (
     <>
-      <div className="m-2">
-        <LiveBadge readyState={readyState} />
-      </div>
+      <div className="lg:grid lg:grid-cols-2">
+        <div className="m-2 space-x-2">
+          <LiveBadge readyState={isStreaming} />
 
-      <LinePlot
-        data={dataSets}
-        xlabel={labels.x}
-        ylabel={labels.y}
-        title={plotTitle}
-        subtitle={plotSubtitle}
-      />
+          {isLoadingData ? <LoadingBadge /> : <></>}
+        </div>
+        <div>
+          <LinePlot
+            data={lineData}
+            xlabel={labels.x}
+            ylabel={labels.y}
+            title={plotTitle}
+            subtitle={plotSubtitle}
+          />
+        </div>
+      </div>
     </>
   );
 }
 
-// Component that shows plots for an array data structure family.
+// Component that shows plots for a frame of an array.
 //
-// If *evPerBin* is present, this means a summed line plot alongside
-// plots for the individua spectra. Otherwise, this means a summed
-// line plot alongside plots for the individual frames as images.
+// Will either show an image (heatmap) or individual spectra. If
+// spectra are shown, *evPerBin* determines the extent of the
+// horizontal axis.
 //
 // @param evPerBin - The energy width of each pixel in electron-volts.
 export function ArrayPlots({
   stream,
-  xSignal,
-  vSignal,
-  rSignal,
-  operation,
+  signal,
   evPerBin,
-  inverted,
-  logarithm,
-  plotTitle,
-  plotSubtitle,
 }: {
   stream: Stream;
-  xSignal: string | null;
-  vSignal: string | null;
-  rSignal: string | null;
-  operation: string;
+  signal: string | null;
   evPerBin?: number;
-  inverted: boolean;
-  logarithm: boolean;
-  plotTitle?: string;
-  plotSubtitle?: string;
 }) {
-  // Open connections to listen for latest data
-  const {
-    isLoading: isLoadingTable,
-    readyState,
-    table: data,
-  } = useDataTable(stream);
-
-  const arrayPath = [...stream.ancestors, stream.key, vSignal].join("/");
+  const arrayPath = [...stream.ancestors, stream.key, signal].join("/");
   const [activeFrame, setActiveFrame] = useState(0);
   const [viewMode, setViewMode] = useState<"frame" | "spectra">(
     evPerBin == null ? "frame" : "spectra",
   );
-  const previousFrame = useRef<TypedArray[] | null>(null);
-  const {
-    array: frameData,
-    shape: frameShape,
-    isLoading: isLoadingFrame,
-  } = useArray(arrayPath, [activeFrame]);
+
+  const previousFrame = useRef<NdArray | null>(null);
+  const isLoadingFrame = false;
+  const { shape: frameShape, streamingState } = useArrayZ(arrayPath);
+  const frame = useArrayData(arrayPath, activeFrame);
+
   const lastFrame = (frameShape?.[0] ?? 1) - 1;
-  if (frameData != null) {
-    previousFrame.current = frameData[0];
+  if (frame != null) {
+    previousFrame.current = frame;
   }
   // Keep track of chosen ROIs
-  const [rois, setRois] = useLocalStorage<ROI[]>(`rois-${vSignal}`, [
+  const [rois, setRois] = useLocalStorage<ROI[]>(`rois-${signal}`, [
     {
       name: "Total",
       isActive: true,
@@ -617,77 +713,11 @@ export function ArrayPlots({
       ...rois.slice(index + 1),
     ]);
   };
-  const { stats, isLoading: isLoadingStats } = useArrayStats(arrayPath, rois);
-  // Process data into a form consumable by the plots
-  let dataSets: LineData[];
-  if (isLoadingTable || stats.length === 0 || isLoadingStats) {
-    dataSets = [];
-  } else {
-    const xdata = xSignal != null ? data.getChild(xSignal)?.toArray() : null;
-    dataSets = stats
-      .map((s, i) => {
-        return i >= rois.length
-          ? null
-          : {
-              x: toNumberArray(xdata),
-              y: s.sum,
-              name: rois[i].name,
-              color: `c${i}`,
-            };
-      })
-      .filter((stats, index) => {
-        const roiIsActive = rois?.[index]?.isActive;
-        return stats != null && roiIsActive;
-      }) as LineData[];
-    const rdata = rSignal != null ? data.getChild(rSignal)?.toArray() : null;
-    // Filter out hidden ROIs
-    // dataSets = dataSets.filter((_, index) => rois?.[index]?.isActive);
 
-    // Apply reference correction and processing steps
-    dataSets = dataSets.map(({ x, y, name, color }) => {
-      return {
-        x,
-        y: prepareYData(y, toNumberArray(rdata), operation, {
-          inverted: inverted,
-          logarithm: logarithm,
-        }),
-        name,
-        color,
-      };
-    });
-  }
-
-  const labels = axisLabels({
-    xSignal: [xSignal ?? "", null],
-    vSignal: [vSignal ?? "", null],
-    rSignal: [rSignal ?? "", null],
-    inverted,
-    logarithm,
-    operation,
-  });
-
-  const imData = frameData?.[0] ?? previousFrame.current;
-
-  // Prepare color range for the frame plot
-  const reduceStat = (
-    stats: Stats[],
-    attr: "min" | "max",
-    compare: (...values: number[]) => number,
-    defaultValue: number,
-  ) => {
-    const arr = stats.map((s) => s?.[attr]).flat();
-    if (arr == null) {
-      return null;
-    } else {
-      return arr.reduce(
-        (cumulative, next) =>
-          compare(cumulative ?? defaultValue, next ?? defaultValue),
-        defaultValue,
-      );
-    }
-  };
-  const vMin = reduceStat(stats, "min", Math.min, Infinity);
-  const vMax = reduceStat(stats, "max", Math.max, -Infinity);
+  const imData = frame ?? previousFrame.current;
+  // const vMin = reduceStat(stats, "min", Math.min, Infinity);
+  const [vMin, vMax] = [0, 200];
+  // const vMax = reduceStat(stats, "max", Math.max, -Infinity);
   // Decide how to plot the individual frames
   let framePlot;
   if (imData != null && vMin != null && vMax != null) {
@@ -724,82 +754,58 @@ export function ArrayPlots({
     // Data are not done loading yet
     framePlot = <div className="skeleton h-[457px] w-[700px]"></div>;
   }
+
   return (
     <>
-      <div className="lg:grid lg:grid-cols-2">
-        <div>
-          <div className="m-2">
-            <LiveBadge readyState={readyState} />
-          </div>
-
-          {isLoadingTable || isLoadingStats ? (
-            <div className="skeleton h-112 w-175"></div>
-          ) : (
-            <LinePlot
-              data={dataSets}
-              xlabel={labels.x}
-              ylabel={labels.y}
-              title={plotTitle}
-              subtitle={plotSubtitle}
-              activePoint={activeFrame}
-            />
-          )}
+      <div>
+        <label className="input w-130">
+          <span className="label">Current frame</span>
+          <span>{activeFrame}</span>
+          <input
+            type="range"
+            min={0}
+            max={lastFrame}
+            value={activeFrame}
+            onChange={(e) => {
+              setActiveFrame(Number(e.target.value));
+            }}
+            className="range"
+            step="1"
+          />
+          <span>{lastFrame}</span>
+        </label>
+        <label className="label px-2">
+          <input
+            type="checkbox"
+            checked={viewMode === "spectra"}
+            onChange={(e) => {
+              setViewMode(e.currentTarget.checked ? "spectra" : "frame");
+            }}
+            className="toggle"
+          />
+          Spectra
+        </label>
+        <div className="m-2 inline">
+          <LiveBadge readyState={streamingState} />
         </div>
+        {isLoadingFrame ? <LoadingBadge /> : <></>}
+        {framePlot}
 
-        <div>
-          <label className="input w-130">
-            <span className="label">Current frame</span>
-            <span>{activeFrame}</span>
-            <input
-              type="range"
-              min={0}
-              max={lastFrame}
-              value={activeFrame}
-              onChange={(e) => {
-                setActiveFrame(Number(e.target.value));
-              }}
-              className="range"
-              step="1"
+        <div
+          tabIndex={0}
+          className="collapse collapse-arrow bg-base-100 border-base-300 border"
+        >
+          <input type="checkbox" />
+          <div className="collapse-title font-semibold">
+            Regions of Interest (ROIs)
+          </div>
+          <div className="collapse-content text-sm">
+            <RoiTable
+              rois={rois}
+              addRoi={addRoi}
+              updateRoi={updateRoi}
+              removeRoi={removeRoi}
             />
-            <span>{lastFrame}</span>
-          </label>
-          <label className="label px-2">
-            <input
-              type="checkbox"
-              checked={viewMode === "spectra"}
-              onChange={(e) => {
-                setViewMode(e.currentTarget.checked ? "spectra" : "frame");
-              }}
-              className="toggle"
-            />
-            Spectra
-          </label>
-          {isLoadingFrame ? (
-            <div className="badge badge-soft badge-info s-3">
-              <CircleStackIcon className="size-4 inline" />
-              Loading…
-            </div>
-          ) : (
-            <></>
-          )}
-          {framePlot}
-
-          <div
-            tabIndex={0}
-            className="collapse collapse-arrow bg-base-100 border-base-300 border"
-          >
-            <input type="checkbox" />
-            <div className="collapse-title font-semibold">
-              Regions of Interest (ROIs)
-            </div>
-            <div className="collapse-content text-sm">
-              <RoiTable
-                rois={rois}
-                addRoi={addRoi}
-                updateRoi={updateRoi}
-                removeRoi={removeRoi}
-              />
-            </div>
           </div>
         </div>
       </div>

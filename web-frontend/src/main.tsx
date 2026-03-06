@@ -9,31 +9,38 @@ import BeamlineStatus25ID from "./beamlines/status_25id.tsx";
 import { BeamlineSummary } from "./beamlines/summary";
 import { LivePlot } from "./beamlines/liveplot";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { tiledHost } from "./tiled/tiled_api";
+import { TiledProvider } from "./tiled";
 
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter basename="/app">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/catalog" element={<RunList />} />
-          <Route path="/catalog/:uid" element={<RunDetail />} />
-          {/* <Route path="/beamline/:beamlineId" element={<BeamlineStatus />} /> */}
-          <Route path="/beamlines/:beamlineId" element={<BeamlineSummary />} />
-          <Route path="/beamlines/:beamlineId/plots" element={<LivePlot />} />
-          <Route
-            path="/beamlines/25-ID-C/equipment"
-            element={<BeamlineStatus25ID />}
-          />
-          <Route
-            path="/beamlines/25-ID-D/equipment"
-            element={<BeamlineStatus25ID />}
-          />
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <TiledProvider uri={tiledHost}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter basename="/app">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/catalog" element={<RunList />} />
+            <Route path="/catalog/:uid" element={<RunDetail />} />
+            {/* <Route path="/beamline/:beamlineId" element={<BeamlineStatus />} /> */}
+            <Route
+              path="/beamlines/:beamlineId"
+              element={<BeamlineSummary />}
+            />
+            <Route path="/beamlines/:beamlineId/plots" element={<LivePlot />} />
+            <Route
+              path="/beamlines/25-ID-C/equipment"
+              element={<BeamlineStatus25ID />}
+            />
+            <Route
+              path="/beamlines/25-ID-D/equipment"
+              element={<BeamlineStatus25ID />}
+            />
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </TiledProvider>
   </StrictMode>,
 );
