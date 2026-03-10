@@ -11,8 +11,9 @@
 export { useTiledWebSocket } from "./streaming";
 export { useDataTable } from "./use_data_table";
 export { TiledProvider } from "./provider";
-export { ZarrRootContext, TiledContext } from "./context";
+export { ZarrRootContext, TiledContext, WebSocketContext } from "./context";
 export { useArrayZ, useArrayData } from "./array";
+export { decodeMsgPack } from "./streaming";
 export { useStreams } from "./use_streams";
 export { useMetadata } from "./metadata";
 export { useSearch } from "./search";

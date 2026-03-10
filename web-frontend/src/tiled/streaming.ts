@@ -8,6 +8,7 @@ import { tiledUri } from "./tiled_api";
 type RawMsgPack = {
   payload?: Uint8Array;
   mimetype?: string;
+  type?: string;
 };
 
 // Convert a msgpack payload into its native object equivalent

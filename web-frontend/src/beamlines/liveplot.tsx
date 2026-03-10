@@ -8,7 +8,7 @@ import { BeamlineHeader } from "./header";
 export const LivePlot = () => {
   const { beamlineId } = useParams<"beamlineId">();
   const { run } = useLatestRun(beamlineId);
-  const plots = run == null ? <></> : <RunPlots run={run} />;
+  const plots = run == null ? <></> : <RunPlots run={run} key={run.uid} />;
   const uid = run?.metadata?.start?.uid ?? "";
   const startTime =
     run?.metadata?.start.time != null

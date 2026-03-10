@@ -4,7 +4,12 @@ import { useContext } from "react";
 import { describe, it, vi, afterEach, expect } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 
-import { TiledProvider, ZarrRootContext, TiledContext } from "./";
+import {
+  TiledProvider,
+  ZarrRootContext,
+  TiledContext,
+  WebSocketContext,
+} from "./";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -14,12 +19,14 @@ afterEach(() => {
 const MockComponent = () => {
   const zarrRoot = useContext(ZarrRootContext);
   const tiledUri = useContext(TiledContext);
+  const wsUri = useContext(WebSocketContext);
   const store = zarrRoot?.store as zarr.FetchStore;
   const zarrUrl = new URL(store.url);
   return (
     <>
-      <div>zarr: {zarrUrl.href} </div>
-      <div>tiled: {tiledUri} </div>
+      <div>zarr: {zarrUrl.href}</div>
+      <div>tiled: {tiledUri}</div>
+      <div>ws: {wsUri}</div>
     </>
   );
 };
@@ -33,6 +40,16 @@ describe("the TiledProvider component", () => {
     );
     expect(
       screen.getByText("tiled: http://localhost:0/api/v1"),
+    ).toBeInTheDocument();
+  });
+  it("provides the websockets uri", () => {
+    render(
+      <TiledProvider uri="http://localhost:0">
+        <MockComponent />
+      </TiledProvider>,
+    );
+    expect(
+      screen.getByText("ws: ws://localhost:0/api/v1/stream/single"),
     ).toBeInTheDocument();
   });
   it("provides an explicit zarr root", () => {

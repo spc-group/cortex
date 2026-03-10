@@ -1,34 +1,59 @@
 import * as zarr from "zarrita";
 import * as ndzarr from "@zarrita/ndarray";
+import { backOff } from "exponential-backoff";
 import ndarray from "ndarray";
 import { sum } from "ndarray-ops";
-import { useState, useEffect, useRef } from "react";
+import type { ReadyState } from "react-use-websocket";
+import { useState, useEffect, useContext } from "react";
 
 import type { ZarrRoot, ZArray } from "../tiled";
+import { WebSocketContext, decodeMsgPack } from "../tiled";
 import type { DataSource } from "./types";
 
-// Semaphore locking mechanism. Returns two functions, request and
-// release. request can be used to *request* the lock. If the lock is
-// available, this function returns true, otherwise it returns false.
+// Semaphore locking mechanism. Returns function to request a lock.
+// Calling `requestLock("my-key")` returns a release function that can
+// be called later once the lock is to be released. If the lock is not
+// availabe, `requestLock` returns false.
 const useSemaphore = (maxCount: number) => {
-  const [currentValue, setCurrentValue] = useState<number>(maxCount);
-  const request = () => {
-    // Get an open lock slot if avaiable
-    if (currentValue > 0) {
-      setCurrentValue((prev) => prev - 1);
-      return true;
+  const [pendingKeys, setPendingKeys] = useState<Set<string>>(new Set());
+
+  const request = (key?: string) => {
+    if (key == null) {
+      throw new Error("UNDEF");
     }
-    return false;
-  };
-  const release = () => {
-    setCurrentValue((prev) => prev + 1);
+    // Get an open lock slot if avaiable
+    if (pendingKeys.size >= maxCount || pendingKeys.has(key)) {
+      return false;
+    }
+    // Apply the locks
+    setPendingKeys((prev) => {
+      return new Set([...prev, key]);
+    });
+    // Return a releasing function
+    return () => {
+      setPendingKeys((prev) => {
+        const newSet = new Set([...prev]);
+        newSet.delete(key);
+        return newSet;
+      });
+    };
   };
   return {
-    lockCount: maxCount - currentValue,
+    lockCount: pendingKeys.size,
     requestLock: request,
-    releaseLock: release,
   };
 };
+
+// Determine where to subscribe for updates to the dataset
+function webSocketUrl(root: string, source: DataSource) {
+  const pathParts = source.path.split("/");
+  let subPath = pathParts;
+  // Check for paths that are part of an internal table
+  if (pathParts[pathParts.length - 2] === "internal") {
+    subPath = pathParts.slice(0, pathParts.length - 1);
+  }
+  return [root, ...subPath].join("/");
+}
 
 // A hook that looks up multiple sets of plotting data and packages it
 // into a consumable format.
@@ -39,72 +64,100 @@ export const useDatasets = (
   datasets: { [key: string]: ndarray.NdArray };
   isLoading: boolean;
   isStreaming: boolean;
+  readyState?: ReadyState;
+  error?: Error;
 } => {
   const root =
     options?.zarrRoot ??
     zarr.root(new zarr.FetchStore("http://localhost:8000/zarr/v3"));
+  const wsRoot = useContext(WebSocketContext);
   const maxTasks = 6;
-  const {
-    releaseLock,
-    requestLock,
-    lockCount: taskCount,
-  } = useSemaphore(maxTasks);
+  const { requestLock, lockCount: taskCount } = useSemaphore(maxTasks);
   const [datasets, setDatasets] = useState<{ [key: string]: ndarray.NdArray }>(
     {},
   );
-  // const [pendingSources, setPendingSources] = useState<Source[]>([]);
-  const pendingSlices = useRef<Set<string>>(new Set());
-  const [zarrays, setZarrays] = useState<{ [key: string]: ZArray }>({});
-  const pendingArrays = useRef<Set<string>>(new Set());
+  const [sockets, setSockets] = useState<{ [key: string]: WebSocket }>({});
+  const [zarrays, setZarrays] = useState<{ [key: string]: ZArray | undefined }>(
+    {},
+  );
+  const [error, setError] = useState<Error | undefined>(undefined);
   // Make sure we have zarr array definitions for each dataset
   useEffect(() => {
+    if (error) {
+      return;
+    }
+    // Asynchronous inner function to do the network I/O
+    const getArray = async (name: string, source: DataSource) => {
+      let arr;
+      try {
+        arr = await backOff(() => zarr.open.v3(root.resolve(source.path)));
+      } catch (err) {
+        setError(err as Error);
+        return;
+      }
+      if (arr instanceof zarr.Array) {
+        // Stash the new zarr array object for later use
+        setZarrays((prev) => {
+          return { ...prev, [name]: arr };
+        });
+        // Initialize empty array for this zarray
+        setDatasets((prev) => {
+          if (!Object.keys(prev).includes(name)) {
+            return { ...prev, [name]: ndarray([], [arr.shape[0]]) };
+          } else {
+            return prev;
+          }
+        });
+      } else {
+        throw new Error(`${source.path} is not a zarr Array`);
+      }
+      // Set up websockets for tracking new data
+      const wsUrl = webSocketUrl(wsRoot, source);
+      let socket = sockets?.[wsUrl];
+      if (socket == null) {
+        socket = new WebSocket(`${wsUrl}?envelope_format=msgpack`);
+        setSockets((prevSockets) => {
+          return { ...prevSockets, [name]: socket };
+        });
+      }
+      socket.addEventListener("message", (event) => {
+        decodeMsgPack(event.data)
+          .then((msg) => {
+            if (msg?.type === "array-ref" || msg?.type === "table-data") {
+              // Remove the cached zarray so it will get re-fetched
+              setZarrays((prev) => {
+                // const oldShape = prev?.[name]?.shape ?? [];
+                // if (oldShape.toString() !== msg.shape.toString()) {
+                return { ...prev, [name]: undefined };
+                // } else {
+                // 	return prev;
+                //   }
+              });
+            }
+          })
+          .catch((err) => console.log(err));
+      });
+    };
+    // Don't try to get more data if something is not working
     for (const [name, source] of Object.entries(sources)) {
       // Guard against getting the data multpile times
-      if (pendingArrays.current.has(name)) {
-        continue;
-      } else {
-        pendingArrays.current.add(name);
+      if (zarrays?.[name] != null) {
+        return;
       }
       // Load the array from the network
-      if (!requestLock()) {
-        continue;
+      const releaseLock = requestLock(`array-${name}`);
+      if (releaseLock) {
+        // Lock acquired
+        getArray(name, source).finally(releaseLock);
       }
-      zarr.open
-        .v3(root.resolve(source.path))
-        .then((arr) => {
-          if (arr instanceof zarr.Array) {
-            // Stash the new zarr array object for later use
-            setZarrays((prev) => {
-              return { ...prev, [name]: arr };
-            });
-            // Initialize empty array for this zarray
-            setDatasets((prev) => {
-              return { ...prev, [name]: ndarray([], [arr.shape[0]]) };
-            });
-          } else {
-            throw new Error(`${source.path} is not a zarr Array`);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          // // If the fetch failed, remove the pending marker from the cached arrays
-          // setZarrays(
-          //   Object.fromEntries(
-          //     Object.entries(zarrays).filter(([thisName]) => thisName !== name),
-          //   ),
-          // );
-        })
-        .finally(() => {
-          releaseLock();
-        });
     }
-  }, [sources, zarrays, releaseLock, requestLock, root]);
+  }, [sources, zarrays, taskCount, requestLock, root, error, sockets, wsRoot]);
   // Load array data through zarr
   useEffect(() => {
     for (const [name] of Object.entries(sources)) {
       // Get the (possibly filled with nulls) dataset
       const ds = datasets?.[name];
-      const zarray = zarrays[name];
+      const zarray = zarrays?.[name];
       // First decide if there's anything to do
       if (ds == null) {
         continue;
@@ -128,58 +181,69 @@ export const useDatasets = (
         start = ds.data.length;
         stop = Math.min(ds.data.length + blockSize, zarray.shape[0]);
       }
-      // Check to make sure we're not sending duplicate requests
-      const sliceKey = `${name}-${start}`;
-      if (pendingSlices.current.has(sliceKey)) {
-        continue;
-      } else {
-        pendingSlices.current.add(sliceKey);
-      }
-      // Get the next block
       const extraDims = new Array(nDims - 1).fill(null);
-      if (!requestLock()) {
+      // Check to make sure we're not sending duplicate requests
+      const sliceKey = `slice-${name}-${start}-${stop}`;
+      const releaseLock = requestLock(sliceKey);
+      if (!releaseLock) {
         continue;
       }
-      ndzarr
-        .get(zarray, [zarr.slice(start, stop), ...extraDims])
-        .then(
-          // @ts-expect-error: This can be unknown[] for some reason?
-          (result: ndarray.NdArray) => {
-            // Reduce dimensions for multi-dimension arrays
-            setDatasets((prevDatasets) => {
-              const ds = prevDatasets[name];
-              let newDataset;
-              if (JSON.stringify(result.shape) === JSON.stringify(ds.shape)) {
-                newDataset = ndarray(
-                  result.data,
-                  result.shape,
-                  result.stride,
-                  result.offset,
-                );
-              } else {
-                for (let i = 0; i < stop - start; i++) {
-                  const sliceData = result.lo(i).hi(1) as ndarray.NdArray;
-                  const sliceSum = sum(sliceData);
-                  ds.set(i + start, sliceSum);
-                }
-                newDataset = ndarray(ds.data, ds.shape, ds.stride, ds.offset);
-              }
-              return { ...prevDatasets, [name]: newDataset };
-            });
-          },
-        )
-        .catch((err) => {
+      // Asynchronous inner function to get the next block
+      const getSlice = async () => {
+        const doGet = () =>
+          ndzarr.get(zarray, [zarr.slice(start, stop), ...extraDims]);
+        let result;
+        try {
+          result = await backOff(() => doGet());
+        } catch (err) {
           console.error(err);
-        })
-        .finally(() => {
-          releaseLock();
-          pendingSlices.current.delete(sliceKey);
+          setError(err as Error);
+          return;
+        }
+        // Reduce dimensions for multi-dimension arrays
+        setDatasets((prevDatasets) => {
+          const ds = prevDatasets[name];
+          let newDataset;
+          if (
+            result.dimension === 1 &&
+            JSON.stringify(result.shape) === JSON.stringify(zarray.shape)
+          ) {
+            // A full result, so just replace the array wholesale
+            newDataset = result as ndarray.NdArray;
+            // newDataset = ndarray(
+            //   result.data,
+            //   result.shape,
+            //   result.stride,
+            //   result.offset,
+            // );
+          } else {
+            // Update the rolling results array for each of the slices
+            newDataset = ds.lo(0); // Need a new object to return to react
+            for (let i = 0; i < stop - start; i++) {
+              const sliceData = result.lo(i).hi(1) as ndarray.NdArray;
+              const sliceSum = sum(sliceData);
+              newDataset.set(i + start, sliceSum);
+            }
+          }
+          return { ...prevDatasets, [name]: newDataset };
         });
+      };
+      getSlice().finally(releaseLock);
     }
-  }, [sources, zarrays, datasets, releaseLock, requestLock]);
+  }, [sources, zarrays, datasets, taskCount, requestLock]);
+  // Determine an overall ready state based on all the sockets
+  const readyStates = Object.values(sockets).map((sock) => sock.readyState);
+  const isStreaming = readyStates.reduce(
+    (acc, state) => acc && state === WebSocket.OPEN,
+    readyStates.length > 0,
+  );
+  const readyState =
+    readyStates.length >= 0 ? Math.max(...readyStates) : undefined;
   return {
     datasets,
     isLoading: taskCount > 0,
-    isStreaming: false,
+    isStreaming: isStreaming,
+    readyState,
+    error,
   };
 };

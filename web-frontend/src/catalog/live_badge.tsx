@@ -5,7 +5,7 @@ import { ReadyState } from "react-use-websocket";
 export const LiveBadge = ({
   readyState,
 }: {
-  readyState: ReadyState | boolean;
+  readyState?: ReadyState | boolean;
 }) => {
   // Decide on a badge for the connection state
   let badgeVariant;

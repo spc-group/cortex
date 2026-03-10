@@ -555,7 +555,7 @@ export function LinePlots({
   const {
     datasets: plotData,
     isLoading: isLoadingData,
-    isStreaming,
+    readyState,
   } = useDatasets(signals);
   // Process data into a form consumable by the plots
   const lineData: LineData[] = [
@@ -620,7 +620,7 @@ export function LinePlots({
     <>
       <div className="lg:grid lg:grid-cols-2">
         <div className="m-2 space-x-2">
-          <LiveBadge readyState={isStreaming} />
+          <LiveBadge readyState={readyState} />
 
           {isLoadingData ? <LoadingBadge /> : <></>}
         </div>
