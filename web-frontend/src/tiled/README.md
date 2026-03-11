@@ -27,6 +27,10 @@ Most hooks return both `isLoading` to describe whether the initial (or
 sometimes subsequent) HTTP requests are pending, and `readyState` to
 describe the connection status of the websocket.
 
+# `provider.ts`
+
+- TiledProvider - A context provider component for registering a Tiled API server.
+
 # `api.ts`
 
 Tools that apply to the API as a whole, and not any particular

@@ -19,6 +19,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import RunTable, { Row } from "./run_table";
 import { allColumns } from "./columns.ts";
+import { TiledProvider } from "../tiled";
 
 const queryClient = new QueryClient();
 
@@ -187,17 +188,15 @@ describe("run table row", () => {
     };
     render(
       <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
-          <table>
-            <tbody>
-              <Row
-                run={run}
-                apiUri={"https://remotehost/api/v1/"}
-                columns={testColumns}
-              />
-            </tbody>
-          </table>
-        </QueryClientProvider>
+        <TiledProvider uri="https://remotehost/api/v1/">
+          <QueryClientProvider client={queryClient}>
+            <table>
+              <tbody>
+                <Row run={run} columns={testColumns} />
+              </tbody>
+            </table>
+          </QueryClientProvider>
+        </TiledProvider>
       </BrowserRouter>,
     );
     const link = screen.getByText("xdi");

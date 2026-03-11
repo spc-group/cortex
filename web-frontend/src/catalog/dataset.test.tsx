@@ -4,6 +4,7 @@ import { expect, describe, beforeEach, afterEach, it } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 
 import { useDatasets } from "./dataset";
+import { TiledProvider } from "../tiled";
 import type { DataSource } from "./types";
 
 let root: zarr.Location<zarr.Mutable>;
@@ -36,7 +37,7 @@ describe("the useDatasets() hook", () => {
   }: {
     sources: { [key: string]: DataSource };
   }) => {
-    const { datasets, isLoading } = useDatasets(sources, { zarrRoot: root });
+    const { datasets, isLoading } = useDatasets(sources);
     return (
       <>
         <div>Loading: {JSON.stringify(isLoading)}</div>
@@ -62,7 +63,11 @@ describe("the useDatasets() hook", () => {
         },
       },
     };
-    render(<MockComponent sources={sources} />);
+    render(
+      <TiledProvider zarrRoot={root}>
+        <MockComponent sources={sources} />
+      </TiledProvider>,
+    );
     await screen.findByText("Loading: false");
     expect(screen.getByText("spam")).toBeInTheDocument();
     // await screen.findByText(/\[\d+(,\d+)*\]/);
@@ -79,7 +84,11 @@ describe("the useDatasets() hook", () => {
         },
       },
     };
-    render(<MockComponent sources={sources} />);
+    render(
+      <TiledProvider zarrRoot={root}>
+        <MockComponent sources={sources} />
+      </TiledProvider>,
+    );
     await screen.findByText("Loading: false");
     expect(screen.getByText("eggs")).toBeInTheDocument();
     // Make sure there are only 11 numbers in the resulting array

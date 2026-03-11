@@ -1,9 +1,9 @@
 import { tableFromIPC } from "apache-arrow";
 import { decode, decodeAsync } from "@msgpack/msgpack";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import useWebSocket from "react-use-websocket";
 
-import { tiledUri } from "./tiled_api";
+import { WebSocketContext } from "./context";
 
 type RawMsgPack = {
   payload?: Uint8Array;
@@ -23,10 +23,7 @@ export const decodeMsgPack = async (encoded: Blob) => {
   } else {
     // Blob#arrayBuffer(): Promise<ArrayBuffer> (if stream() is not available)
     decoded = decode(await encoded.arrayBuffer()) as RawMsgPack;
-  } //  else {
-  //   // Just a regular array buffer (e.g. used in testing
-  //   decoded = decode(encoded);
-  // }
+  }
   // Decode the awkward array if present
   if (decoded?.mimetype === "application/vnd.apache.arrow.file") {
     return {
@@ -55,9 +52,8 @@ export const useDecodeBlob = (
 };
 
 export const useTiledWebSocket = <T>(path: string) => {
-  const wsUrl = makeWebsocketUrl(
-    `${tiledUri}stream/single/${path}?envelope_format=msgpack`,
-  );
+  const wsRoot = useContext(WebSocketContext);
+  const wsUrl = `${wsRoot}/${path}?envelope_format=msgpack`;
   const { lastMessage, readyState } = useWebSocket<T>(wsUrl, {
     retryOnError: true,
     reconnectAttempts: 10,
@@ -84,20 +80,4 @@ export const useTiledWebSocket = <T>(path: string) => {
     timestamp,
   };
   return result;
-};
-
-// Convert a (maybe) http(s) URL for the tiled server into a websocket
-// url.
-// @param httpUrl: The HTTP equivalent url that will be parsed
-// @returns A similar URL but formatted to be a websocket (i.e. ws:// or wss://)
-export const makeWebsocketUrl = (httpUrl: string): string => {
-  const url = new URL(httpUrl);
-  const newProtocol = {
-    "http:": "ws:",
-    "https:": "wss:",
-  }[url.protocol];
-  if (newProtocol != null) {
-    url.protocol = newProtocol;
-  }
-  return url.href;
 };

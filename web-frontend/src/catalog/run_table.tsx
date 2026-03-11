@@ -6,10 +6,12 @@ import {
 } from "@heroicons/react/24/solid";
 import { BeakerIcon } from "@heroicons/react/24/outline";
 import { useQuery } from "@tanstack/react-query";
+import { useContext } from "react";
 import type { ChangeEvent } from "react";
 
 import { Link } from "react-router";
-import { tiledUri, getApiInfo } from "../tiled/tiled_api";
+import { getApiInfo } from "../tiled/tiled_api";
+import { TiledContext } from "../tiled";
 import { ExitStatus } from "./exit_status";
 import type { TableColumn, Run } from "./types";
 import type { Spec } from "../tiled/types";
@@ -168,13 +170,12 @@ export function Row({
   run,
   onSelect,
   columns,
-  apiUri = tiledUri,
 }: {
   run: Run;
   onSelect?: (uid: string, isSelected: boolean) => void;
   columns: TableColumn[];
-  apiUri?: string;
 }) {
+  const apiUri = useContext(TiledContext);
   // Handler for selecting a run
   const handleCheckboxChecked = (event: ChangeEvent<HTMLInputElement>) => {
     if (onSelect !== undefined) {
@@ -227,7 +228,7 @@ export function Row({
   }
   // Prepare additional data
   const uid = run?.metadata?.start?.uid ?? "";
-  const runUri = `${apiUri}container/full/${run.uid}`;
+  const runUri = `${apiUri}/container/full/${run.uid}`;
   const specs = run.specs === undefined ? [] : run.specs;
   const specNames = specs.map((spec: Spec) => spec.name);
   const dataSpecs = ["XASRun"];

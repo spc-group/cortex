@@ -6,8 +6,8 @@ import { sum } from "ndarray-ops";
 import type { ReadyState } from "react-use-websocket";
 import { useState, useEffect, useContext } from "react";
 
-import type { ZarrRoot, ZArray } from "../tiled";
-import { WebSocketContext, decodeMsgPack } from "../tiled";
+import type { ZArray } from "../tiled";
+import { WebSocketContext, decodeMsgPack, ZarrRootContext } from "../tiled";
 import type { DataSource } from "./types";
 
 // Semaphore locking mechanism. Returns function to request a lock.
@@ -57,19 +57,16 @@ function webSocketUrl(root: string, source: DataSource) {
 
 // A hook that looks up multiple sets of plotting data and packages it
 // into a consumable format.
-export const useDatasets = (
-  sources: { [key: string]: DataSource },
-  options?: { zarrRoot?: ZarrRoot },
-): {
+export const useDatasets = (sources: {
+  [key: string]: DataSource;
+}): {
   datasets: { [key: string]: ndarray.NdArray };
   isLoading: boolean;
   isStreaming: boolean;
   readyState?: ReadyState;
   error?: Error;
 } => {
-  const root =
-    options?.zarrRoot ??
-    zarr.root(new zarr.FetchStore("http://localhost:8000/zarr/v3"));
+  const root = useContext(ZarrRootContext);
   const wsRoot = useContext(WebSocketContext);
   const maxTasks = 6;
   const { requestLock, lockCount: taskCount } = useSemaphore(maxTasks);
@@ -89,6 +86,13 @@ export const useDatasets = (
     // Asynchronous inner function to do the network I/O
     const getArray = async (name: string, source: DataSource) => {
       let arr;
+      if (root == null) {
+        const err = new Error(
+          "TiledProvider is not configured correctly. No zarr root.",
+        );
+        setError(err);
+        return;
+      }
       try {
         arr = await backOff(() => zarr.open.v3(root.resolve(source.path)));
       } catch (err) {
