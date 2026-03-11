@@ -620,7 +620,9 @@ export function LinePlots({
     <>
       <div className="lg:grid lg:grid-cols-2">
         <div className="m-2 space-x-2">
-          <LiveBadge readyState={readyState} />
+          <div className={"inline"}>
+            <LiveBadge readyState={readyState} />
+          </div>
 
           {isLoadingData ? <LoadingBadge /> : <></>}
         </div>
@@ -656,16 +658,22 @@ export function ArrayPlots({
 }) {
   const arrayPath = [...stream.ancestors, stream.key, signal].join("/");
   const [activeFrame, setActiveFrame] = useState(0);
+  const [autoFrame, setAutoFrame] = useState(true);
   const [viewMode, setViewMode] = useState<"frame" | "spectra">(
     evPerBin == null ? "frame" : "spectra",
   );
 
   const previousFrame = useRef<NdArray | null>(null);
   const isLoadingFrame = false;
-  const { shape: frameShape, streamingState } = useArrayZ(arrayPath);
+  const { arr: zarray, streamingState } = useArrayZ(arrayPath);
+
+  // Use the last frame if one has not been explicitely set
+  const lastFrame = (zarray?.shape?.[0] ?? 1) - 1;
+  if (autoFrame && activeFrame != lastFrame) {
+    setActiveFrame(lastFrame);
+  }
   const frame = useArrayData(arrayPath, activeFrame);
 
-  const lastFrame = (frameShape?.[0] ?? 1) - 1;
   if (frame != null) {
     previousFrame.current = frame;
   }
@@ -767,6 +775,7 @@ export function ArrayPlots({
             max={lastFrame}
             value={activeFrame}
             onChange={(e) => {
+              setAutoFrame(false);
               setActiveFrame(Number(e.target.value));
             }}
             className="range"

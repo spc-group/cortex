@@ -4,8 +4,13 @@ import ndarray from "ndarray";
 import { useState, useEffect, useContext } from "react";
 
 import { useMetadata } from "./metadata";
+import { useTiledWebSocket } from "./streaming";
 import { ZarrRootContext } from "./context";
-import type { ArrayStructure, ZArray } from "./types";
+import type { ArrayStructure, ZArray, WebSocketMessage } from "./types";
+
+interface WebSocketArray extends WebSocketMessage {
+  shape: number[];
+}
 
 // Hit the API over HTTP to get a given array slice
 // @param path - The Tiled URI path for this array
@@ -49,7 +54,15 @@ export const useArrayZ = (path: string) => {
   }
   // Use the shape to listen for new frames
   const { metadata } = useMetadata<object, ArrayStructure>(path);
-  const shape = metadata?.attributes.structure.shape;
+  const { payload } = useTiledWebSocket<WebSocketArray>(path);
+  let shape: number[] | undefined;
+  if (payload?.type === "array-ref") {
+    // Use the shape from the latest websocket update
+    shape = payload.shape;
+  } else {
+    // Use the shape from HTTP metadata
+    shape = metadata?.attributes.structure.shape;
+  }
   const shapeString = JSON.stringify(shape);
   // Load the metadata for the array
   useEffect(() => {

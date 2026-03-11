@@ -21,6 +21,16 @@ vi.mock("../tiled/metadata", () => {
     },
   };
 });
+vi.mock("../tiled/streaming", () => {
+  return {
+    useTiledWebSocket: () => {
+      return {
+        type: "array-schema",
+        shape: null,
+      };
+    },
+  };
+});
 vi.mock("../tiled/use_streams", () => {
   return {
     useStreams: () => {

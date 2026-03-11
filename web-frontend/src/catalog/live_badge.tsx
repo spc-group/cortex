@@ -11,15 +11,6 @@ export const LiveBadge = ({
   let badgeVariant;
   let badgeContent;
   switch (readyState) {
-    case true:
-    case ReadyState.OPEN:
-      badgeVariant = "badge-success";
-      badgeContent = (
-        <span>
-          <SignalIcon className="size-4 inline" /> Live
-        </span>
-      );
-      break;
     case ReadyState.CONNECTING:
       badgeVariant = "badge-info";
       badgeContent = (
@@ -28,11 +19,35 @@ export const LiveBadge = ({
         </span>
       );
       break;
-    default:
+    case ReadyState.OPEN:
+      badgeVariant = "badge-success";
+      badgeContent = (
+        <span>
+          <SignalIcon className="size-4 inline" /> Live
+        </span>
+      );
+      break;
+    case ReadyState.CLOSING:
       badgeVariant = "badge-warning";
       badgeContent = (
         <span>
-          <SignalSlashIcon className="size-4 inline" /> Disconnected
+          <SignalSlashIcon className="size-4 inline" /> Closing
+        </span>
+      );
+      break;
+    case ReadyState.CLOSED:
+      badgeVariant = "badge-warning";
+      badgeContent = (
+        <span>
+          <SignalSlashIcon className="size-4 inline" /> Closed
+        </span>
+      );
+      break;
+    default:
+      badgeVariant = "badge-neutral";
+      badgeContent = (
+        <span>
+          <SignalSlashIcon className="size-4 inline" /> Unknown
         </span>
       );
       break;

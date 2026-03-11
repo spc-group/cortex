@@ -113,30 +113,26 @@ export const useDatasets = (
       }
       // Set up websockets for tracking new data
       const wsUrl = webSocketUrl(wsRoot, source);
-      let socket = sockets?.[wsUrl];
+      let socket = sockets?.[name];
       if (socket == null) {
+        // Set up a new websocket for this data set
         socket = new WebSocket(`${wsUrl}?envelope_format=msgpack`);
         setSockets((prevSockets) => {
           return { ...prevSockets, [name]: socket };
         });
+        socket.addEventListener("message", (event) => {
+          decodeMsgPack(event.data)
+            .then((msg) => {
+              if (msg?.type === "array-ref" || msg?.type === "table-data") {
+                // Remove the cached zarray so it will get re-fetched
+                setZarrays((prev) => {
+                  return { ...prev, [name]: undefined };
+                });
+              }
+            })
+            .catch((err) => console.log(err));
+        });
       }
-      socket.addEventListener("message", (event) => {
-        decodeMsgPack(event.data)
-          .then((msg) => {
-            if (msg?.type === "array-ref" || msg?.type === "table-data") {
-              // Remove the cached zarray so it will get re-fetched
-              setZarrays((prev) => {
-                // const oldShape = prev?.[name]?.shape ?? [];
-                // if (oldShape.toString() !== msg.shape.toString()) {
-                return { ...prev, [name]: undefined };
-                // } else {
-                // 	return prev;
-                //   }
-              });
-            }
-          })
-          .catch((err) => console.log(err));
-      });
     };
     // Don't try to get more data if something is not working
     for (const [name, source] of Object.entries(sources)) {
@@ -209,7 +205,7 @@ export const useDatasets = (
             JSON.stringify(result.shape) === JSON.stringify(zarray.shape)
           ) {
             // A full result, so just replace the array wholesale
-            newDataset = result as ndarray.NdArray;
+            newDataset = result.lo(0) as ndarray.NdArray;
             // newDataset = ndarray(
             //   result.data,
             //   result.shape,
@@ -219,6 +215,12 @@ export const useDatasets = (
           } else {
             // Update the rolling results array for each of the slices
             newDataset = ds.lo(0); // Need a new object to return to react
+            newDataset = ndarray(
+              ds.data,
+              [zarray.shape[0]],
+              ds.stride,
+              ds.offset,
+            );
             for (let i = 0; i < stop - start; i++) {
               const sliceData = result.lo(i).hi(1) as ndarray.NdArray;
               const sliceSum = sum(sliceData);
