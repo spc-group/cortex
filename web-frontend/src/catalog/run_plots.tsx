@@ -10,7 +10,7 @@ import type { NdArray } from "ndarray";
 import { LinePlot, FramePlot, SpectraPlot } from "../plots";
 import type { LineData } from "../plots";
 import { SignalPicker } from "../plots/signal_picker";
-// import { prepareYData } from "./prepare_data";
+import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
 import { useStreams, useMetadata, useArrayZ, useArrayData } from "../tiled";
 import { axisLabels, OPERATIONS } from "./axis_labels";
@@ -558,15 +558,24 @@ export function LinePlots({
     readyState,
   } = useDatasets(signals);
   // Process data into a form consumable by the plots
-  const lineData: LineData[] = [
-    {
-      x: xSignal == null ? undefined : plotData[xSignal],
-      y: vSignal == null ? undefined : plotData[vSignal],
-      name: vSignal,
-      color: "c0",
-    },
-  ];
-
+  const rdata = rSignal == null ? null : plotData[rSignal];
+  const ydata = prepareYData(plotData[vSignal], rdata, operation, {
+    inverted,
+    logarithm,
+  });
+  let lineData: LineData[];
+  if (vSignal == null || ydata == null) {
+    lineData = [];
+  } else {
+    lineData = [
+      {
+        x: xSignal == null ? undefined : plotData[xSignal],
+        y: ydata,
+        name: vSignal,
+        color: "c0",
+      },
+    ];
+  }
   // const { stats, isLoading: isLoadingStats } = useArrayStats(arrayPath, rois);
   // Process data into a form consumable by the plots
   // let dataSets: LineData[];

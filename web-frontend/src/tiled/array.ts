@@ -90,7 +90,7 @@ export const useArrayData = (
   // Load the data from the array
   useEffect(() => {
     const getData = async () => {
-      if (zArr != null) {
+      if (zArr != null && zArr.shape[0] > 0) {
         const slc = slice == null ? null : [slice, null, null];
         const arrData = await ndzarr.get(zArr, slc);
         setArrData(arrData as ndarray.NdArray);
