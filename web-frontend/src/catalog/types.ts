@@ -70,7 +70,7 @@ export interface DataKey {
       high: number;
     };
   };
-  source: string; // E.g. "ca://25iddVME:3820:scaler1_netA.D"
+  source?: string; // E.g. "ca://25iddVME:3820:scaler1_netA.D"
   external?: string;
   precision?: number; // E.g. 3
   dtype_numpy?: string; // E.g. "<f8"
@@ -102,4 +102,5 @@ export interface DataSource {
   path: string; // E.g. "<uid>/primary/internal/I0-count_rate"
   dataKey: DataKey;
   roi?: ROI; // Will be applied to the dataset after its retrieved
+  name: string; // Human-readable description for this data source
 }

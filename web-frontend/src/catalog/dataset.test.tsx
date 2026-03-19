@@ -55,6 +55,7 @@ describe("the useDatasets() hook", () => {
   it("loads a 1D dataset", async () => {
     const sources = {
       spam: {
+        name: "spam",
         path: "spam",
         dataKey: {
           dtype: "number",
@@ -76,6 +77,7 @@ describe("the useDatasets() hook", () => {
   it("reduces a 3D dataset", async () => {
     const sources = {
       eggs: {
+        name: "eggs",
         path: "eggs",
         dataKey: {
           dtype: "array",

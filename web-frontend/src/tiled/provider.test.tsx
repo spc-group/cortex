@@ -18,7 +18,7 @@ afterEach(() => {
 
 const MockComponent = () => {
   const zarrRoot = useContext(ZarrRootContext);
-  const tiledUri = useContext(TiledContext);
+  const tiledUri = useContext(TiledContext).baseUri;
   const wsUri = useContext(WebSocketContext);
   const store = zarrRoot?.store as zarr.FetchStore;
   const zarrUrl = new URL(store.url);

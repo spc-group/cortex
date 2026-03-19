@@ -42,17 +42,13 @@ export const RoiTable = ({
             return (
               <tr key={`roi-row-${index}`}>
                 <td>
-                  {index > 0 ? (
-                    <button
-                      className="btn btn-xs"
-                      title={`Remove ROI ${index}`}
-                      onClick={() => removeRoi(index)}
-                    >
-                      <TrashIcon className="size-4 inline" />
-                    </button>
-                  ) : (
-                    <></>
-                  )}
+                  <button
+                    className="btn btn-xs"
+                    title={`Remove ROI ${index}`}
+                    onClick={() => removeRoi(index)}
+                  >
+                    <TrashIcon className="size-4 inline" />
+                  </button>
                 </td>
                 <td>
                   <label className="swap">
@@ -74,77 +70,65 @@ export const RoiTable = ({
                   />
                 </td>
                 <td>
-                  {index > 0 ? (
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="ROI Name…"
+                    value={roi.name}
+                    onChange={(e) =>
+                      updateRoi(index, { name: e.currentTarget.value })
+                    }
+                  />
+                </td>
+                <td>
+                  <div className="join">
                     <input
-                      type="text"
-                      className="input"
-                      placeholder="ROI Name…"
-                      value={roi.name}
+                      type="number"
+                      className="input join-item"
+                      min={0}
+                      value={roundValue(roi.x0)}
                       onChange={(e) =>
-                        updateRoi(index, { name: e.currentTarget.value })
+                        updateRoi(index, { x0: e.currentTarget.value })
                       }
                     />
-                  ) : (
-                    roi.name
-                  )}
+                    <span className="btn btn-light btn-disabled join-item">
+                      &mdash;
+                    </span>
+                    <input
+                      type="number"
+                      className="input join-item"
+                      min={0}
+                      value={roundValue(roi.x1)}
+                      onChange={(e) =>
+                        updateRoi(index, { x1: e.currentTarget.value })
+                      }
+                    />
+                  </div>
                 </td>
                 <td>
-                  {index === 0 ? (
-                    <span>0 &mdash; &infin;</span>
-                  ) : (
-                    <div className="join">
-                      <input
-                        type="number"
-                        className="input join-item"
-                        min={0}
-                        value={roundValue(roi.x0)}
-                        onChange={(e) =>
-                          updateRoi(index, { x0: e.currentTarget.value })
-                        }
-                      />
-                      <span className="btn btn-light btn-disabled join-item">
-                        &mdash;
-                      </span>
-                      <input
-                        type="number"
-                        className="input join-item"
-                        min={0}
-                        value={roundValue(roi.x1)}
-                        onChange={(e) =>
-                          updateRoi(index, { x1: e.currentTarget.value })
-                        }
-                      />
+                  <div className="join">
+                    <input
+                      type="number"
+                      className="input join-item"
+                      min={0}
+                      value={roundValue(roi.y0)}
+                      onChange={(e) =>
+                        updateRoi(index, { y0: e.currentTarget.value })
+                      }
+                    />
+                    <div className="btn btn-light btn-disabled join-item">
+                      &mdash;
                     </div>
-                  )}
-                </td>
-                <td>
-                  {index === 0 ? (
-                    <span>0 &mdash; &infin;</span>
-                  ) : (
-                    <div className="join">
-                      <input
-                        type="number"
-                        className="input join-item"
-                        min={0}
-                        value={roundValue(roi.y0)}
-                        onChange={(e) =>
-                          updateRoi(index, { y0: e.currentTarget.value })
-                        }
-                      />
-                      <div className="btn btn-light btn-disabled join-item">
-                        &mdash;
-                      </div>
-                      <input
-                        type="number"
-                        className="input join-item"
-                        min={0}
-                        value={roundValue(roi.y1)}
-                        onChange={(e) =>
-                          updateRoi(index, { y1: e.currentTarget.value })
-                        }
-                      />
-                    </div>
-                  )}
+                    <input
+                      type="number"
+                      className="input join-item"
+                      min={0}
+                      value={roundValue(roi.y1)}
+                      onChange={(e) =>
+                        updateRoi(index, { y1: e.currentTarget.value })
+                      }
+                    />
+                  </div>
                 </td>
               </tr>
             );

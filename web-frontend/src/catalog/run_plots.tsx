@@ -8,7 +8,6 @@ import { useState, useRef } from "react";
 import type { NdArray } from "ndarray";
 
 import { LinePlot, FramePlot, SpectraPlot } from "../plots";
-import type { LineData } from "../plots";
 import { SignalPicker } from "../plots/signal_picker";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
@@ -17,10 +16,11 @@ import { axisLabels, OPERATIONS } from "./axis_labels";
 import type { Run, Stream, RunMetadata, DataSource } from "../catalog/types";
 import type { ROI, ROIUpdate } from "../plots";
 import { useLastChoice } from "../plots/last_choice.ts";
-import { signalNames } from "./signal";
+import { signalSources } from "./signal";
 import { RoiTable } from "./roi_table";
 import { useDatasets } from "./dataset";
-import { useLocalStorage } from "../local_storage";
+// import { useLocalStorage } from "../local_storage";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 const NULL_SIGNAL = "---";
 
@@ -156,14 +156,32 @@ export const StreamPlots = ({
     [true, false],
     "hinted",
   );
-  const xSignals = signalNames(stream.data_keys, hintedOnly ? runHints : null);
-  if (!hintedOnly) {
-    xSignals.push("seq_num", "time");
-  }
-  const ySignals = signalNames(stream.data_keys, hintedOnly ? iHints : null);
-  if (!hintedOnly) {
-    ySignals.push("seq_num", "time");
-  }
+  const [rois] = useLocalStorage<{ [key: string]: ROI[] }>(`rois`, {});
+  const dataKeys = {
+    seq_num: {
+      dtype: "int64",
+      shape: [], // To-do, figure out how to get the actual shape
+    },
+    time: {
+      dtype: "float64",
+      shape: [], // To-do, figure out how to get the actual shape
+    },
+    ...stream.data_keys,
+  };
+  const xSources = signalSources(
+    dataKeys,
+    hintedOnly ? runHints : null,
+    rois,
+    stream,
+  );
+  const xSignals = Object.keys(xSources);
+  const ySources = signalSources(
+    dataKeys,
+    hintedOnly ? iHints : null,
+    rois,
+    stream,
+  );
+  const ySignals = Object.keys(ySources);
 
   // State management
   const [xSignal, setXSignal] = useLastChoice<string>(
@@ -253,20 +271,22 @@ export const StreamPlots = ({
       </div>
     );
   }
-
-  const evPerBin = stream.configuration?.[vSignal]?.data?.[
-    `${vSignal}-ev_per_bin`
-  ] as number | undefined;
+  // Build the list of line data sources and show them
   let plotWidget;
+
   if (stream == null) {
     plotWidget = <></>;
   } else {
+    const lineSources = [
+      {
+        x: xSources[xSignal],
+        s: ySources[vSignal],
+        r: ySources[rSignal],
+      },
+    ];
     plotWidget = (
       <LinePlots
-        stream={stream}
-        xSignal={xSignal}
-        vSignal={vSignal}
-        rSignal={rSignal}
+        sources={lineSources}
         operation={operation ?? ""}
         inverted={inverted}
         logarithm={logarithm}
@@ -278,6 +298,9 @@ export const StreamPlots = ({
   }
   // Create a plot widget for the array frames if needed
   const isArray = stream?.data_keys?.[vSignal]?.dtype === "array";
+  const evPerBin = stream.configuration?.[vSignal]?.data?.[
+    `${vSignal}-ev_per_bin`
+  ] as number | undefined;
   let frameWidget;
   if (!isArray) {
     frameWidget = <></>;
@@ -511,20 +534,14 @@ export const StreamPlots = ({
 // Component that shows signals as line. For an array data structure
 // family, arrays are reduced to scalar signales.
 export function LinePlots({
-  stream,
-  xSignal,
-  vSignal,
-  rSignal,
+  sources,
   operation,
   inverted,
   logarithm,
   plotTitle,
   plotSubtitle,
 }: {
-  stream: Stream;
-  xSignal?: string;
-  vSignal: string;
-  rSignal?: string;
+  sources: { x?: DataSource; s: DataSource; r?: DataSource }[];
   operation: string;
   inverted: boolean;
   logarithm: boolean;
@@ -532,50 +549,71 @@ export function LinePlots({
   plotSubtitle?: string;
 }) {
   // Load data from various sources to plot it
-  const dataKeys = stream?.data_keys ?? {};
-  const toSource = (signal: string): DataSource => {
-    const ancestors = [...stream.ancestors, stream.key];
-    if (dataKeys[signal]?.external == null) {
-      ancestors.push("internal");
-    }
-    return {
-      path: [...ancestors, signal].join("/"),
-      dataKey: dataKeys[signal],
-    };
-  };
-  const signals = {
-    [vSignal]: toSource(vSignal),
-  };
-  if (xSignal != null) {
-    signals[xSignal] = toSource(xSignal);
-  }
-  if (rSignal != null) {
-    signals[rSignal] = toSource(rSignal);
-  }
+  // const dataKeys = stream?.data_keys ?? {};
+  // const toSource = (signal: string): DataSource => {
+  //   console.warn("toSource() is deprecated");
+  //   const ancestors = [...stream.ancestors, stream.key];
+  //   if (dataKeys[signal]?.external == null) {
+  //     ancestors.push("internal");
+  //   }
+  //   return {
+  //     path: [...ancestors, signal].join("/"),
+  //     dataKey: dataKeys[signal],
+  //   };
+  // };
+  // const signals = Object.fromEntries(
+  //   vSignals.map((vSignal) => [vSignal, toSource(vSignal)])
+  // );
+  // if (xSignal != null) {
+  //   signals[xSignal] = toSource(xSignal);
+  // }
+  // if (rSignal != null) {
+  //   signals[rSignal] = toSource(rSignal);
+  // }
+  const allSources = Object.fromEntries(
+    sources
+      .map((lineSources) => [lineSources?.x, lineSources.s, lineSources?.r])
+      .flat()
+      .filter((src) => src != null)
+      .map((src) => [src.name, src]),
+  );
   const {
     datasets: plotData,
     isLoading: isLoadingData,
     readyState,
-  } = useDatasets(signals);
+  } = useDatasets(allSources);
   // Process data into a form consumable by the plots
-  const rdata = rSignal == null ? null : plotData[rSignal];
-  const ydata = prepareYData(plotData[vSignal], rdata, operation, {
-    inverted,
-    logarithm,
-  });
-  let lineData: LineData[];
-  if (vSignal == null || ydata == null) {
-    lineData = [];
-  } else {
-    lineData = [
-      {
-        x: xSignal == null ? undefined : plotData[xSignal],
-        y: ydata,
-        name: vSignal,
+
+  // const xdata = xSignal == null ? undefined : plotData[xSignal];
+  // const rdata = rSignal == null ? undefined : plotData[rSignal];
+  // const ydata = Object.fromEntries(
+  //   vSignals.map((vSignal) => [vSignal, prepareYData(plotData[vSignal], rdata, operation, {
+  //     inverted,
+  //     logarithm,
+  //   })])
+  // );
+  // let lineData: LineData[];
+  // if (vSignals == null || ydata == null) {
+  //   lineData = [];
+  // } else {
+  const lineData = sources
+    .map(({ x, s, r }) => {
+      if (s == null) {
+        return null;
+      }
+      const rdata = r == null ? undefined : plotData[r.name];
+      const ydata = prepareYData(plotData[s.name], rdata ?? null, operation, {
+        inverted,
+        logarithm,
+      });
+      return {
+        x: x == null ? undefined : plotData[x.name],
+        y: ydata ?? undefined,
+        name: s.name,
         color: "c0",
-      },
-    ];
-  }
+      };
+    })
+    .filter((ds) => ds != null);
   // const { stats, isLoading: isLoadingStats } = useArrayStats(arrayPath, rois);
   // Process data into a form consumable by the plots
   // let dataSets: LineData[];
@@ -615,11 +653,12 @@ export function LinePlots({
   //     };
   //   });
   // }
-
+  const firstSource = sources[0];
   const labels = axisLabels({
-    xSignal: [xSignal ?? "", null],
-    vSignal: [vSignal ?? "", null],
-    rSignal: [rSignal ?? "", null],
+    // Replace these `null` values with DataKeys later
+    xSignal: [firstSource.x?.name ?? "X", firstSource.x?.dataKey ?? null],
+    vSignal: [firstSource.s?.name ?? "Y", firstSource.s?.dataKey ?? null],
+    rSignal: [firstSource.r?.name ?? "Ref", firstSource.r?.dataKey ?? null],
     inverted,
     logarithm,
     operation,
@@ -687,21 +726,21 @@ export function ArrayPlots({
     previousFrame.current = frame;
   }
   // Keep track of chosen ROIs
-  const [rois, setRois] = useLocalStorage<ROI[]>(`rois-${signal}`, [
-    {
-      name: "Total",
-      isActive: true,
-      x0: 0,
-      x1: Infinity,
-      y0: 0,
-      y1: Infinity,
-    },
-  ]);
+  const [allRois, setAllRois] = useLocalStorage<{ [key: string]: ROI[] }>(
+    `rois`,
+    {},
+  );
+  // If there's nothing to plot, then just don't
+  if (signal == null) {
+    return <></>;
+  }
+
+  const rois = allRois?.[signal] ?? [];
   const addRoi = () => {
     if (rois.length === 1) {
       rois[0].isActive = false;
     }
-    setRois([
+    const theseRois = [
       ...rois,
       {
         isActive: true,
@@ -711,24 +750,31 @@ export function ArrayPlots({
         x1: 50,
         y1: 50,
       },
-    ]);
+    ];
+    setAllRois({
+      ...allRois,
+      [signal]: theseRois,
+    });
   };
   const removeRoi = (index: number) => {
-    if (rois.length === 2) {
-      // Reactive the total ROI so there's no empty plot
-      rois[0].isActive = true;
-    }
-    setRois([...rois.slice(0, index), ...rois.slice(index + 1)]);
+    const newRois = {
+      ...allRois,
+      [signal]: [...rois.slice(0, index), ...rois.slice(index + 1)],
+    };
+    setAllRois(newRois);
   };
   const updateRoi = (index: number, update: ROIUpdate) => {
-    setRois([
-      ...rois.slice(0, index),
-      {
-        ...rois[index],
-        ...update,
-      },
-      ...rois.slice(index + 1),
-    ]);
+    setAllRois({
+      ...allRois,
+      [signal]: [
+        ...rois.slice(0, index),
+        {
+          ...rois[index],
+          ...update,
+        },
+        ...rois.slice(index + 1),
+      ],
+    });
   };
 
   const imData = frame ?? previousFrame.current;

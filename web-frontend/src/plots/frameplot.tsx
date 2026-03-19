@@ -260,7 +260,7 @@ export const FramePlot = ({
         },
         textposition: "top left",
       },
-      visible: index > 0,
+      visible: true,
     };
   });
 

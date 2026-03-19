@@ -67,7 +67,7 @@ export function prepareYData(
     vdata == null ? Infinity : vdata.shape[0],
     rdata == null || !isValidOp ? Infinity : rdata.shape[0],
   );
-  const ydata = ndarray(new Float32Array(ndunpack(vdata)), [commonShape]);
+  const ydata = ndarray(ndunpack(vdata).map(Number), [commonShape]);
   const vdata_ = vdata.hi(commonShape);
 
   // Apply reference correction

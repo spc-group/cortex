@@ -8,10 +8,12 @@ import type { ZarrRoot } from "./types";
 export const TiledProvider = ({
   uri,
   children,
+  pathPrefix,
   zarrRoot,
 }: {
   children: ReactElement[] | ReactElement;
   uri?: string;
+  pathPrefix?: string;
   zarrRoot?: ZarrRoot;
 }) => {
   // Parse the URI
@@ -25,8 +27,12 @@ export const TiledProvider = ({
   let element = children;
   // Set up context for regular API queries
   if (uri != null && httpUri != null && wsUri != null) {
+    const tiledInfo = {
+      baseUri: `${httpUri.origin}/api/v1`,
+      pathPrefix: pathPrefix ?? "",
+    };
     element = (
-      <TiledContext value={`${httpUri.origin}/api/v1`}>
+      <TiledContext value={tiledInfo}>
         <WebSocketContext value={`${wsUri.origin}/api/v1/stream/single`}>
           {element}
         </WebSocketContext>
@@ -36,7 +42,10 @@ export const TiledProvider = ({
   if (zarrRoot != null) {
     element = <ZarrRootContext value={zarrRoot}>{element}</ZarrRootContext>;
   } else if (httpUri != null) {
-    const zarrUri = `${httpUri.origin}/zarr/v3`;
+    let zarrUri = `${httpUri.origin}/zarr/v3`;
+    if (pathPrefix != null) {
+      zarrUri = `${zarrUri}/${pathPrefix}`;
+    }
     const root = zarr.root(new zarr.FetchStore(zarrUri));
     element = <ZarrRootContext value={root}>{element}</ZarrRootContext>;
   }

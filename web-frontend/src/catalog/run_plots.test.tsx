@@ -96,15 +96,13 @@ describe("the RunPlots component", () => {
   };
   beforeEach(async () => {
     const queryClient = new QueryClient();
-    await React.act(async () => {
-      render(
-        <BrowserRouter>
-          <QueryClientProvider client={queryClient}>
-            <RunPlots run={run} />
-          </QueryClientProvider>
-        </BrowserRouter>,
-      );
-    });
+    render(
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <RunPlots run={run} />
+        </QueryClientProvider>
+      </BrowserRouter>,
+    );
   });
   it("doesn't crash", () => {});
   it("sorts the primary stream to be first", () => {
@@ -113,47 +111,58 @@ describe("the RunPlots component", () => {
   });
 });
 
-describe("the StreamPlots component", () => {
-  const stream: Stream = {
-    key: "primary",
-    data_keys: { sim_motor_2: {} },
-    ancestors: [],
-    hints: {
-      sim_motor_2: {
-        fields: ["sim_motor_2"],
-      },
+const stream: Stream = {
+  key: "primary",
+  data_keys: { sim_motor_2: {} },
+  ancestors: [],
+  hints: {
+    sim_motor_2: {
+      fields: ["sim_motor_2"],
     },
-  };
+  },
+};
+
+describe("the StreamPlots component", () => {
   beforeEach(async () => {
-    await renderRouter(<StreamPlots uid={5} stream={stream} />);
+    cleanup();
+    await render(
+      <StreamPlots uid={5} stream={stream} runHints={["sim_motor_2"]} />,
+    );
   });
   it("populates signal pickers", () => {
     expect(screen.getAllByText("sim_motor_2").length).toEqual(3);
   });
-  // it("adds 'seq_num' and 'time' signals when unhinted", async () => {
-  //   const checkbox = screen.getByLabelText("Hints only");
-  //   await fireEvent.change(checkbox, {target: {checked: false}});
-  //   expect(screen.getAllByText("seq_num").length).toEqual(3);
-  //   expect(screen.getAllByText("time").length).toEqual(3);
-  // });
-  it("skips 'seq_num' and 'time' signals when hinted", () => {
-    expect(screen.queryByText("seq_num")).toBeNull();
-    expect(screen.queryByText("time")).toBeNull();
+  it("adds 'seq_num' and 'time' signals when unhinted", async () => {
+    expect(screen.queryAllByText("seq_num")).toHaveLength(0);
+    expect(screen.queryAllByText("time")).toHaveLength(0);
+    const checkbox = screen.getByLabelText("Hints only");
+    // await fireEvent.change(checkbox, {target: {checked: false}});
+    await fireEvent.click(checkbox);
+    await screen.findAllByText("seq_num");
+    await screen.findAllByText("time");
+    expect(screen.getAllByText("seq_num").length).toEqual(3);
+    expect(screen.getAllByText("time").length).toEqual(3);
+  });
+  it("adds ROIs", async () => {
+    localStorage.setItem(
+      "rois",
+      JSON.stringify({
+        sim_motor_2: [
+          {
+            name: "Ni-KL",
+            isActive: true,
+            x0: 0,
+            x1: 3,
+            y0: 5,
+            y1: 10,
+          },
+        ],
+      }),
+    );
+    render(<StreamPlots uid={5} stream={stream} />);
+    await screen.findAllByText("sim_motor_2 (Ni-KL)");
   });
 });
-
-const renderRouter = async (element) => {
-  const queryClient = new QueryClient();
-  await React.act(async () => {
-    render(
-      <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
-          {element}
-        </QueryClientProvider>
-      </BrowserRouter>,
-    );
-  });
-};
 
 describe("the ArrayPlots component", () => {
   let root;
@@ -183,31 +192,39 @@ describe("the ArrayPlots component", () => {
       shape: [11, 24, 32],
       chunk_shape: [1, 24, 32],
     });
-    await renderRouter(
+    await render(
       <TiledProvider zarrRoot={root}>
         <ArrayPlots stream={stream} signal="bdet" />
       </TiledProvider>,
     );
   });
   afterEach(() => {
-    localStorage.removeItem("rois-bdet");
+    localStorage.removeItem("rois");
   });
   it("shows the 'live' badge", () => {
     expect(screen.getByText("Live")).toBeInTheDocument();
   });
   it("adds an ROI", async () => {
     const button = screen.getByText("Add ROI");
-    expect(screen.queryAllByRole("row")).toHaveLength(2);
+    expect(screen.queryAllByRole("row")).toHaveLength(1);
     await fireEvent.click(button);
-    expect(screen.queryAllByRole("row")).toHaveLength(3);
+    expect(screen.queryAllByRole("row")).toHaveLength(2);
   });
   it("removes ROIs", async () => {
-    expect(screen.queryAllByRole("row")).toHaveLength(2);
+    expect(screen.queryAllByRole("row")).toHaveLength(1);
     const addButton = screen.getByText("Add ROI");
     await fireEvent.click(addButton);
-    expect(screen.queryAllByRole("row")).toHaveLength(3);
-    const removeButton = screen.getByTitle("Remove ROI 1");
-    await fireEvent.click(removeButton);
     expect(screen.queryAllByRole("row")).toHaveLength(2);
+    const removeButton = screen.getByTitle("Remove ROI 0");
+    await fireEvent.click(removeButton);
+    expect(screen.queryAllByRole("row")).toHaveLength(1);
   });
+  // it("sets ROI names", async () => {
+  //   expect(screen.queryAllByRole("row")).toHaveLength(1);
+  //   const addButton = screen.getByText("Add ROI");
+  //   await fireEvent.click(addButton);
+  //   const nameInput = screen.getByPlaceholderText("ROI Name…");
+  //   await fireEvent.change(nameInput, {currentTarget: {value: "Hello"}});
+  //   expect(screen.queryAllByRole("row")).toHaveLength(1);
+  // });
 });

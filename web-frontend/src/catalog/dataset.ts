@@ -9,6 +9,7 @@ import { useState, useEffect, useContext } from "react";
 import type { ZArray } from "../tiled";
 import { WebSocketContext, decodeMsgPack, ZarrRootContext } from "../tiled";
 import type { DataSource } from "./types";
+import type { ROI } from "../plots";
 
 // Semaphore locking mechanism. Returns function to request a lock.
 // Calling `requestLock("my-key")` returns a release function that can
@@ -68,11 +69,12 @@ export const useDatasets = (sources: {
 } => {
   const root = useContext(ZarrRootContext);
   const wsRoot = useContext(WebSocketContext);
-  const maxTasks = 6;
+  const maxTasks = 12;
   const { requestLock, lockCount: taskCount } = useSemaphore(maxTasks);
   const [datasets, setDatasets] = useState<{ [key: string]: ndarray.NdArray }>(
     {},
   );
+  const [rois, setRois] = useState<{ [key: string]: ROI }>({});
   const [sockets, setSockets] = useState<{ [key: string]: WebSocket }>({});
   const [zarrays, setZarrays] = useState<{ [key: string]: ZArray | undefined }>(
     {},
@@ -102,19 +104,19 @@ export const useDatasets = (sources: {
       if (arr instanceof zarr.Array) {
         // Stash the new zarr array object for later use
         setZarrays((prev) => {
-          return { ...prev, [name]: arr };
-        });
-        // Initialize empty array for this zarray
-        setDatasets((prev) => {
-          if (!Object.keys(prev).includes(name)) {
-            return { ...prev, [name]: ndarray([], [arr.shape[0]]) };
-          } else {
-            return prev;
-          }
+          return { ...prev, [source.path]: arr };
         });
       } else {
         throw new Error(`${source.path} is not a zarr Array`);
       }
+      // Clear out any old data
+      setDatasets((prev) => {
+        if (!Object.keys(prev).includes(name)) {
+          return { ...prev, [name]: ndarray([], [arr.shape[0]]) };
+        } else {
+          return prev;
+        }
+      });
       // Set up websockets for tracking new data
       const wsUrl = webSocketUrl(wsRoot, source);
       let socket = sockets?.[name];
@@ -141,28 +143,82 @@ export const useDatasets = (sources: {
     // Don't try to get more data if something is not working
     for (const [name, source] of Object.entries(sources)) {
       // Guard against getting the data multpile times
-      if (zarrays?.[name] != null) {
-        return;
+      if (zarrays?.[source.path] != null) {
+        continue;
       }
       // Load the array from the network
-      const releaseLock = requestLock(`array-${name}`);
+      const releaseLock = requestLock(`array-${source.path}`);
       if (releaseLock) {
         // Lock acquired
         getArray(name, source).finally(releaseLock);
       }
     }
   }, [sources, zarrays, taskCount, requestLock, root, error, sockets, wsRoot]);
-  // Load array data through zarr
+  // Set up empty arrays
   useEffect(() => {
-    for (const [name] of Object.entries(sources)) {
-      // Get the (possibly filled with nulls) dataset
-      const ds = datasets?.[name];
-      const zarray = zarrays?.[name];
-      // First decide if there's anything to do
-      if (ds == null) {
+    for (const [name, source] of Object.entries(sources)) {
+      const arr = zarrays?.[source.path];
+      const hasArray = arr != null;
+      const hasDataset = Object.keys(datasets).includes(name);
+      if (hasArray && !hasDataset) {
+        setDatasets((prev) => {
+          return { ...prev, [name]: ndarray([], [arr.shape[0]]) };
+        });
+      }
+    }
+  }, [sources, zarrays, datasets]);
+  // Clear out arrays if the ROI limits have changed
+  useEffect(() => {
+    const toRoiString = (roi: ROI): string => {
+      const [x0, x1, y0, y1] = [
+        roi.x0 == null ? "null" : Math.floor(roi.x0),
+        roi.x1 == null ? "null" : Math.ceil(roi.x1),
+        roi.y0 == null ? "null" : Math.floor(roi.y0),
+        roi.y1 == null ? "null" : Math.ceil(roi.y1),
+      ];
+      return `${x0}-${x1}-${y0}-${y1}`;
+    };
+    // Check each source for updates 1-by-1
+    const newRois: { [key: string]: ROI } = {};
+    for (const [name, source] of Object.entries(sources)) {
+      if (source?.roi == null) {
         continue;
       }
+      // Check for changes to the ROI bounds
+      const oldRoiString =
+        rois?.[name] == null ? undefined : toRoiString(rois[name]);
+      const arr = zarrays?.[source.path];
+      if (arr == null) {
+        continue;
+      }
+      if (toRoiString(source.roi) !== oldRoiString) {
+        setDatasets((prev) => {
+          // Erase the existing dataset
+          return { ...prev, [name]: ndarray([], [arr.shape[0]]) };
+        });
+        newRois[name] = source.roi;
+      }
+    }
+    // Update the saved ROIs if anything has changed
+    if (Object.keys(newRois).length > 0) {
+      setRois(newRois);
+    }
+  }, [sources, zarrays, rois]);
+  // Load array data through zarr
+  useEffect(() => {
+    for (const [name, source] of Object.entries(sources)) {
+      // Sort out the details of the ROI
+      const roi = source?.roi;
+      const arrayName = source.path;
+      const datasetName = name;
+      // Get the (possibly filled with nulls) dataset
+      const ds = datasets?.[datasetName];
+      const zarray = zarrays?.[source.path];
+      // First decide if there's anything to do
       if (zarray == null) {
+        continue;
+      }
+      if (ds == null) {
         continue;
       }
       if (ds.data.length === zarray.shape[0]) {
@@ -181,17 +237,31 @@ export const useDatasets = (sources: {
         start = ds.data.length;
         stop = Math.min(ds.data.length + blockSize, zarray.shape[0]);
       }
-      const extraDims = new Array(nDims - 1).fill(null);
+      console.log(name, start);
+      let extraDims;
+      if (roi != null) {
+        const [x0, x1, y0, y1] = [
+          roi.x0 == null ? 0 : Math.floor(roi.x0),
+          roi.x1 == null ? null : Math.ceil(roi.x1),
+          roi.y0 == null ? 0 : Math.floor(roi.y0),
+          roi.y1 == null ? null : Math.ceil(roi.y1),
+        ];
+        extraDims = [zarr.slice(y0, y1), zarr.slice(x0, x1)];
+      } else {
+        extraDims = new Array(nDims - 1).fill(null);
+      }
       // Check to make sure we're not sending duplicate requests
-      const sliceKey = `slice-${name}-${start}-${stop}`;
+      const sliceKey = `slice-${arrayName}-${start}-${stop}`;
       const releaseLock = requestLock(sliceKey);
       if (!releaseLock) {
         continue;
       }
       // Asynchronous inner function to get the next block
       const getSlice = async () => {
-        const doGet = () =>
-          ndzarr.get(zarray, [zarr.slice(start, stop), ...extraDims]);
+        const doGet = () => {
+	  console.log("Getting", zarray.path, start, stop)
+          return ndzarr.get(zarray, [zarr.slice(start, stop), ...extraDims]);
+	}
         let result;
         try {
           result = await backOff(() => doGet());
@@ -202,7 +272,7 @@ export const useDatasets = (sources: {
         }
         // Reduce dimensions for multi-dimension arrays
         setDatasets((prevDatasets) => {
-          const ds = prevDatasets[name];
+          const ds = prevDatasets[datasetName];
           let newDataset;
           if (
             result.dimension === 1 &&
@@ -210,12 +280,6 @@ export const useDatasets = (sources: {
           ) {
             // A full result, so just replace the array wholesale
             newDataset = result.lo(0) as ndarray.NdArray;
-            // newDataset = ndarray(
-            //   result.data,
-            //   result.shape,
-            //   result.stride,
-            //   result.offset,
-            // );
           } else {
             // Update the rolling results array for each of the slices
             newDataset = ds.lo(0); // Need a new object to return to react
@@ -231,7 +295,7 @@ export const useDatasets = (sources: {
               newDataset.set(i + start, sliceSum);
             }
           }
-          return { ...prevDatasets, [name]: newDataset };
+          return { ...prevDatasets, [datasetName]: newDataset };
         });
       };
       getSlice().finally(releaseLock);
@@ -245,8 +309,9 @@ export const useDatasets = (sources: {
   );
   const readyState =
     readyStates.length >= 0 ? Math.max(...readyStates) : undefined;
+  // Actual datasets
   return {
-    datasets,
+    datasets: datasets,
     isLoading: taskCount > 0,
     isStreaming: isStreaming,
     readyState,

@@ -19,7 +19,7 @@ export const axisLabels = ({
   inverted: boolean;
   logarithm: boolean;
 }) => {
-  let ylabel = vSignal[0];
+  let ylabel = vSignal?.[0] ?? "";
   if (OPERATIONS.includes(operation)) {
     ylabel = `${ylabel} ${operation} ${rSignal}`;
   }
@@ -29,8 +29,12 @@ export const axisLabels = ({
   if (logarithm) {
     ylabel = `ln( ${ylabel} )`;
   }
+  let xlabel = xSignal?.[0] ?? "";
+  if (xSignal[1]?.units) {
+    xlabel = `${xlabel} /${xSignal[1].units}`;
+  }
   return {
-    x: xSignal?.[0],
+    x: xlabel,
     y: ylabel,
   };
 };

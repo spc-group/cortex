@@ -228,7 +228,9 @@ export function Row({
   }
   // Prepare additional data
   const uid = run?.metadata?.start?.uid ?? "";
-  const runUri = `${apiUri}/container/full/${run.uid}`;
+  const path =
+    apiUri?.pathPrefix != null ? `${apiUri?.pathPrefix}/${run.uid}` : run.uid;
+  const runUri = `${apiUri.baseUri}/container/full/${path}`;
   const specs = run.specs === undefined ? [] : run.specs;
   const specNames = specs.map((spec: Spec) => spec.name);
   const dataSpecs = ["XASRun"];
