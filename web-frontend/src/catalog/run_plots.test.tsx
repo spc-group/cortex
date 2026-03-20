@@ -145,7 +145,7 @@ describe("the StreamPlots component", () => {
   });
   it("adds ROIs", async () => {
     localStorage.setItem(
-      "rois",
+      "rois-v1",
       JSON.stringify({
         sim_motor_2: [
           {

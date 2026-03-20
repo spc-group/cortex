@@ -251,7 +251,6 @@ export const useDatasets = (sources: {
           normalize(roi.y0),
           normalize(roi.y1),
         ];
-        console.log(x0, x1, y0, y1);
         extraDims = [zarr.slice(y0, y1), zarr.slice(x0, x1)];
       } else {
         extraDims = new Array(nDims - 1).fill(null);

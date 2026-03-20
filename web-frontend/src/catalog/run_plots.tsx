@@ -19,7 +19,6 @@ import { useLastChoice } from "../plots/last_choice.ts";
 import { signalSources } from "./signal";
 import { RoiTable } from "./roi_table";
 import { useDatasets } from "./dataset";
-// import { useLocalStorage } from "../local_storage";
 import { useLocalStorage } from "@uidotdev/usehooks";
 
 const NULL_SIGNAL = "---";
@@ -156,7 +155,10 @@ export const StreamPlots = ({
     [true, false],
     "hinted",
   );
-  const [rois, setRois] = useLocalStorage<{ [key: string]: ROI[] }>(`rois`, {});
+  const [rois, setRois] = useLocalStorage<{ [key: string]: ROI[] }>(
+    `rois-v1`,
+    {},
+  );
   const dataKeys = {
     seq_num: {
       dtype: "int64",
@@ -174,14 +176,14 @@ export const StreamPlots = ({
     rois,
     stream,
   );
-  const xSignals = Object.keys(xSources);
+  const xSignals = Object.keys(xSources).sort();
   const ySources = signalSources(
     dataKeys,
     hintedOnly ? iHints : null,
     rois,
     stream,
   );
-  const ySignals = Object.keys(ySources);
+  const ySignals = Object.keys(ySources).sort();
 
   // State management
   const [xSignal, setXSignal] = useLastChoice<string>(
