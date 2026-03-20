@@ -160,17 +160,22 @@ describe("the StreamPlots component", () => {
       }),
     );
     render(<StreamPlots uid={5} stream={stream} />);
-    await screen.findAllByText("sim_motor_2 (Ni-KL)");
+    await screen.findAllByText("sim_motor_2 – Ni-KL");
+  });
+  it("adds and removes ROIs", async () => {
+    expect(screen.queryAllByRole("row")).toHaveLength(1);
+    const addButton = screen.getByText("Add ROI");
+    await fireEvent.click(addButton);
+    expect(screen.queryAllByRole("row")).toHaveLength(2);
+    const removeButton = screen.getByTitle("Remove ROI 0");
+    await fireEvent.click(removeButton);
+    expect(screen.queryAllByRole("row")).toHaveLength(1);
   });
 });
 
 describe("the ArrayPlots component", () => {
   let root;
   beforeEach(async () => {
-    const stream = {
-      ancestors: ["12345-6789"],
-      key: "primary",
-    };
     // Use an in-memory zarr store for testing data fetching
     root = zarr.root(new Map());
     await zarr.create(root);
@@ -194,7 +199,7 @@ describe("the ArrayPlots component", () => {
     });
     await render(
       <TiledProvider zarrRoot={root}>
-        <ArrayPlots stream={stream} signal="bdet" />
+        <ArrayPlots source={{}} signal="bdet" />
       </TiledProvider>,
     );
   });
@@ -203,21 +208,6 @@ describe("the ArrayPlots component", () => {
   });
   it("shows the 'live' badge", () => {
     expect(screen.getByText("Live")).toBeInTheDocument();
-  });
-  it("adds an ROI", async () => {
-    const button = screen.getByText("Add ROI");
-    expect(screen.queryAllByRole("row")).toHaveLength(1);
-    await fireEvent.click(button);
-    expect(screen.queryAllByRole("row")).toHaveLength(2);
-  });
-  it("removes ROIs", async () => {
-    expect(screen.queryAllByRole("row")).toHaveLength(1);
-    const addButton = screen.getByText("Add ROI");
-    await fireEvent.click(addButton);
-    expect(screen.queryAllByRole("row")).toHaveLength(2);
-    const removeButton = screen.getByTitle("Remove ROI 0");
-    await fireEvent.click(removeButton);
-    expect(screen.queryAllByRole("row")).toHaveLength(1);
   });
   // it("sets ROI names", async () => {
   //   expect(screen.queryAllByRole("row")).toHaveLength(1);

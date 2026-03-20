@@ -156,7 +156,7 @@ export const StreamPlots = ({
     [true, false],
     "hinted",
   );
-  const [rois] = useLocalStorage<{ [key: string]: ROI[] }>(`rois`, {});
+  const [rois, setRois] = useLocalStorage<{ [key: string]: ROI[] }>(`rois`, {});
   const dataKeys = {
     seq_num: {
       dtype: "int64",
@@ -297,16 +297,63 @@ export const StreamPlots = ({
     );
   }
   // Create a plot widget for the array frames if needed
-  const isArray = stream?.data_keys?.[vSignal]?.dtype === "array";
-  const evPerBin = stream.configuration?.[vSignal]?.data?.[
-    `${vSignal}-ev_per_bin`
+  const frameSource = ySources?.[vSignal];
+  const isArray = frameSource?.dataKey?.dtype === "array";
+  const objName = frameSource?.dataKey?.object_name;
+  const frameRois = rois?.[objName] ?? [];
+  const evPerBin = stream.configuration?.[objName]?.data?.[
+    `${objName}-ev_per_bin`
   ] as number | undefined;
+  // Handlers for changing the ROI definitions
+  const addRoi = () => {
+    const theseRois = [
+      ...frameRois,
+      {
+        isActive: true,
+        name: "",
+        x0: 0,
+        y0: 0,
+        x1: 50,
+        y1: 50,
+      },
+    ];
+    setRois({
+      ...rois,
+      [objName]: theseRois,
+    });
+  };
+  const removeRoi = (index: number) => {
+    const newRois = {
+      ...rois,
+      [objName]: [...frameRois.slice(0, index), ...frameRois.slice(index + 1)],
+    };
+    setRois(newRois);
+  };
+  const updateRoi = (index: number, update: ROIUpdate) => {
+    setRois({
+      ...rois,
+      [objName]: [
+        ...frameRois.slice(0, index),
+        {
+          ...frameRois[index],
+          ...update,
+        },
+        ...frameRois.slice(index + 1),
+      ],
+    });
+  };
+  // Create widgets
   let frameWidget;
   if (!isArray) {
     frameWidget = <></>;
   } else {
     frameWidget = (
-      <ArrayPlots stream={stream} signal={vSignal} evPerBin={evPerBin} />
+      <ArrayPlots
+        source={frameSource}
+        evPerBin={evPerBin}
+        rois={frameRois}
+        updateRoi={updateRoi}
+      />
     );
   }
 
@@ -444,6 +491,24 @@ export const StreamPlots = ({
       {infoWidget}
       {plotWidget}
       {frameWidget}
+
+      <div
+        tabIndex={0}
+        className="collapse collapse-arrow bg-base-100 border-base-300 border"
+      >
+        <input type="checkbox" />
+        <div className="collapse-title font-semibold">
+          Regions of Interest (ROIs)
+        </div>
+        <div className="collapse-content text-sm">
+          <RoiTable
+            rois={frameRois}
+            addRoi={addRoi}
+            updateRoi={updateRoi}
+            removeRoi={removeRoi}
+          />
+        </div>
+      </div>
     </>
   );
 };
@@ -696,15 +761,17 @@ export function LinePlots({
 //
 // @param evPerBin - The energy width of each pixel in electron-volts.
 export function ArrayPlots({
-  stream,
-  signal,
+  source,
+  rois,
+  updateRoi,
   evPerBin,
 }: {
-  stream: Stream;
-  signal: string | null;
+  source: DataSource;
+  rois: ROI[];
+  updateRoi: (index: number, update: ROIUpdate) => void;
   evPerBin?: number;
 }) {
-  const arrayPath = [...stream.ancestors, stream.key, signal].join("/");
+  const arrayPath = source.path;
   const [activeFrame, setActiveFrame] = useState(0);
   const [autoFrame, setAutoFrame] = useState(true);
   const [viewMode, setViewMode] = useState<"frame" | "spectra">(
@@ -720,62 +787,16 @@ export function ArrayPlots({
   if (autoFrame && activeFrame != lastFrame) {
     setActiveFrame(lastFrame);
   }
-  const frame = useArrayData(arrayPath, activeFrame);
+  // const frame = useArrayData(arrayPath, activeFrame);
+  const frame = useArrayData(source.path, activeFrame);
 
   if (frame != null) {
     previousFrame.current = frame;
   }
-  // Keep track of chosen ROIs
-  const [allRois, setAllRois] = useLocalStorage<{ [key: string]: ROI[] }>(
-    `rois`,
-    {},
-  );
   // If there's nothing to plot, then just don't
-  if (signal == null) {
+  if (source == null) {
     return <></>;
   }
-
-  const rois = allRois?.[signal] ?? [];
-  const addRoi = () => {
-    if (rois.length === 1) {
-      rois[0].isActive = false;
-    }
-    const theseRois = [
-      ...rois,
-      {
-        isActive: true,
-        name: "",
-        x0: 0,
-        y0: 0,
-        x1: 50,
-        y1: 50,
-      },
-    ];
-    setAllRois({
-      ...allRois,
-      [signal]: theseRois,
-    });
-  };
-  const removeRoi = (index: number) => {
-    const newRois = {
-      ...allRois,
-      [signal]: [...rois.slice(0, index), ...rois.slice(index + 1)],
-    };
-    setAllRois(newRois);
-  };
-  const updateRoi = (index: number, update: ROIUpdate) => {
-    setAllRois({
-      ...allRois,
-      [signal]: [
-        ...rois.slice(0, index),
-        {
-          ...rois[index],
-          ...update,
-        },
-        ...rois.slice(index + 1),
-      ],
-    });
-  };
 
   const imData = frame ?? previousFrame.current;
   // const vMin = reduceStat(stats, "min", Math.min, Infinity);
@@ -854,24 +875,6 @@ export function ArrayPlots({
         </div>
         {isLoadingFrame ? <LoadingBadge /> : <></>}
         {framePlot}
-
-        <div
-          tabIndex={0}
-          className="collapse collapse-arrow bg-base-100 border-base-300 border"
-        >
-          <input type="checkbox" />
-          <div className="collapse-title font-semibold">
-            Regions of Interest (ROIs)
-          </div>
-          <div className="collapse-content text-sm">
-            <RoiTable
-              rois={rois}
-              addRoi={addRoi}
-              updateRoi={updateRoi}
-              removeRoi={removeRoi}
-            />
-          </div>
-        </div>
       </div>
     </>
   );

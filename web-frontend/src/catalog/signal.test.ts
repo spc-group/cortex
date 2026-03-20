@@ -83,7 +83,7 @@ describe("the signalSources() function", () => {
         uid: "",
       },
     );
-    expect(Object.keys(sources)).toEqual(["I0", "I0 (Ni-Ka)"]);
+    expect(Object.keys(sources)).toEqual(["I0", "I0 – Ni-Ka"]);
   });
   it("skips ROIs for unused signals", () => {
     const sources = signalSources(

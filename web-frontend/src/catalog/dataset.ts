@@ -237,15 +237,21 @@ export const useDatasets = (sources: {
         start = ds.data.length;
         stop = Math.min(ds.data.length + blockSize, zarray.shape[0]);
       }
-      console.log(name, start);
       let extraDims;
       if (roi != null) {
+        const normalize = (value: number | null) => {
+          const roundValue = value == null ? null : Math.floor(value);
+          // Helper function to ensure the value is in-bounds
+          const isInBounds = roundValue == null ? false : 0 <= roundValue;
+          return isInBounds ? roundValue : null;
+        };
         const [x0, x1, y0, y1] = [
-          roi.x0 == null ? 0 : Math.floor(roi.x0),
-          roi.x1 == null ? null : Math.ceil(roi.x1),
-          roi.y0 == null ? 0 : Math.floor(roi.y0),
-          roi.y1 == null ? null : Math.ceil(roi.y1),
+          normalize(roi.x0),
+          normalize(roi.x1),
+          normalize(roi.y0),
+          normalize(roi.y1),
         ];
+        console.log(x0, x1, y0, y1);
         extraDims = [zarr.slice(y0, y1), zarr.slice(x0, x1)];
       } else {
         extraDims = new Array(nDims - 1).fill(null);
@@ -259,14 +265,14 @@ export const useDatasets = (sources: {
       // Asynchronous inner function to get the next block
       const getSlice = async () => {
         const doGet = () => {
-	  console.log("Getting", zarray.path, start, stop)
           return ndzarr.get(zarray, [zarr.slice(start, stop), ...extraDims]);
-	}
+        };
         let result;
         try {
           result = await backOff(() => doGet());
         } catch (err) {
           console.error(err);
+          throw err;
           setError(err as Error);
           return;
         }

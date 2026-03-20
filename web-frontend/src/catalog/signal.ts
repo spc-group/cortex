@@ -40,9 +40,10 @@ export const signalSources = (
     .filter(([signalName]) => Object.keys(signalSources).includes(signalName));
   const roiEntries = oldRoiEntries.reduce(
     (previousValue: [string, DataSource][], [signalName, sigRois]) => {
-      const newRois = sigRois.map((roi: ROI): [string, DataSource] => {
-        const roiName = `${signalName} (${roi.name})`;
-        return [roiName, { ...signalSources[signalName], roi, name: roiName }];
+      const newRois = sigRois.map((roi: ROI, index): [string, DataSource] => {
+        const roiName = roi.name == "" ? `rois[${index}]` : `${roi.name}`;
+        const sigName = `${signalName} – ${roiName}`;
+        return [sigName, { ...signalSources[signalName], roi, name: sigName }];
       });
       return [...previousValue, ...newRois];
     },
