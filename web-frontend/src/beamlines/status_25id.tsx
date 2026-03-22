@@ -263,7 +263,7 @@ export default function BeamlineStatus() {
       </div>
       <OphydProvider uri={ophydUri}>
         <div></div>
-        <div className="lg:columns-3">
+          <div className="xl:columns-2">
           <div className="card w-160 bg-base-100 card-md shadow-md m-3">
             <div className="card-body break-inside-avoid-column">
               <h2 className="card-title">25-ID-A Vacuum</h2>
