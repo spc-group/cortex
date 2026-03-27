@@ -22,7 +22,8 @@ export const useLastChoice = <T>(
   choices: T[],
   localKey: string,
 ): [T, (value: T) => void] => {
-  const pastPreferences = JSON.parse(localStorage.getItem(localKey) ?? "[]");
+  const fullKey = `last-choice-v1-${localKey}`;
+  const pastPreferences = JSON.parse(localStorage.getItem(fullKey) ?? "[]");
   // const hasChangedRef = useReference(false);
   // Set up some state to keep track of past choices
   const [lastChoice, setLastChoice] = useState<T>(() => {
@@ -36,7 +37,7 @@ export const useLastChoice = <T>(
     }
     // Insert the new preference
     const newArray = [newValue, ...pastPreferences.slice(0, MAX_HISTORY)];
-    localStorage.setItem(localKey, JSON.stringify(newArray));
+    localStorage.setItem(fullKey, JSON.stringify(newArray));
     // Tracker whether we should update the list of preference
     return setLastChoice(newValue);
   };

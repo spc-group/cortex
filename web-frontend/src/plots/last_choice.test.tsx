@@ -58,15 +58,17 @@ describe("the useLastChoice() hook", () => {
     expect(screen.getByText("Last:")).toBeInTheDocument();
   });
   it("updates its value", async () => {
-    localStorage.setItem("my_key", '["bacon"]');
+    localStorage.setItem("last-choice-v1-my_key", '["bacon"]');
     render(<MockComponent />);
     const button = screen.getByRole("button");
     await user.click(button);
     expect(screen.getByText("Last: eggs")).toBeInTheDocument();
-    expect(localStorage.getItem("my_key")).toEqual('["eggs","bacon"]');
+    expect(localStorage.getItem("last-choice-v1-my_key")).toEqual(
+      '["eggs","bacon"]',
+    );
   });
   it("returns past choices by default", async () => {
-    localStorage.setItem("my_key", '["cheese"]');
+    localStorage.setItem("last-choice-v1-my_key", '["cheese"]');
     render(<MockComponent />);
     expect(screen.getByText("Last: cheese")).toBeInTheDocument();
   });
