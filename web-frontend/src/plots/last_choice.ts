@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const MAX_HISTORY = 50;
 
@@ -23,23 +23,31 @@ export const useLastChoice = <T>(
   localKey: string,
 ): [T, (value: T) => void] => {
   const fullKey = `last-choice-v1-${localKey}`;
-  const pastPreferences = JSON.parse(localStorage.getItem(fullKey) ?? "[]");
-  // const hasChangedRef = useReference(false);
+  const pastPreferences = useCallback(() => {
+    return JSON.parse(localStorage.getItem(fullKey) ?? "[]");
+  }, [fullKey]);
   // Set up some state to keep track of past choices
-  const [lastChoice, setLastChoice] = useState<T>(() => {
-    return lastPreference<T>(choices, pastPreferences) ?? defaultValue;
-  });
+  const [currentChoice, setCurrentChoice] = useState<T>(defaultValue);
+  useEffect(() => {
+    // Find the best option from previous choices
+    const lastChoice = lastPreference<T>(choices, pastPreferences());
+    if (lastChoice != null && currentChoice !== lastChoice) {
+      setCurrentChoice(lastChoice);
+    }
+  }, [choices, currentChoice, pastPreferences]);
+  // Define a handler so the local storage can be updated when the value is changed
   const setter = (newValue: T) => {
-    const prefIndex = pastPreferences.indexOf(newValue);
+    const pastPrefs = pastPreferences();
+    const prefIndex = pastPrefs.indexOf(newValue);
     if (prefIndex !== -1) {
       // Remove the previous preference
-      pastPreferences.splice(prefIndex, 1);
+      pastPrefs.splice(prefIndex, 1);
     }
     // Insert the new preference
-    const newArray = [newValue, ...pastPreferences.slice(0, MAX_HISTORY)];
+    const newArray = [newValue, ...pastPrefs.slice(0, MAX_HISTORY)];
     localStorage.setItem(fullKey, JSON.stringify(newArray));
     // Tracker whether we should update the list of preference
-    return setLastChoice(newValue);
+    return setCurrentChoice(newValue);
   };
-  return [lastChoice, setter];
+  return [currentChoice, setter];
 };

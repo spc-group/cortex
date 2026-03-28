@@ -37,9 +37,13 @@ export const RunPlots = ({ run }: { run: Run }) => {
   renderNumRef.current += 1;
   const uid = run.uid;
   // Get the valid streams for this run
-  const [streamName, setStream] = useState(NULL_SIGNAL);
   const { streams, isLoading: isLoadingStreams } = useStreams(uid);
   const streamNames = Object.keys(streams);
+  const [lastStreamName, setStream] = useLastChoice(
+    NULL_SIGNAL,
+    streamNames,
+    "stream",
+  );
   streamNames.sort((a, b) => {
     // "Primary" should be first and "baseline" should be last
     if (a === "primary" || b === "baseline" || a < b) {
@@ -51,17 +55,15 @@ export const RunPlots = ({ run }: { run: Run }) => {
     }
   });
 
-  // Select the primary stream by default
-  if (
-    streamName === NULL_SIGNAL &&
-    !isLoadingStreams &&
-    streamNames.length > 0
-  ) {
-    setStream(streamNames[0]);
-  }
+  const streamName =
+    lastStreamName === NULL_SIGNAL ? (streamNames?.[0] ?? "") : lastStreamName;
 
   // Retrieve metadata and data keys for this dataset
   const { metadata } = useMetadata<RunMetadata>(uid);
+
+  if (isLoadingStreams) {
+    return <LoadingBadge />;
+  }
 
   let plotTitle: string;
   let plotSubtitle: string;
@@ -101,6 +103,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
       </div>
     );
   }
+
   return (
     <div className="m-4">
       {/* Widget to pick a stream */}
