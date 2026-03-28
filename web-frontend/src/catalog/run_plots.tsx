@@ -46,13 +46,18 @@ export const RunPlots = ({ run }: { run: Run }) => {
   );
   streamNames.sort((a, b) => {
     // "Primary" should be first and "baseline" should be last
-    if (a === "primary" || b === "baseline" || a < b) {
+    if (a === "primary" || b === "baseline") {
       return -1;
-    } else if (b === "primary" || a === "baseline" || a > b) {
+    } else if (b === "primary" || a === "baseline") {
       return 1;
-    } else {
-      return 0;
+    } else if (a < b) {
+      // We don't have any of the magic values, so just do normal ordering
+      return -1;
+    } else if (a > b) {
+      return 1;
     }
+    // Values must be identical
+    return 0;
   });
 
   const streamName =
@@ -173,20 +178,22 @@ export const StreamPlots = ({
     },
     ...stream.data_keys,
   };
+  const caselessSort = (a: string, b: string) =>
+    a.localeCompare(b, undefined, { sensitivity: "base" });
   const xSources = signalSources(
     dataKeys,
     hintedOnly ? runHints : null,
     rois,
     stream,
   );
-  const xSignals = Object.keys(xSources).sort();
+  const xSignals = Object.keys(xSources).sort(caselessSort);
   const ySources = signalSources(
     dataKeys,
     hintedOnly ? iHints : null,
     rois,
     stream,
   );
-  const ySignals = Object.keys(ySources).sort();
+  const ySignals = Object.keys(ySources).sort(caselessSort);
 
   // State management
   const [xSignal, setXSignal] = useLastChoice<string>(
