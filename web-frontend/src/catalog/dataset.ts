@@ -132,7 +132,7 @@ export const useDatasets = (sources: {
               if (msg?.type === "array-ref" || msg?.type === "table-data") {
                 // Remove the cached zarray so it will get re-fetched
                 setZarrays((prev) => {
-                  return { ...prev, [name]: undefined };
+                  return { ...prev, [source.path]: undefined };
                 });
               }
             })

@@ -89,12 +89,12 @@ export function prepareYData(
     }
   }
 
-  // Apply other operations
-  if (logarithm) {
-    applyLogarithm(ydata);
-  }
+  // Apply other operations (order matters!!)
   if (inverted) {
     invert(ydata);
+  }
+  if (logarithm) {
+    applyLogarithm(ydata);
   }
 
   return ydata;

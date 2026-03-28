@@ -90,11 +90,17 @@ export const useArrayData = (
   // Load the data from the array
   useEffect(() => {
     const getData = async () => {
-      if (zArr != null && zArr.shape[0] > 0) {
-        const slc = slice == null ? null : [slice, null, null];
-        const arrData = await ndzarr.get(zArr, slc);
-        setArrData(arrData as ndarray.NdArray);
-      }
+      // Guard against errors where things aren't loaded yet
+      if (zArr == null) return;
+      if (zArr.shape[0] === 0) return;
+      // Check for a database/API race condition
+      const outOfBounds =
+        typeof slice === "number" ? slice >= zArr?.shape[0] : false;
+      if (outOfBounds) return;
+      // Update the array data from the API
+      const slc = slice == null ? null : [slice, null, null];
+      const arrData = await ndzarr.get(zArr, slc);
+      setArrData(arrData as ndarray.NdArray);
     };
     getData().catch(console.error);
   }, [zArr, slice]);
