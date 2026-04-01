@@ -235,4 +235,14 @@ def xafs_run(tree):
             },
         )
         internal = baseline.write_table(xafs_baseline, key="internal")
+        # Create a secondary stream similar to fly-scanning an area detector
+        secondary_metadata = {
+            "hints": {"vortex_me4": {'fields': ['vortex_me4']}},
+            "data_keys": {'vortex_me4': {}},
+            "configuration": {},
+        }
+        secondary = client.create_container("secondary", metadata=secondary_metadata)
+        array = secondary.write_array(
+            np.full(shape=(100, 8, 4096), fill_value=2), key="vortex_me4"
+        )
         yield tree

@@ -25,6 +25,7 @@ root:NXroot
       energy -> /7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrument/bluesky/streams/primary/energy/value
       energy-id-energy-readback -> /7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrument/bluesky/streams/primary/energy-id-energy-readback/value
       ge_8element -> /7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrument/bluesky/streams/primary/ge_8element/value
+      vortex_me4 -> /7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrument/bluesky/streams/secondary/vortex_me4/value
     duration = 38.35049033164978
     entry_identifier -> /7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrument/bluesky/metadata/start.uid
     instrument:NXinstrument
@@ -131,6 +132,10 @@ root:NXroot
                 @target = '/7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrume...'
             ge_8element-element0-all_event:NXdata
               value = float64(100)
+          secondary:NXnote
+            vortex_me4:NXdata
+              value = int64(100x8x4096)
+                @target = '/7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrume...'
         uid -> /7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrument/bluesky/metadata/start.uid
     plan_name -> /7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrument/bluesky/metadata/start.plan_name
     sample_name -> /7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrument/bluesky/metadata/start.sample_name

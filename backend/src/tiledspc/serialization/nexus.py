@@ -210,34 +210,17 @@ async def write_stream(
     try:
         internal = await stream["internal"].read()
     except KeyError:
-        # We don't have an internal dataset for some reason
+        # We don't have an internal dataset, maybe it's a fly scan or something
         internal = None
     for col_name, desc in metadata["data_keys"].items():
         data_group = nxdata(stream_group, col_name)
-        if "external" in desc:
-            sources = stream[col_name].data_sources
-            if len(sources) == 1 and "dataset" in sources[0].parameters:
-                # Include a symlink to the original HDF5 file
-                source = sources[0]
-                dataset = source.parameters["dataset"]
-                fpath = Path(path_from_uri(source.assets[0].data_uri))
-                nxexternallink(
-                    parent=data_group, name="value", target=dataset, filepath=fpath
-                )
-            else:
-                # Copy the array itself into the new file
-                #   This might be really slow…
-                warnings.warn(
-                    f"Could not link external dataset {col_name} in NeXus file. "
-                    "Copying entire array"
-                )
-                arr = await stream[col_name].read()
-                nxfield(data_group, "value", arr)
-        else:
+        is_internal = internal is not None and col_name in internal
+        print(is_internal)
+        if is_internal:
             # Save internal dataset
             try:
                 nxfield(data_group, "value", internal[col_name].values)
-            except KeyError:
+            except (KeyError, TypeError):
                 raise SerializationError(
                     f"Could not find internal dataset '{col_name}'"
                 )
@@ -257,6 +240,26 @@ async def write_stream(
                 # nxdata["time"] = times - np.min(times)
                 data_group["time"].attrs["units"] = "s"
                 data_group.attrs["axes"] = "time"
+        else:
+            # Most likely an external dataset
+            sources = stream[col_name].data_sources
+            if len(sources) == 1 and "dataset" in sources[0].parameters:
+                # Include a symlink to the original HDF5 file
+                source = sources[0]
+                dataset = source.parameters["dataset"]
+                fpath = Path(path_from_uri(source.assets[0].data_uri))
+                nxexternallink(
+                    parent=data_group, name="value", target=dataset, filepath=fpath
+                )
+            else:
+                # Copy the array itself into the new file
+                #   This might be really slow…
+                log.warning(
+                    f"Could not link external dataset {col_name} in NeXus file. "
+                    "Copying entire array"
+                )
+                arr = await stream[col_name].read()
+                nxfield(data_group, "value", arr)
     # Add links to the main NXdata group
     if name == "baseline":
         # We don't want to see baseline fields in the data NXdata group
