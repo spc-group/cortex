@@ -221,7 +221,7 @@ def xafs_run(tree):
             "configuration": xafs_config,
         }
         primary = client.create_container("primary", metadata=primary_metadata)
-        internal = primary.write_table(xafs_events, key="internal")
+        primary.write_table(xafs_events, key="internal")
         # Fluorescence data
         primary.write_array(
             np.full(shape=(100, 8, 4096), fill_value=2), key="ge_8element"
@@ -234,7 +234,7 @@ def xafs_run(tree):
                 "data_keys": baseline_data_keys,
             },
         )
-        internal = baseline.write_table(xafs_baseline, key="internal")
+        baseline.write_table(xafs_baseline, key="internal")
         # Create a secondary stream similar to fly-scanning an area detector
         secondary_metadata = {
             "hints": {"vortex_me4": {'fields': ['vortex_me4']}},
@@ -242,7 +242,7 @@ def xafs_run(tree):
             "configuration": {},
         }
         secondary = client.create_container("secondary", metadata=secondary_metadata)
-        array = secondary.write_array(
+        secondary.write_array(
             np.full(shape=(100, 8, 4096), fill_value=2), key="vortex_me4"
         )
         yield tree

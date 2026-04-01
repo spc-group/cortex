@@ -2,7 +2,6 @@ import datetime as dt
 import io
 import json
 import logging
-import warnings
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
@@ -292,9 +291,8 @@ async def serialize_nexus(mimetype, node, metadata, filter_for_access):
 
     """
     buff = io.BytesIO()
-    root_node = node
 
     with h5py.File(buff, mode="w") as nxfile:
         # Write data entry to the nexus file
-        tree = await write_run(nxfile=nxfile, node=node, metadata=metadata)
+        await write_run(nxfile=nxfile, node=node, metadata=metadata)
     return buff.getbuffer()

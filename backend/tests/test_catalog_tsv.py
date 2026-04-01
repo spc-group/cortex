@@ -146,7 +146,7 @@ def test_tsv_headers(tsv_text):
 
 def test_missing_edge(tsv_text):
     """Can we export with missing edge information."""
-    hdrs = list(
+    list(
         headers(
             metadata={
                 "start": {
