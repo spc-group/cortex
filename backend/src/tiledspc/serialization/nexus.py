@@ -211,7 +211,7 @@ async def write_stream(
     except KeyError:
         # We don't have an internal dataset, maybe it's a fly scan or something
         internal = None
-    for col_name, desc in metadata["data_keys"].items():
+    for col_name, desc in [*metadata["data_keys"].items(), ("seq_num", {})]:
         data_group = nxdata(stream_group, col_name)
         is_internal = internal is not None and col_name in internal
         print(is_internal)
