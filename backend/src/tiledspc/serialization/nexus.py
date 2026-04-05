@@ -241,7 +241,11 @@ async def write_stream(
                 data_group.attrs["axes"] = "time"
         else:
             # Most likely an external dataset
+            # First write data sources information to an attr
             sources = stream[col_name].data_sources
+            json_sources = json.dumps([source.model_dump() for source in sources])
+            data_group.attrs["data_sources"] = json_sources
+            # Create the dataset
             if len(sources) == 1 and "dataset" in sources[0].parameters:
                 # Include a symlink to the original HDF5 file
                 source = sources[0]

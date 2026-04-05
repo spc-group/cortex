@@ -1,5 +1,6 @@
 import datetime
 import io
+import json
 from typing import IO
 from pathlib import Path
 from unittest import mock
@@ -128,12 +129,15 @@ root:NXroot
                 @target = '/7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrume...'
                 @units = 'keV'
             ge_8element:NXdata
+              @data_sources = '[{"id": 2, "structure_family": "array", "struc...'
               value = int64(100x8x4096)
                 @target = '/7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrume...'
             ge_8element-element0-all_event:NXdata
+              @data_sources = '[{"id": 3, "structure_family": "array", "struc...'
               value = float64(100)
           secondary:NXnote
             vortex_me4:NXdata
+              @data_sources = '[{"id": 5, "structure_family": "array", "struc...'
               value = int64(100x8x4096)
                 @target = '/7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrume...'
         uid -> /7d1daf1d-60c7-4aa7-a668-d1cd97e5335f/instrument/bluesky/metadata/start.uid
@@ -312,6 +316,26 @@ async def test_external_datasets(nxfile):
     assert np.min(ds) == 2
 
 
+@pytest.mark.asyncio
+async def test_external_data_sources(nxfile):
+    """Make sure the data from an external dataset include data sources
+    for later handling.
+
+    This is maybe generally useful, but is included here as a
+    temporary solution for hardening external links in the
+    tiled-export package.
+
+    """
+    uid = "7d1daf1d-60c7-4aa7-a668-d1cd97e5335f"
+    ds = nxfile[f"{uid}/instrument/bluesky/streams/primary/ge_8element"]
+    assert "data_sources" in ds.attrs
+    sources = json.loads(ds.attrs['data_sources'])
+    assert len(sources) == 1
+    assert sources[0]['structure']['data_type']['kind'] == 'i'
+    assert sources[0]['structure']['data_type']['itemsize'] == 8
+    assert len(sources[0]['assets']) == 1
+
+
 def test_nxexternallink_targets():
     buff = io.BytesIO()
     with h5py.File(buff, mode='w') as fd:
@@ -320,4 +344,4 @@ def test_nxexternallink_targets():
         linkA = fd.get('externA', getlink=True)
         linkB = fd.get('externB', getlink=True)
     assert linkA.path == "/entry/data"
-    assert linkB.path == "/entry/data"    
+    assert linkB.path == "/entry/data"
