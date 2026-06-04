@@ -3,3 +3,4 @@ export { LinePlot } from "./lineplot";
 export type { LineData, ROI, ROIUpdate } from "./types";
 export { FramePlot } from "./frameplot";
 export { SpectraPlot } from "./spectraplot";
+export { useLastChoice } from "./last_choice";

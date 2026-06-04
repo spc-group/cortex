@@ -20,6 +20,7 @@ import { signalSources } from "./signal";
 import { RoiTable } from "./roi_table";
 import { useDatasets } from "./dataset";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { SingleRunPicker } from "./source_picker";
 
 const NULL_SIGNAL = "---";
 
@@ -129,6 +130,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
           </select>
         </label>
       </div>
+      // <SingleRunPicker run={run} />
       <StreamPlots
         stream={stream}
         runHints={hints}
