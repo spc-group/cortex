@@ -68,7 +68,7 @@ describe("the SingleRunPicker() component", () => {
     const queryClient = new QueryClient();
     return (
       <QueryClientProvider client={queryClient}>
-        <SingleRunPicker run={run} />,
+        <SingleRunPicker run={run} setLineData={() => {}} />,
       </QueryClientProvider>
     );
   };

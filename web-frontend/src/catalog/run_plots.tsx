@@ -13,7 +13,7 @@ import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
 import { useStreams, useMetadata, useArrayZ, useArrayData } from "../tiled";
 import { axisLabels, OPERATIONS } from "./axis_labels";
-import type { Run, Stream, RunMetadata, DataSource } from "../catalog/types";
+import type { Run, Stream, RunMetadata, DataSource, LineDatum } from "./types";
 import type { ROI, ROIUpdate } from "../plots";
 import { useLastChoice } from "../plots/last_choice.ts";
 import { signalSources } from "./signal";
@@ -37,6 +37,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
   const renderNumRef = useRef(0);
   renderNumRef.current += 1;
   const uid = run.uid;
+  const [lineData, setLineData] = useState<LineDatum[]>([]);
   // Get the valid streams for this run
   const { streams, isLoading: isLoadingStreams } = useStreams(uid);
   const streamNames = Object.keys(streams);
@@ -130,7 +131,6 @@ export const RunPlots = ({ run }: { run: Run }) => {
           </select>
         </label>
       </div>
-      // <SingleRunPicker run={run} />
       <StreamPlots
         stream={stream}
         runHints={hints}
@@ -138,6 +138,28 @@ export const RunPlots = ({ run }: { run: Run }) => {
         plotSubtitle={plotSubtitle}
         key={uid}
       />
+      {/* New style signal picker */}
+      <SingleRunPicker run={run} setLineData={setLineData} />
+      <div className="lg:grid lg:grid-cols-2">
+        <div className="m-2 space-x-2">
+          <div className={"inline"}>
+            {/* <LiveBadge readyState={readyState} /> */}
+          </div>
+
+          {/* {isLoadingData ? <LoadingBadge /> : <></>} */}
+        </div>
+        <div>
+          {lineData.toString()}
+          {/* <LinePlot */}
+          {/*   data={lineData} */}
+          {/*   xlabel={labels.x} */}
+          {/*   ylabel={labels.y} */}
+          {/*   title={plotTitle} */}
+          {/*   subtitle={plotSubtitle} */}
+          {/* /> */}
+        </div>
+      </div>
+      {/* End new style signal picker */}
     </div>
   );
 };
@@ -299,15 +321,17 @@ export const StreamPlots = ({
       },
     ];
     plotWidget = (
-      <LinePlots
-        sources={lineSources}
-        operation={operation ?? ""}
-        inverted={inverted}
-        logarithm={logarithm}
-        plotTitle={plotTitle}
-        plotSubtitle={plotSubtitle}
-        key={stream.uid}
-      />
+      <>
+        <LinePlots
+          sources={lineSources}
+          operation={operation ?? ""}
+          inverted={inverted}
+          logarithm={logarithm}
+          plotTitle={plotTitle}
+          plotSubtitle={plotSubtitle}
+          key={stream.uid}
+        />
+      </>
     );
   }
   // Create a plot widget for the array frames if needed

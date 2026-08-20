@@ -104,3 +104,14 @@ export interface DataSource {
   roi?: ROI; // Will be applied to the dataset after its retrieved
   name: string; // Human-readable description for this data source
 }
+
+// Describes a way of defining the data used to plot a line
+export type LineDatum = {
+  x: DataSource;
+  s: DataSource;
+  r?: DataSource;
+  name: string;
+  inverted?: boolean;
+  logarithm?: boolean;
+  derivative?: boolean;
+};

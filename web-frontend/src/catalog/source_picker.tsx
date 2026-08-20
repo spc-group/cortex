@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { Stream, Run } from "./types";
+import type { Stream, Run, LineDatum } from "./types";
 import { signalSources } from "./signal";
 import { useStreams } from "../tiled";
 import { useLastChoice } from "../plots";
@@ -106,9 +106,25 @@ const SourcePicker = ({
   );
 };
 
-const SourceRow = ({ run, label }: { run: Run; label: string }) => {
+const SourceRow = ({
+  run,
+  label,
+  setLine,
+}: {
+  run: Run;
+  label: string;
+  setLine: (datum: LineDatum) => void;
+}) => {
   const [hinted, setHinted] = useState<boolean>(true);
   const dimensions = run.metadata.start?.hints?.dimensions ?? [];
+  if (false) {
+    // To-do: call this with actual signal picker info
+    setLine({
+      x: { path: "", dataKey: { dtype: "<f8", shape: [] }, name: "" },
+      s: { path: "", dataKey: { dtype: "<f8", shape: [] }, name: "" },
+      name: "signal",
+    });
+  }
   return (
     <tr>
       <td>{label}</td>
@@ -153,7 +169,13 @@ const SourceRow = ({ run, label }: { run: Run; label: string }) => {
   );
 };
 
-export const SingleRunPicker = ({ run }: { run: Run }) => {
+export const SingleRunPicker = ({
+  run,
+  setLineData,
+}: {
+  run: Run;
+  setLineData: (nextState: LineDatum[]) => void;
+}) => {
   const [numRows, setNumRows] = useState<number>(1);
   const addRow = () => {
     setNumRows((prev) => prev + 1);
@@ -162,6 +184,13 @@ export const SingleRunPicker = ({ run }: { run: Run }) => {
     setNumRows((prev) => Math.max(prev - 1, 0));
   };
   const rowNumbers = [...Array(numRows).keys()];
+  const setLine = (rowNum: number) => (datum: LineDatum) => {
+    console.log(rowNum, datum);
+  };
+  if (false) {
+    // To-do do this in `setLine()` above
+    setLineData([]);
+  }
   return (
     <>
       <div className="join">
@@ -184,7 +213,14 @@ export const SingleRunPicker = ({ run }: { run: Run }) => {
         </thead>
         <tbody>
           {rowNumbers.map((rowNum) => {
-            return <SourceRow run={run} label={String(rowNum)} key={rowNum} />;
+            return (
+              <SourceRow
+                run={run}
+                label={String(rowNum)}
+                key={rowNum}
+                setLine={setLine(rowNum)}
+              />
+            );
           })}
         </tbody>
       </table>
