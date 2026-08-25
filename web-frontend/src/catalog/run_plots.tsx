@@ -139,7 +139,11 @@ export const RunPlots = ({ run }: { run: Run }) => {
         key={uid}
       />
       {/* New style signal picker */}
-      <SingleRunPicker run={run} setLineData={setLineData} />
+      <SingleRunPicker
+        run={run}
+        setLineInfos={setLineData}
+        lineInfos={lineData}
+      />
       <div className="lg:grid lg:grid-cols-2">
         <div className="m-2 space-x-2">
           <div className={"inline"}>
@@ -149,7 +153,18 @@ export const RunPlots = ({ run }: { run: Run }) => {
           {/* {isLoadingData ? <LoadingBadge /> : <></>} */}
         </div>
         <div>
-          {lineData.toString()}
+          <p>{lineData.length}</p>
+          {lineData.map((datum, idx) => {
+            return (
+              <div key={idx}>
+                <hr key={idx + "hr"} />
+                <p key={idx + "x"}>{JSON.stringify(datum?.x, null, 2)}</p>
+                <p key={idx + "y"}>{JSON.stringify(datum?.s, null, 2)}</p>
+		<p key={idx + "op"}>{datum?.operation ?? "None"}</p>
+                <p key={idx + "r"}>{JSON.stringify(datum?.r, null, 2)}</p>
+              </div>
+            );
+          })}
           {/* <LinePlot */}
           {/*   data={lineData} */}
           {/*   xlabel={labels.x} */}

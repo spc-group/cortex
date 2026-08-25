@@ -1,9 +1,13 @@
+import { useState } from "react";
+
 import "@testing-library/jest-dom/vitest";
 import { vi, describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-// import userEvent from '@testing-library/user-event';
+import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import type { LineDatum, Run } from "./types";
+import { Operation } from "./types";
 import { SingleRunPicker, SignalPicker } from "./source_picker.tsx";
 
 afterEach(() => {
@@ -39,12 +43,15 @@ vi.mock("../tiled", async (importOriginal) => {
     useStreams: () => ({
       streams: {
         baseline: {
-          data_keys: {},
+          data_keys: {
+            "I0-frequency": { dtype: "<f8", shape: [] },
+            "It-frequency": { dtype: "<f8", shape: [] },
+          },
           ancestors: [],
         },
         primary: {
           data_keys: {
-            "I0-count": {},
+            "I0-count": { dtype: "<i4", shape: [] },
           },
           ancestors: [],
         },
@@ -53,26 +60,45 @@ vi.mock("../tiled", async (importOriginal) => {
   };
 });
 
-describe("the SingleRunPicker() component", () => {
-  const Component = () => {
-    const run = {
-      uid: "new_run",
-      path: "new_run",
-      structure_family: "container",
-      specs: [],
-      metadata: {
-        start: { time: 0, uid: "1234556" },
+const Component = () => {
+  const run: Run = {
+    uid: "new_run",
+    path: "new_run",
+    structure_family: "container",
+    specs: [],
+    metadata: {
+      start: {
+        time: 0,
+        uid: "1234556",
+        hints: {
+          dimensions: [
+            [["It-frequency", "I0-frequency"], "baseline"],
+            [["I0-count"], "primary"],
+          ],
+        },
       },
-      structure: {},
-    };
-    const queryClient = new QueryClient();
-    return (
-      <QueryClientProvider client={queryClient}>
-        <SingleRunPicker run={run} setLineData={() => {}} />,
-      </QueryClientProvider>
-    );
+    },
+    structure: {},
   };
+  const queryClient = new QueryClient();
+  const [lineInfos, setLineInfos] = useState<LineDatum[]>([]);
+  return (
+    <>
+      <div>Signal: {lineInfos[0]?.["x"]?.["name"]}</div>
+      <div>Operation: {JSON.stringify(lineInfos[0]?.["operation"])}</div>
+      <QueryClientProvider client={queryClient}>
+        <SingleRunPicker
+          run={run}
+          lineInfos={lineInfos}
+          setLineInfos={setLineInfos}
+        />
+        ,
+      </QueryClientProvider>
+    </>
+  );
+};
 
+describe("the SingleRunPicker() component", () => {
   it("adds and drops rows", async () => {
     render(<Component />);
     let rows = screen.getAllByRole("row");
@@ -96,23 +122,30 @@ describe("the SingleRunPicker() component", () => {
     expect(baselineOptions).toHaveLength(3);
   });
   it("lists data keys", async () => {
-    const stream = {
-      data_keys: {
-        "I0-count": {
-          dtype: "float32",
-          shape: [101],
-        },
-      },
-      ancestors: [],
-      structure_family: "container",
-      specs: [],
-      configuration: {},
-      hints: {},
-      time: 0,
-      uid: "12345",
-      key: "primary",
-    };
-    render(<SignalPicker stream={stream} hints={[]} useHints={false} />);
+    const signalNames = new Set(["I0-count"]);
+    render(
+      <SignalPicker
+        signalNames={signalNames}
+        setSignal={() => {}}
+        localKey="spam"
+      />,
+    );
     await screen.findByText("I0-count");
+  });
+  it("sets line data", async () => {
+    const user = userEvent.setup();
+    render(<Component />);
+    const selectBoxes = screen.getAllByTestId("select-signal");
+    await user.selectOptions(selectBoxes[0], "It-frequency");
+    await screen.findByText("Signal: It-frequency");
+  });
+  it("sets reference operation", async () => {
+    const user = userEvent.setup();
+    render(<Component />);
+    const operationSelect = screen.getByTestId("select-operation");
+    await user.selectOptions(operationSelect, Operation.DIVIDE);
+    await screen.findByText('Operation: "÷"');
+    await user.selectOptions(operationSelect, "");
+    await screen.findByText("Operation: null");
   });
 });
