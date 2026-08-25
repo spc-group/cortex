@@ -106,18 +106,18 @@ export interface DataSource {
 }
 
 // Describes a way of defining the data used to plot a line
-export const Operation = {
-  ADD: "+",
-  SUBTRACT: "−",
-  MULTIPLY: "×",
-  DIVIDE: "÷",
-} as const;
+export enum Operation {
+  ADD = "+",
+  SUBTRACT = "−",
+  MULTIPLY = "×",
+  DIVIDE = "÷",
+}
 
 export type LineDatum = {
   x?: DataSource;
   s?: DataSource;
   r?: DataSource;
-  operation?: (typeof Operation)[keyof typeof Operation] | null;
+  operation?: Operation | null;
   name: string;
   inverted?: boolean;
   logarithm?: boolean;

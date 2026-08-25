@@ -208,8 +208,9 @@ const SourceRow = ({
     },
     [setLineInfo, rowNum],
   );
-  const setOperation = (value: LineDatum["operation"] | "") => {
-    ourInfo.current["operation"] = value !== "" ? value : null;
+  const setOperation = (value: string) => {
+    type OperationKey = keyof typeof Operation;
+    ourInfo.current["operation"] = Operation?.[value as OperationKey] ?? null;
     // Pass a copy so ours doesn't get mutated
     setLineInfo(rowNum, { ...ourInfo.current });
   };
@@ -255,14 +256,13 @@ const SourceRow = ({
             className="select join-item"
             data-testid="select-operation"
             onChange={(e) => {
-              setOperation(e.currentTarget.value as LineDatum["operation"]);
+              setOperation(e.currentTarget.value);
             }}
           >
             <option></option>
-            <option>{Operation.ADD}</option>
-            <option>{Operation.SUBTRACT}</option>
-            <option>{Operation.MULTIPLY}</option>
-            <option>{Operation.DIVIDE}</option>
+            {Object.entries(Operation).map(([key, val]) => {
+              return <option value={key}>{val}</option>;
+            })}
           </select>
           <SourcePicker
             run={run}

@@ -160,7 +160,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
                 <hr key={idx + "hr"} />
                 <p key={idx + "x"}>{JSON.stringify(datum?.x, null, 2)}</p>
                 <p key={idx + "y"}>{JSON.stringify(datum?.s, null, 2)}</p>
-		<p key={idx + "op"}>{datum?.operation ?? "None"}</p>
+                <p key={idx + "op"}>{datum?.operation ?? "None"}</p>
                 <p key={idx + "r"}>{JSON.stringify(datum?.r, null, 2)}</p>
               </div>
             );
