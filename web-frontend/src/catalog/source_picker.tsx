@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { isEqual } from "lodash";
 
-import type { Run, LineDatum, DataSource } from "./types";
+import type { Run, LineInfo, DataSource } from "./types";
 import { Operation } from "./types";
 import { signalSources } from "./signal";
 import { useStreams } from "../tiled";
@@ -193,9 +193,9 @@ const SourceRow = ({
   run: Run;
   label: string;
   rowNum: number;
-  setLineInfo: (rowNum: number, datum: LineDatum) => void;
+  setLineInfo: (rowNum: number, datum: LineInfo) => void;
 }) => {
-  const ourInfo = useRef<LineDatum>({ name: "<N/A>" });
+  const ourInfo = useRef<LineInfo>({ name: "<N/A>" });
   const [hinted, setHinted] = useState<boolean>(true);
   const dimensions = run.metadata.start?.hints?.dimensions ?? [];
   // Curried function so we can take the stream and signal, and build
@@ -283,8 +283,8 @@ export const SingleRunPicker = ({
   setLineInfos,
 }: {
   run: Run;
-  lineInfos: LineDatum[];
-  setLineInfos: (data: LineDatum[]) => void;
+  lineInfos: LineInfo[];
+  setLineInfos: (data: LineInfo[]) => void;
 }) => {
   const [numRows, setNumRows] = useState<number>(1);
   const addRow = () => {
@@ -295,7 +295,7 @@ export const SingleRunPicker = ({
   };
   const rowNumbers = [...Array(numRows).keys()];
   const setLineInfo = useCallback(
-    (rowNum: number, info: LineDatum) => {
+    (rowNum: number, info: LineInfo) => {
       const newInfos = [
         ...lineInfos.slice(0, rowNum),
         info,

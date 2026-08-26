@@ -113,7 +113,7 @@ export enum Operation {
   DIVIDE = "÷",
 }
 
-export type LineDatum = {
+export type LineInfo = {
   x?: DataSource;
   s?: DataSource;
   r?: DataSource;

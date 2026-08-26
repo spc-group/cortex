@@ -6,7 +6,7 @@ import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import type { LineDatum, Run } from "./types";
+import type { LineInfo, Run } from "./types";
 import { Operation } from "./types";
 import { SingleRunPicker, SignalPicker } from "./source_picker.tsx";
 
@@ -81,7 +81,7 @@ const Component = () => {
     structure: {},
   };
   const queryClient = new QueryClient();
-  const [lineInfos, setLineInfos] = useState<LineDatum[]>([]);
+  const [lineInfos, setLineInfos] = useState<LineInfo[]>([]);
   return (
     <>
       <div>Signal: {lineInfos[0]?.["x"]?.["name"]}</div>

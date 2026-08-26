@@ -13,7 +13,7 @@ import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
 import { useStreams, useMetadata, useArrayZ, useArrayData } from "../tiled";
 import { axisLabels, OPERATIONS } from "./axis_labels";
-import type { Run, Stream, RunMetadata, DataSource, LineDatum } from "./types";
+import type { Run, Stream, RunMetadata, DataSource, LineInfo } from "./types";
 import type { ROI, ROIUpdate } from "../plots";
 import { useLastChoice } from "../plots/last_choice.ts";
 import { signalSources } from "./signal";
@@ -37,7 +37,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
   const renderNumRef = useRef(0);
   renderNumRef.current += 1;
   const uid = run.uid;
-  const [lineData, setLineData] = useState<LineDatum[]>([]);
+  const [lineInfos, setLineData] = useState<LineInfo[]>([]);
   // Get the valid streams for this run
   const { streams, isLoading: isLoadingStreams } = useStreams(uid);
   const streamNames = Object.keys(streams);
@@ -142,7 +142,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
       <SingleRunPicker
         run={run}
         setLineInfos={setLineData}
-        lineInfos={lineData}
+        lineInfos={lineInfos}
       />
       <div className="lg:grid lg:grid-cols-2">
         <div className="m-2 space-x-2">
@@ -153,8 +153,8 @@ export const RunPlots = ({ run }: { run: Run }) => {
           {/* {isLoadingData ? <LoadingBadge /> : <></>} */}
         </div>
         <div>
-          <p>{lineData.length}</p>
-          {lineData.map((datum, idx) => {
+          <p>{lineInfos.length}</p>
+          {lineInfos.map((datum, idx) => {
             return (
               <div key={idx}>
                 <hr key={idx + "hr"} />
@@ -166,7 +166,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
             );
           })}
           {/* <LinePlot */}
-          {/*   data={lineData} */}
+          {/*   data={lineInfos} */}
           {/*   xlabel={labels.x} */}
           {/*   ylabel={labels.y} */}
           {/*   title={plotTitle} */}
@@ -710,11 +710,11 @@ export function LinePlots({
   //     logarithm,
   //   })])
   // );
-  // let lineData: LineData[];
+  // let lineInfos: LineData[];
   // if (vSignals == null || ydata == null) {
-  //   lineData = [];
+  //   lineInfos = [];
   // } else {
-  const lineData = sources
+  const lineInfos = sources
     .map(({ x, s, r }) => {
       if (s == null) {
         return null;
@@ -794,7 +794,7 @@ export function LinePlots({
         </div>
         <div>
           <LinePlot
-            data={lineData}
+            data={lineInfos}
             xlabel={labels.x}
             ylabel={labels.y}
             title={plotTitle}
