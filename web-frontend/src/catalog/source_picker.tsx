@@ -22,25 +22,37 @@ export const SignalPicker = ({
   setSignal: (signal: string) => void;
   localKey: string;
 }) => {
-  const [activeSignal, setActiveSignal] = useLastChoice<string>(
-    "",
+  const firstSignal = [...signalNames]?.[0] ?? "";
+  const [savedSignal, setSavedSignal] = useLastChoice<string>(
+    firstSignal,
     [...signalNames],
     `${localKey}-signal`,
   );
+  const activeSignal = savedSignal ? savedSignal : firstSignal;
   useEffect(() => {
     // On first render we want to set the default signal
-    // const setSignal = (signalName: string) => {
-    const isValidSignal = signalNames.has(activeSignal);
-    if (isValidSignal) {
-      setSignal(activeSignal);
-    } else if (activeSignal !== "") {
-      console.warn(`Could not find signal ${activeSignal} in  `, signalNames);
+    let newSignal: string;
+    if (activeSignal) {
+      newSignal = activeSignal;
+    } else if (firstSignal) {
+      // We don't have a valid last choice, so just use the first
+      // signal for now
+      newSignal = firstSignal;
+    } else {
+      return;
     }
-  }, [activeSignal, signalNames, setSignal]);
+    const isValidSignal = signalNames.has(newSignal);
+    if (isValidSignal) {
+      setSignal(newSignal);
+    } else if (firstSignal) {
+      setSignal(firstSignal);
+    } else {
+      setSignal(null);
+    }
+  }, [activeSignal, signalNames, setSignal, firstSignal]);
 
   const changeSignal = (sig: string) => {
-    setActiveSignal(sig);
-    // setSignal(sig);
+    setSavedSignal(sig);
   };
 
   return (
@@ -155,7 +167,7 @@ const SourcePicker = ({
         <SignalPicker
           signalNames={signalNames.current}
           setSignal={setSignal}
-          localKey={localKey}
+          localKey={`${localKey}-${streamName}`}
         />
       </>
     );
@@ -188,15 +200,16 @@ const SourceRow = ({
   run,
   label,
   rowNum,
+  hinted,
   setLineInfo,
 }: {
   run: Run;
   label: string;
   rowNum: number;
+  hinted: boolean;
   setLineInfo: (rowNum: number, datum: LineInfo) => void;
 }) => {
   const ourInfo = useRef<LineInfo>({ name: "<N/A>" });
-  const [hinted, setHinted] = useState<boolean>(true);
   const dimensions = run.metadata.start?.hints?.dimensions ?? [];
   // Curried function so we can take the stream and signal, and build
   // the line definition
@@ -217,16 +230,6 @@ const SourceRow = ({
   return (
     <tr>
       <td>{label}</td>
-      <td>
-        <input
-          className="checkbox"
-          type="checkbox"
-          checked={hinted}
-          onChange={(e) => {
-            setHinted(e.currentTarget.checked);
-          }}
-        />
-      </td>
       <td>
         <div className="join">
           <SourcePicker
@@ -286,6 +289,7 @@ export const SingleRunPicker = ({
   lineInfos: LineInfo[];
   setLineInfos: (data: LineInfo[]) => void;
 }) => {
+  const [hinted, setHinted] = useState<boolean>(true);
   const [numRows, setNumRows] = useState<number>(1);
   const addRow = () => {
     setNumRows((prev) => prev + 1);
@@ -312,20 +316,31 @@ export const SingleRunPicker = ({
 
   return (
     <>
-      <div className="join">
-        <button className="btn btn-sm join-item" onClick={dropRow}>
-          −
-        </button>
-        <button className="btn btn-sm join-item" onClick={addRow}>
-          +
-        </button>
+      <div>
+        <div className="join">
+          <button className="btn btn-sm join-item" onClick={dropRow}>
+            −
+          </button>
+          <button className="btn btn-sm join-item" onClick={addRow}>
+            +
+          </button>
+        </div>
+        <label for="hintedCheckbox">Hinted Only</label>
+        <input
+          className="checkbox"
+          id="hintedCheckbox"
+          type="checkbox"
+          checked={hinted}
+          onChange={(e) => {
+            setHinted(e.currentTarget.checked);
+          }}
+        />
       </div>
       <table className="table">
         <thead>
           <tr>
             <th></th>
-            <th>Hints?</th>
-            <th>X</th>
+            <th>Horizontal</th>
             <th>Signal</th>
             <th>Reference</th>
           </tr>
@@ -338,6 +353,7 @@ export const SingleRunPicker = ({
                 label={String(rowNum)}
                 key={rowNum}
                 rowNum={rowNum}
+                hinted={hinted}
                 setLineInfo={setLineInfo}
               />
             );

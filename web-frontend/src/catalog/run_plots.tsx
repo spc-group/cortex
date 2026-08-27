@@ -34,10 +34,128 @@ const LoadingBadge = () => {
 };
 
 export const RunPlots = ({ run }: { run: Run }) => {
+  const uid = run.uid;
+  const [lineInfos, setLineData] = useState<LineInfo[]>([]);
+  // Retrieve metadata and data keys for this dataset
+  const { metadata } = useMetadata<RunMetadata>(uid);
+
+  // Get data from disk
+  const sources = Object.fromEntries(
+    lineInfos
+      .map((info: LineInfo) => {
+        return [
+          [info.x?.path, info.x],
+          [info.s?.path, info.s],
+          [info.r?.path, info.r],
+        ];
+      })
+      .flat()
+      .filter(([path]) => path != null),
+  );
+  const {
+    datasets,
+    isLoading: isLoadingData,
+    readyState,
+    error,
+  } = useDatasets(sources);
+
+  let plotTitle: string;
+  let plotSubtitle: string;
+  if (uid === undefined) {
+    return (
+      <div role="alert" className="m-2 alert alert-error alert-soft">
+        <span>
+          <ExclamationTriangleIcon className="size-4 inline" /> No UID was
+          provided.
+        </span>
+      </div>
+    );
+  } else if (metadata == null) {
+    plotTitle = "";
+    plotSubtitle = "";
+  } else {
+    const runMetadata: RunMetadata = metadata?.attributes?.metadata ?? {};
+    plotTitle = `${runMetadata?.start?.sample_name} - ${runMetadata?.start?.scan_name}`;
+    plotSubtitle = `${runMetadata?.start?.uid ?? ""}`;
+  }
+
+  const labels = axisLabels(lineInfos);
+
+  // Re-package the data into lines
+  const lineData = lineInfos.map((info: LineInfo, i: number) => {
+    return {
+      x: datasets[info.x.path],
+      y: prepareYData(
+        datasets[info.s?.path],
+        datasets[info.r?.path],
+        info.operation,
+        { inverted: false, logarith: false },
+      ),
+      color: `c${i}`,
+      name: `Row ${i}`,
+    };
+  });
+
+  return (
+    <div className="m-4">
+      {/* New style signal picker */}
+      <SingleRunPicker
+        run={run}
+        setLineInfos={setLineData}
+        lineInfos={lineInfos}
+      />
+      <div className="lg:grid lg:grid-cols-2">
+        <div className="m-2 space-x-2">
+          <div className={"inline"}>
+            <LiveBadge readyState={readyState} />
+            {isLoadingData ? <LoadingBadge /> : <></>}
+          </div>
+        </div>
+        <div>
+          {/* <p>{lineInfos.length}</p> */}
+          {/* {lineInfos.map((datum, idx) => { */}
+          {/*   return ( */}
+          {/*     <div key={idx}> */}
+          {/*       <hr key={idx + "hr"} /> */}
+          {/*       <p key={idx + "x"}>{JSON.stringify(datum?.x, null, 2)}</p> */}
+          {/*       <p key={idx + "y"}>{JSON.stringify(datum?.s, null, 2)}</p> */}
+          {/*       <p key={idx + "op"}>{datum?.operation ?? "None"}</p> */}
+          {/*       <p key={idx + "r"}>{JSON.stringify(datum?.r, null, 2)}</p> */}
+          {/*     </div> */}
+          {/*   ); */}
+          {/* })} */}
+          {error ? (
+            <div role="alert" className="m-2 alert alert-error alert-soft">
+              <span>
+                <ExclamationTriangleIcon className="size-4 inline" />
+                {error}
+              </span>
+            </div>
+          ) : (
+            <></>
+          )}
+          <LinePlot
+            data={lineData}
+            xlabel={labels.x}
+            ylabel={labels.y}
+            title={plotTitle}
+            subtitle={plotSubtitle}
+          />
+        </div>
+      </div>
+      {/* End new style signal picker */}
+    </div>
+  );
+};
+
+////////////////////////////
+// Old implementation below
+////////////////////////////
+
+export const OldRunPlots = ({ run }: { run: Run }) => {
   const renderNumRef = useRef(0);
   renderNumRef.current += 1;
   const uid = run.uid;
-  const [lineInfos, setLineData] = useState<LineInfo[]>([]);
   // Get the valid streams for this run
   const { streams, isLoading: isLoadingStreams } = useStreams(uid);
   const streamNames = Object.keys(streams);
@@ -138,43 +256,6 @@ export const RunPlots = ({ run }: { run: Run }) => {
         plotSubtitle={plotSubtitle}
         key={uid}
       />
-      {/* New style signal picker */}
-      <SingleRunPicker
-        run={run}
-        setLineInfos={setLineData}
-        lineInfos={lineInfos}
-      />
-      <div className="lg:grid lg:grid-cols-2">
-        <div className="m-2 space-x-2">
-          <div className={"inline"}>
-            {/* <LiveBadge readyState={readyState} /> */}
-          </div>
-
-          {/* {isLoadingData ? <LoadingBadge /> : <></>} */}
-        </div>
-        <div>
-          <p>{lineInfos.length}</p>
-          {lineInfos.map((datum, idx) => {
-            return (
-              <div key={idx}>
-                <hr key={idx + "hr"} />
-                <p key={idx + "x"}>{JSON.stringify(datum?.x, null, 2)}</p>
-                <p key={idx + "y"}>{JSON.stringify(datum?.s, null, 2)}</p>
-                <p key={idx + "op"}>{datum?.operation ?? "None"}</p>
-                <p key={idx + "r"}>{JSON.stringify(datum?.r, null, 2)}</p>
-              </div>
-            );
-          })}
-          {/* <LinePlot */}
-          {/*   data={lineInfos} */}
-          {/*   xlabel={labels.x} */}
-          {/*   ylabel={labels.y} */}
-          {/*   title={plotTitle} */}
-          {/*   subtitle={plotSubtitle} */}
-          {/* /> */}
-        </div>
-      </div>
-      {/* End new style signal picker */}
     </div>
   );
 };
@@ -714,7 +795,7 @@ export function LinePlots({
   // if (vSignals == null || ydata == null) {
   //   lineInfos = [];
   // } else {
-  const lineInfos = sources
+  const lineData = sources
     .map(({ x, s, r }) => {
       if (s == null) {
         return null;
@@ -794,7 +875,7 @@ export function LinePlots({
         </div>
         <div>
           <LinePlot
-            data={lineInfos}
+            data={lineData}
             xlabel={labels.x}
             ylabel={labels.y}
             title={plotTitle}

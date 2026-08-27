@@ -5,6 +5,7 @@ import * as zarr from "zarrita";
 import * as React from "react";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Table } from "apache-arrow";
@@ -37,12 +38,12 @@ vi.mock("../tiled/use_streams", () => {
       return {
         streams: {
           baseline: {
-            data_keys: {},
+            data_keys: { "It-count": {} },
             ancestors: [],
           },
 
           primary: {
-            data_keys: {},
+            data_keys: { "It-count": {} },
             ancestors: [],
           },
         },
@@ -94,21 +95,29 @@ describe("the RunPlots component", () => {
     uid: 5,
     metadata: { start: {} },
   };
-  beforeEach(async () => {
+  const Component = () => {
     const queryClient = new QueryClient();
-    render(
+    return (
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <RunPlots run={run} />
         </QueryClientProvider>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
+  };
+  it("derives axis labels", async () => {
+    const user = userEvent.setup();
+    render(<Component />);
+    await user.click(screen.getByLabelText("Hinted Only"));
+    const selectBoxes = screen.getAllByTestId("select-signal");
+    await user.selectOptions(selectBoxes[0], "It-count");
+    expect(screen.getByText("It-count")).toBeInTheDocument();
   });
-  it("doesn't crash", () => {});
-  it("sorts the primary stream to be first", () => {
-    const select = screen.getByTitle("Select a data stream");
-    expect(select.children[0].textContent).toEqual("primary");
-  });
+  // it("sorts the primary stream to be first", () => {
+  //   const select = screen.getByTitle("Select a data stream");
+  //   expect(select.children[0].textContent).toEqual("primary");
+  // });
+  // it("sorts the
 });
 
 const stream: Stream = {

@@ -1,7 +1,7 @@
 import { useParams } from "react-router";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
-import { RunPlots } from "./run_plots";
+import { RunPlots, OldRunPlots } from "./run_plots";
 import { useMetadata } from "../tiled";
 import type { Run, RunMetadata } from "./types";
 import { ExitStatus } from "./exit_status";
@@ -36,6 +36,7 @@ export function RunDetail() {
   //     exitStatus: metadata.attributes.metadata.stop?.exit_status ?? "",
   //   };
   // }
+  const useNewSourcePicker = true;
   if (run == null) {
     return (
       <div role="alert" className="alert alert-error">
@@ -54,7 +55,11 @@ export function RunDetail() {
           <div>
             Exit status: <ExitStatus status={run.metadata?.stop?.exit_status} />
           </div>
-          <RunPlots run={run} />
+          {useNewSourcePicker ? (
+            <RunPlots run={run} />
+          ) : (
+            <OldRunPlots run={run} />
+          )}
         </div>
       </>
     );
