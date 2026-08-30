@@ -19,7 +19,7 @@ export const SignalPicker = ({
   localKey,
 }: {
   signalNames: Set<string>;
-  setSignal: (signal: string) => void;
+  setSignal: (signal: string | null) => void;
   localKey: string;
 }) => {
   const firstSignal = [...signalNames]?.[0] ?? "";
@@ -29,6 +29,7 @@ export const SignalPicker = ({
     `${localKey}-signal`,
   );
   const activeSignal = savedSignal ? savedSignal : firstSignal;
+  const parentKey = localKey.split("-").slice(0, -1).join("-");
   useEffect(() => {
     // On first render we want to set the default signal
     let newSignal: string;
@@ -62,8 +63,8 @@ export const SignalPicker = ({
       value={activeSignal}
       onChange={(e) => changeSignal(e.currentTarget.value)}
     >
-      {[...signalNames].map((name) => {
-        return <option key={name}>{name}</option>;
+      {[...signalNames].map((name, idx) => {
+        return <option key={`${parentKey}-signal${idx}`}>{name}</option>;
       })}
     </select>
   );
@@ -83,7 +84,7 @@ const SourcePicker = ({
   dimensions?: [string[], string][];
   useHints: boolean;
   axis: Axis;
-  setSource: (axis: Axis, source: DataSource) => void;
+  setSource: (axis: Axis, source: DataSource | null) => void;
 }) => {
   const signalNames = useRef<Set<string>>(new Set());
   const { streams } = useStreams(run.uid);
@@ -140,18 +141,11 @@ const SourcePicker = ({
   }
   // Callback for getting the source when the signal changes
   const setSignal = useCallback(
-    (signal: string) => {
-      const source = sources.current[signal];
+    (signal: string | null) => {
+      const source = signal != null ? sources.current[signal] : null;
       setSource(axis, source);
     },
-    [
-      // streamName,
-      // useHints,
-      setSource,
-      axis,
-      // hints.current,
-      // sources.current,
-    ],
+    [setSource, axis],
   );
 
   // We only want a new object if the things in it have actually changed
@@ -183,9 +177,9 @@ const SourcePicker = ({
           setActiveStream(e.currentTarget.value);
         }}
       >
-        {streamNames.map((streamName) => {
+        {streamNames.map((streamName, idx) => {
           return (
-            <option value={streamName} key={streamName}>
+            <option value={streamName} key={`${localKey}-stream${idx}`}>
               {streamName}/
             </option>
           );
@@ -214,8 +208,12 @@ const SourceRow = ({
   // Curried function so we can take the stream and signal, and build
   // the line definition
   const setSource = useCallback(
-    (axis: Axis, source: DataSource) => {
-      ourInfo.current[axis] = source;
+    (axis: Axis, source: DataSource | null) => {
+      if (source == null) {
+        delete ourInfo.current[axis];
+      } else {
+        ourInfo.current[axis] = source;
+      }
       // Pass a copy so ours doesn't get mutated
       setLineInfo(rowNum, { ...ourInfo.current });
     },
@@ -264,7 +262,11 @@ const SourceRow = ({
           >
             <option></option>
             {Object.entries(Operation).map(([key, val]) => {
-              return <option value={key}>{val}</option>;
+              return (
+                <option value={key} key={`${label}-operation-${key}`}>
+                  {val}
+                </option>
+              );
             })}
           </select>
           <SourcePicker
@@ -325,7 +327,7 @@ export const SingleRunPicker = ({
             +
           </button>
         </div>
-        <label for="hintedCheckbox">Hinted Only</label>
+        <label htmlFor="hintedCheckbox">Hinted Only</label>
         <input
           className="checkbox"
           id="hintedCheckbox"

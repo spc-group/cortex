@@ -4,7 +4,7 @@ import "@testing-library/jest-dom/vitest";
 import * as zarr from "zarrita";
 import * as React from "react";
 import { vi, expect, describe, beforeEach, afterEach, it } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -12,7 +12,7 @@ import { Table } from "apache-arrow";
 import { ReadyState } from "react-use-websocket";
 
 import mockMetadata from "../mocks/run_metadata.json";
-import { RunPlots, StreamPlots, ArrayPlots } from "./run_plots.tsx";
+import { RunPlots, ArrayPlots } from "./run_plots.tsx";
 import { TiledProvider } from "../tiled";
 
 vi.mock("../tiled/metadata", () => {
@@ -38,12 +38,16 @@ vi.mock("../tiled/use_streams", () => {
       return {
         streams: {
           baseline: {
-            data_keys: { "It-count": {} },
+            data_keys: { "It-count": {}, bdet: { shape: [5, 3, 19] } },
             ancestors: [],
+            hints: { fields: ["bdet"] },
           },
 
           primary: {
-            data_keys: { "It-count": {} },
+            data_keys: {
+              "It-count": {},
+              bdet: {},
+            },
             ancestors: [],
           },
         },
@@ -68,6 +72,32 @@ vi.mock("../tiled/use_data_table", () => {
     },
   };
 });
+
+let root;
+beforeEach(async () => {
+  // Use an in-memory zarr store for testing data fetching
+  root = zarr.root(new Map());
+  await zarr.create(root);
+  await zarr.create(root.resolve("spam"), {
+    data_type: "int32",
+    shape: [11],
+    chunk_shape: [11],
+  });
+  const zarray = await zarr.create(root.resolve("eggs"), {
+    data_type: "int32",
+    shape: [11, 24, 32],
+    chunk_shape: [1, 24, 32],
+  });
+  for (let i = 0; i < zarray.shape[0]; i++) {
+    zarr.set(zarray, [i, null, null], i);
+  }
+  await zarr.create(root.resolve("12345-6789/primary/bdet"), {
+    data_type: "int32",
+    shape: [11, 24, 32],
+    chunk_shape: [1, 24, 32],
+  });
+});
+
 // vi.mock("../tiled/array", () => {
 //   return {
 //     useArray: () => {
@@ -98,11 +128,13 @@ describe("the RunPlots component", () => {
   const Component = () => {
     const queryClient = new QueryClient();
     return (
-      <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
-          <RunPlots run={run} />
-        </QueryClientProvider>
-      </BrowserRouter>
+      <TiledProvider zarrRoot={root}>
+        <BrowserRouter>
+          <QueryClientProvider client={queryClient}>
+            <RunPlots run={run} />
+          </QueryClientProvider>
+        </BrowserRouter>
+      </TiledProvider>
     );
   };
   it("derives axis labels", async () => {
@@ -111,7 +143,28 @@ describe("the RunPlots component", () => {
     await user.click(screen.getByLabelText("Hinted Only"));
     const selectBoxes = screen.getAllByTestId("select-signal");
     await user.selectOptions(selectBoxes[0], "It-count");
-    expect(screen.getByText("It-count")).toBeInTheDocument();
+    const numSignals = 3; // x, signal, and reference
+    expect(screen.getAllByRole("option", { name: "It-count" })).toHaveLength(
+      numSignals,
+    );
+  });
+  it("shows array components", async () => {
+    const user = userEvent.setup();
+    render(<Component />);
+    await user.click(screen.getByLabelText("Hinted Only"));
+    const selectBoxes = screen.getAllByTestId("select-signal");
+    console.log(selectBoxes[0].options);
+    await user.selectOptions(selectBoxes[0], "bdet");
+    expect(screen.getByRole("heading", { name: "bdet" })).toBeInTheDocument();
+  });
+  it("only shows each array once", async () => {
+    const user = userEvent.setup();
+    render(<Component />);
+    await user.click(screen.getByLabelText("Hinted Only"));
+    const selectBoxes = screen.getAllByTestId("select-signal");
+    await user.selectOptions(selectBoxes[0], "bdet");
+    await user.selectOptions(selectBoxes[1], "bdet");
+    expect(screen.getAllByRole("heading", { name: "bdet" })).toHaveLength(1);
   });
   // it("sorts the primary stream to be first", () => {
   //   const select = screen.getByTitle("Select a data stream");
@@ -120,104 +173,34 @@ describe("the RunPlots component", () => {
   // it("sorts the
 });
 
-const stream: Stream = {
-  key: "primary",
-  data_keys: { sim_motor_2: {} },
-  ancestors: [],
-  hints: {
-    sim_motor_2: {
-      fields: ["sim_motor_2"],
-    },
-  },
-};
-
-describe("the StreamPlots component", () => {
-  beforeEach(async () => {
-    cleanup();
-    await render(
-      <StreamPlots uid={5} stream={stream} runHints={["sim_motor_2"]} />,
-    );
-  });
-  it("populates signal pickers", () => {
-    expect(screen.getAllByText("sim_motor_2").length).toEqual(3);
-  });
-  it("adds 'seq_num' and 'time' signals when unhinted", async () => {
-    expect(screen.queryAllByText("seq_num")).toHaveLength(0);
-    expect(screen.queryAllByText("time")).toHaveLength(0);
-    const checkbox = screen.getByLabelText("Hints only");
-    // await fireEvent.change(checkbox, {target: {checked: false}});
-    await fireEvent.click(checkbox);
-    await screen.findAllByText("seq_num");
-    await screen.findAllByText("time");
-    expect(screen.getAllByText("seq_num").length).toEqual(3);
-    expect(screen.getAllByText("time").length).toEqual(3);
-  });
-  it("adds ROIs", async () => {
-    localStorage.setItem(
-      "rois-v1",
-      JSON.stringify({
-        sim_motor_2: [
-          {
-            name: "Ni-KL",
-            isActive: true,
-            x0: 0,
-            x1: 3,
-            y0: 5,
-            y1: 10,
-          },
-        ],
-      }),
-    );
-    render(<StreamPlots uid={5} stream={stream} />);
-    await screen.findAllByText("sim_motor_2 – Ni-KL");
-  });
-  it("adds and removes ROIs", async () => {
-    expect(screen.queryAllByRole("row")).toHaveLength(1);
-    const addButton = screen.getByText("Add ROI");
-    await fireEvent.click(addButton);
-    expect(screen.queryAllByRole("row")).toHaveLength(2);
-    const removeButton = screen.getByTitle("Remove ROI 0");
-    await fireEvent.click(removeButton);
-    expect(screen.queryAllByRole("row")).toHaveLength(1);
-  });
-});
-
 describe("the ArrayPlots component", () => {
-  let root;
-  beforeEach(async () => {
-    // Use an in-memory zarr store for testing data fetching
-    root = zarr.root(new Map());
-    await zarr.create(root);
-    await zarr.create(root.resolve("spam"), {
-      data_type: "int32",
-      shape: [11],
-      chunk_shape: [11],
-    });
-    const zarray = await zarr.create(root.resolve("eggs"), {
-      data_type: "int32",
-      shape: [11, 24, 32],
-      chunk_shape: [1, 24, 32],
-    });
-    for (let i = 0; i < zarray.shape[0]; i++) {
-      zarr.set(zarray, [i, null, null], i);
-    }
-    await zarr.create(root.resolve("12345-6789/primary/bdet"), {
-      data_type: "int32",
-      shape: [11, 24, 32],
-      chunk_shape: [1, 24, 32],
-    });
-    await render(
+  const ArrayComponent = ({ name }: { name?: string }) => {
+    const source = {
+      path: "12345-6789/primary/bdet",
+      name: name,
+    };
+    return (
       <TiledProvider zarrRoot={root}>
-        <ArrayPlots source={{}} signal="bdet" />
-      </TiledProvider>,
+        <ArrayPlots source={source} signal="bdet" />
+      </TiledProvider>
     );
-  });
+  };
   afterEach(() => {
     localStorage.removeItem("rois");
   });
   it("shows the 'live' badge", () => {
+    render(<ArrayComponent />);
     expect(screen.getByText("Live")).toBeInTheDocument();
   });
+  it("shows the dataset name if provided", () => {
+    render(<ArrayComponent name="Binary Detector" />);
+    expect(screen.getByText("Binary Detector")).toBeInTheDocument();
+  });
+  it("shows the dataset path if unnamed", () => {
+    render(<ArrayComponent />);
+    expect(screen.getByText("12345-6789/primary/bdet")).toBeInTheDocument();
+  });
+
   // it("sets ROI names", async () => {
   //   expect(screen.queryAllByRole("row")).toHaveLength(1);
   //   const addButton = screen.getByText("Add ROI");

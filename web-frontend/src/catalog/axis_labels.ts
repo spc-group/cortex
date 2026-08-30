@@ -8,7 +8,7 @@ type Signal = [string, DataKey | null];
 const infoLabel = (info: LineInfo) => {
   let ylabel = info.s?.name ?? "";
   const xunits = info.x?.dataKey?.units;
-  if (OPERATIONS.includes(info.operation)) {
+  if (OPERATIONS.includes(info.operation ?? "") && info.r != null) {
     ylabel = `${ylabel} ${info.operation} ${info.r.name}`;
   }
   if (info.inverted) {

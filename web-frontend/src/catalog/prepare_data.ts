@@ -50,12 +50,12 @@ const invert = cwise({
 export function prepareYData(
   vdata: ndarray.NdArray | null,
   rdata: ndarray.NdArray | null,
-  operation: string,
+  operation: string | null,
   { inverted, logarithm }: { inverted?: boolean; logarithm?: boolean } = {},
 ) {
   // Weed out nonsense values
   const operations = ["+", "−", "×", "÷"];
-  const isValidOp = operations.includes(operation);
+  const isValidOp = operations.includes(operation ?? "");
   if (vdata == null) {
     return null;
   } else if (rdata == null && isValidOp) {

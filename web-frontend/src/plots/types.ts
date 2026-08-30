@@ -1,8 +1,8 @@
 import type { NdArray } from "ndarray";
 
 export interface LineData {
-  x?: NdArray;
-  y?: NdArray;
+  x: NdArray | null;
+  y: NdArray;
   name?: string;
   color?: string;
 }
