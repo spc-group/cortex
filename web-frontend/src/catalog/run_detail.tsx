@@ -37,11 +37,25 @@ export function RunDetail() {
     return (
       <>
         <h1>{run.metadata.start?.scan_name}</h1>
+        <ul className="list">
+          <li className="list-row py-2 ">
+            <div>UID:</div>
+            <div>{run.uid}</div>
+          </li>
+          <li className="list-row py-2">
+            <div>Sample: {run.metadata.start?.sample_name}</div>
+          </li>
+          <li className="list-row py-2">
+            <div>
+              Exit status:{" "}
+              <ExitStatus status={run.metadata?.stop?.exit_status} />
+            </div>
+          </li>
+          <li className="list-row py-2">
+            <div>Beamline: {run.metadata.start?.beamline_id}</div>
+          </li>
+        </ul>
         <div>
-          <h2>UID: {run.uid}</h2>
-          <div>
-            Exit status: <ExitStatus status={run.metadata?.stop?.exit_status} />
-          </div>
           <RunPlots run={run} />
         </div>
       </>

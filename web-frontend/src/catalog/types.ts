@@ -34,6 +34,7 @@ export interface RunMetadata {
   start: {
     esaf_id?: string;
     proposal_id?: string;
+    beamline_id?: string;
     sample_name?: string;
     scan_name?: string;
     plan_name?: string;
@@ -43,6 +44,7 @@ export interface RunMetadata {
   };
   stop?: {
     exit_status: string;
+    time: number;
   };
 }
 
