@@ -257,8 +257,8 @@ describe("run table row", () => {
           sample_name: "SrN03",
 
           time: 0,
-          proposal_id: "2",
-          esaf_id: "13",
+          beamline_id: "255-ID-Z",
+          dm_exp: "wolfman_2026-3",
         },
         stop: {
           exit_status: "success",
@@ -284,7 +284,7 @@ describe("run table row", () => {
     expect(screen.getByText("SrN03")).toBeInTheDocument();
     expect(screen.getByText("Success")).toBeInTheDocument();
     expect(screen.getByText("1970-01-01 00:00")).toBeInTheDocument();
-    expect(screen.getByText("2")).toBeInTheDocument();
-    expect(screen.getByText("13")).toBeInTheDocument();
+    expect(screen.getByText("255-ID-Z")).toBeInTheDocument();
+    expect(screen.getByText("wolfman_2026-3")).toBeInTheDocument();
   });
 });

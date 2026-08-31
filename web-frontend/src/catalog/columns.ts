@@ -54,21 +54,39 @@ export const allColumns: Column[] = [
     },
   },
   {
-    label: "Proposal",
-    name: "proposalId",
-    field: "start.proposal_id",
+    label: "Beamline",
+    name: "beamlineId",
+    field: "start.beamline_id",
     query: {
-      type: "eq",
-      key: "start.proposal_id",
+      type: "contains",
+      key: "start.beamline_id",
     },
   },
   {
-    label: "ESAF",
-    name: "esafId",
-    field: "start.esaf_id",
+    label: "DM Experiment",
+    name: "dmExperiment",
+    field: "start.dm_exp",
     query: {
-      type: "eq",
-      key: "start.esaf_id",
+      type: "contains",
+      key: "start.dm_exp",
     },
   },
+  // {
+  //   label: "Proposal",
+  //   name: "proposalId",
+  //   field: "start.proposal_id",
+  //   query: {
+  //     type: "eq",
+  //     key: "start.proposal_id",
+  //   },
+  // },
+  // {
+  //   label: "ESAF",
+  //   name: "esafId",
+  //   field: "start.esaf_id",
+  //   query: {
+  //     type: "eq",
+  //     key: "start.esaf_id",
+  //   },
+  // },
 ];

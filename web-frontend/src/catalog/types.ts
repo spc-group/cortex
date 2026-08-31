@@ -15,6 +15,8 @@ export interface Column {
       | "start.time"
       | "start.proposal_id"
       | "start.esaf_id"
+      | "start.beamline_id"
+      | "start.dm_exp"
       | "structure_family";
     type: "eq" | "contains" | "comparison";
     operator?: "lt" | "gt" | "le" | "ge";
@@ -35,6 +37,7 @@ export interface RunMetadata {
     esaf_id?: string;
     proposal_id?: string;
     beamline_id?: string;
+    dm_exp?: string;
     sample_name?: string;
     scan_name?: string;
     plan_name?: string;

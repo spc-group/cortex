@@ -248,6 +248,8 @@ export function Row({
     "stop.exit_status": exitStatus,
     "start.proposal_id": run.metadata.start?.proposal_id ?? "",
     "start.esaf_id": run.metadata.start?.esaf_id ?? "",
+    "start.beamline_id": run.metadata.start?.beamline_id ?? "",
+    "start.dm_exp": run.metadata.start?.dm_exp ?? "",
     "start.time":
       run?.metadata?.start?.time != null
         ? new Date(run.metadata.start.time * seconds)
