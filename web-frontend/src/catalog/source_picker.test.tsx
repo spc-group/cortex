@@ -102,17 +102,17 @@ describe("the SingleRunPicker() component", () => {
   it("adds and drops rows", async () => {
     render(<Component />);
     let rows = screen.getAllByRole("row");
-    expect(rows.length).toEqual(2);
+    expect(rows.length).toEqual(3);
     // Add a row
     const addButton = screen.getByText("+", { selector: "button" });
     await fireEvent.click(addButton);
     rows = screen.getAllByRole("row");
-    expect(rows.length).toEqual(3);
+    expect(rows.length).toEqual(5);
     // Remove a row
     const dropButton = screen.getByText("−", { selector: "button" });
     await fireEvent.click(dropButton);
     rows = screen.getAllByRole("row");
-    expect(rows.length).toEqual(2);
+    expect(rows.length).toEqual(3);
   });
   it("lists streams", () => {
     render(<Component />);
@@ -127,6 +127,7 @@ describe("the SingleRunPicker() component", () => {
       <SignalPicker
         signalNames={signalNames}
         setSignal={() => {}}
+        disabled={false}
         localKey="spam"
       />,
     );
@@ -142,10 +143,75 @@ describe("the SingleRunPicker() component", () => {
   it("sets reference operation", async () => {
     const user = userEvent.setup();
     render(<Component />);
-    const operationSelect = screen.getByTestId("select-operation");
+    const operationSelect = screen.getByRole("combobox", {
+      name: "Row 0 reference operation",
+    });
     await user.selectOptions(operationSelect, Operation.DIVIDE);
     await screen.findByText('Operation: "÷"');
     await user.selectOptions(operationSelect, "");
     await screen.findByText("Operation: null");
+  });
+  it("applies simple preset", async () => {
+    const user = userEvent.setup();
+    render(<Component />);
+    const invertCheckbox = screen.getByLabelText(/Inverted/i);
+    const logarithmCheckbox = screen.getByLabelText(/Natural logarithm/i);
+    const operationInput = screen.getByRole("combobox", {
+      name: "Row 0 reference operation",
+    });
+    // Set up previous UI state so we can tell that things changed
+    await user.click(invertCheckbox);
+    await user.click(logarithmCheckbox);
+    await fireEvent.change(operationInput, { target: { value: "+" } });
+    // Activate the new mode
+    const simpleButton = screen.getByRole("button", {
+      name: "Row 0 simple preset",
+    });
+    await user.click(simpleButton);
+    // Check that other UI element responded properly
+    expect(operationInput).toHaveValue("");
+    expect(invertCheckbox).not.toBeChecked();
+    expect(logarithmCheckbox).not.toBeChecked();
+  });
+  it("applies fluorescence preset", async () => {
+    const user = userEvent.setup();
+    render(<Component />);
+    const invertCheckbox = screen.getByLabelText(/Inverted/i);
+    const logarithmCheckbox = screen.getByLabelText(/Natural logarithm/i);
+    const operationInput = screen.getByRole("combobox", {
+      name: "Row 0 reference operation",
+    });
+    // Set up previous UI state so we can tell that things changed
+    await user.click(invertCheckbox);
+    await user.click(logarithmCheckbox);
+    await fireEvent.change(operationInput, { target: { value: "+" } });
+    // Activate the new mode
+    const fluoroButton = screen.getByRole("button", {
+      name: "Row 0 fluorescence preset",
+    });
+    await user.click(fluoroButton);
+    // Check that other UI element responded properly
+    expect(operationInput).toHaveValue(Operation.DIVIDE);
+    expect(invertCheckbox).not.toBeChecked();
+    expect(logarithmCheckbox).not.toBeChecked();
+  });
+  it("applies transmission preset", async () => {
+    const user = userEvent.setup();
+    render(<Component />);
+    const invertCheckbox = screen.getByLabelText(/Inverted/i);
+    const logarithmCheckbox = screen.getByLabelText(/Natural logarithm/i);
+    const operationInput = screen.getByRole("combobox", {
+      name: "Row 0 reference operation",
+    });
+    // Set up previous UI state so we can tell that things changed
+    // Activate the new mode
+    const transButton = screen.getByRole("button", {
+      name: "Row 0 transmission preset",
+    });
+    await user.click(transButton);
+    // Check that other UI element responded properly
+    expect(operationInput).toHaveValue(Operation.DIVIDE);
+    expect(invertCheckbox).toBeChecked();
+    expect(logarithmCheckbox).toBeChecked();
   });
 });

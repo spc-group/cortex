@@ -24,18 +24,6 @@ export function RunDetail() {
       structure: metadata.attributes.structure,
     };
   }
-  // let runMetadata = {
-  //   scanName: "",
-  //   uid: "",
-  //   exitStatus: "",
-  // };
-  // if (metadata != null) {
-  //   runMetadata = {
-  //     scanName: metadata.attributes.metadata.start?.scan_name ?? "",
-  //     uid: metadata.attributes.metadata.start.uid,
-  //     exitStatus: metadata.attributes.metadata.stop?.exit_status ?? "",
-  //   };
-  // }
   if (run == null) {
     return (
       <div role="alert" className="alert alert-error">

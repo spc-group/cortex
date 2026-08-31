@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { InlineMath } from "react-katex";
 import { isEqual } from "lodash";
 
 import type { Run, LineInfo, DataSource } from "./types";
@@ -17,10 +18,12 @@ export const SignalPicker = ({
   signalNames,
   setSignal,
   localKey,
+  disabled,
 }: {
   signalNames: Set<string>;
   setSignal: (signal: string | null) => void;
   localKey: string;
+  disabled?: boolean;
 }) => {
   const firstSignal = [...signalNames]?.[0] ?? "";
   const [savedSignal, setSavedSignal] = useLastChoice<string>(
@@ -60,10 +63,11 @@ export const SignalPicker = ({
     <select
       className="select join-item"
       data-testid="select-signal"
+      disabled={disabled}
       value={activeSignal}
       onChange={(e) => changeSignal(e.currentTarget.value)}
     >
-      {[...signalNames].map((name, idx) => {
+      {[...signalNames].sort().map((name, idx) => {
         return <option key={`${parentKey}-signal${idx}`}>{name}</option>;
       })}
     </select>
@@ -78,6 +82,7 @@ const SourcePicker = ({
   useHints,
   axis,
   setSource,
+  disabled,
 }: {
   run: Run;
   localKey: string;
@@ -85,6 +90,7 @@ const SourcePicker = ({
   useHints: boolean;
   axis: Axis;
   setSource: (axis: Axis, source: DataSource | null) => void;
+  disabled?: boolean;
 }) => {
   const signalNames = useRef<Set<string>>(new Set());
   const { streams } = useStreams(run.uid);
@@ -157,10 +163,14 @@ const SourcePicker = ({
   let signalWidget;
   if (streamName) {
     signalWidget = (
+      // We needed signal picker to be a separate component because we
+      // can't run the use hook if there's no stream. Maybe
+      // signalpicker can be combined with sourcePicker.
       <>
         <SignalPicker
           signalNames={signalNames.current}
           setSignal={setSignal}
+          disabled={disabled}
           localKey={`${localKey}-${streamName}`}
         />
       </>
@@ -173,6 +183,7 @@ const SourcePicker = ({
       <select
         className="select join-item"
         value={streamName}
+        disabled={disabled}
         onChange={(e) => {
           setActiveStream(e.currentTarget.value);
         }}
@@ -219,66 +230,182 @@ const SourceRow = ({
     },
     [setLineInfo, rowNum],
   );
-  const setOperation = (value: string) => {
-    type OperationKey = keyof typeof Operation;
-    ourInfo.current["operation"] = Operation?.[value as OperationKey] ?? null;
-    // Pass a copy so ours doesn't get mutated
+  const [operation, setOperation] = useLastChoice<string>(
+    "+",
+    ["", ...Object.values(Operation)],
+    `${label}-operation`,
+  );
+  const [inverted, setInverted] = useLastChoice<boolean>(
+    false,
+    [true, false],
+    `${label}-inverted`,
+  );
+  const [logarithm, setLogarithm] = useLastChoice<boolean>(
+    false,
+    [true, false],
+    `${label}-logarithm`,
+  );
+  const [derivative, setDerivative] = useLastChoice<boolean>(
+    false,
+    [true, false],
+    `${label}-gradient`,
+  );
+
+  useEffect(() => {
+    // Update the info object based on local parameters
+    //
+    // This effect doesn't touch the sources themselves, just the
+    // other options, so we need to use the reference to make sure we
+    // don't overwrite previous choices
+    const newOperation = operation !== "" ? (operation as Operation) : null;
+    ourInfo.current["operation"] = newOperation;
+    ourInfo.current["inverted"] = inverted;
+    ourInfo.current["logarithm"] = logarithm;
+    ourInfo.current["derivative"] = derivative;
     setLineInfo(rowNum, { ...ourInfo.current });
+  }, [operation, inverted, logarithm, derivative, rowNum, setLineInfo]);
+
+  const normalMode = () => {
+    setOperation("");
+    setInverted(false);
+    setLogarithm(false);
   };
+  const fluoroMode = () => {
+    setOperation(Operation.DIVIDE);
+    setInverted(false);
+    setLogarithm(false);
+  };
+  const transMode = () => {
+    setOperation(Operation.DIVIDE);
+    setInverted(true);
+    setLogarithm(true);
+  };
+
   return (
-    <tr>
-      <td>{label}</td>
-      <td>
-        <div className="join">
-          <SourcePicker
-            run={run}
-            localKey={label + "-X"}
-            dimensions={dimensions}
-            useHints={hinted}
-            axis={"x"}
-            setSource={setSource}
-          />
-        </div>
-      </td>
-      <td>
-        <div className="join">
-          <SourcePicker
-            run={run}
-            localKey={label + "-sig"}
-            useHints={hinted}
-            axis={"s"}
-            setSource={setSource}
-          />
-        </div>
-      </td>
-      <td>
-        <div className="join">
-          <select
-            className="select join-item"
-            data-testid="select-operation"
-            onChange={(e) => {
-              setOperation(e.currentTarget.value);
-            }}
-          >
-            <option></option>
-            {Object.entries(Operation).map(([key, val]) => {
-              return (
-                <option value={key} key={`${label}-operation-${key}`}>
-                  {val}
-                </option>
-              );
-            })}
-          </select>
-          <SourcePicker
-            run={run}
-            localKey={label + "-ref"}
-            useHints={hinted}
-            axis={"r"}
-            setSource={setSource}
-          />
-        </div>
-      </td>
-    </tr>
+    <>
+      <tr>
+        <td>{label}</td>
+        <td>
+          <div className="join">
+            <SourcePicker
+              run={run}
+              localKey={label + "-X"}
+              dimensions={dimensions}
+              useHints={hinted}
+              axis={"x"}
+              setSource={setSource}
+            />
+          </div>
+        </td>
+        <td>
+          <div className="join">
+            <SourcePicker
+              run={run}
+              localKey={label + "-sig"}
+              useHints={hinted}
+              axis={"s"}
+              setSource={setSource}
+            />
+          </div>
+        </td>
+        <td>
+          <div className="join">
+            <select
+              className="select join-item"
+              aria-label={`Row ${label} reference operation`}
+              value={operation}
+              onChange={(e) => setOperation(e.currentTarget.value)}
+            >
+              <option></option>
+              {Object.entries(Operation).map(([key, val]) => {
+                return <option key={`${label}-operation-${key}`}>{val}</option>;
+              })}
+            </select>
+            <SourcePicker
+              run={run}
+              localKey={`${label}-ref`}
+              useHints={hinted}
+              disabled={operation === ""}
+              axis={"r"}
+              setSource={setSource}
+            />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colSpan={3} className=" text-center">
+          <div className="space-x-4 inline">
+            <div className="inline">
+              <span className="mr-2">Presets:</span>
+              <div className="join">
+                <button
+                  className="btn btn-soft join-item"
+                  aria-description="Set the plotting options for a simple line plot."
+                  aria-label={`Row ${label} simple preset`}
+                  name={`${label}-simple-preset`}
+                  onClick={normalMode}
+                >
+                  <InlineMath math="S" />
+                </button>
+                <button
+                  className="btn btn-soft join-item"
+                  aria-description="Set the plotting options for a fluorescence measurement."
+                  aria-label={`Row ${label} fluorescence preset`}
+                  name={`${label}-fluorescence-preset`}
+                  onClick={fluoroMode}
+                >
+                  <InlineMath math="\frac{S}{R}" />
+                </button>
+                <button
+                  className="btn btn-soft join-item"
+                  aria-description="Set the plotting options for a transmission measurement."
+                  aria-label={`Row ${label} transmission preset`}
+                  name={`${label}-transmission-preset`}
+                  onClick={transMode}
+                >
+                  <InlineMath math="\ln \frac{R}{S}" />
+                </button>
+              </div>
+            </div>
+            <label className="label">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={inverted}
+                onChange={(e) => setInverted(e.target.checked)}
+              />
+              Inverted <InlineMath math="\big(\frac{1}{y}\big)" />
+            </label>
+            <label className="label">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={logarithm}
+                onChange={(e) => setLogarithm(e.target.checked)}
+              />
+              Natural logarithm
+            </label>
+            {/* Need to get a good gradient function. */}
+            <div
+              className="tooltip"
+              data-tip="This feature is in development. Stay tuned."
+            >
+              <label className="label disabled">
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  disabled
+                  checked={derivative}
+                  onChange={(e) => setDerivative(e.target.checked)}
+                />
+                Derivative
+              </label>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </>
   );
 };
 

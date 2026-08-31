@@ -1,5 +1,4 @@
 import "katex/dist/katex.min.css";
-// import { InlineMath } from "react-katex";
 import {
   ExclamationTriangleIcon,
   CircleStackIcon,
@@ -88,8 +87,8 @@ export const RunPlots = ({ run }: { run: Run }) => {
       return {
         x: xData,
         y: prepareYData(sData, rData, info?.operation ?? null, {
-          inverted: false,
-          logarithm: false,
+          inverted: info?.inverted ?? false,
+          logarithm: info?.logarithm ?? false,
         }),
         color: `c${i}`,
         name: `Row ${i}`,
@@ -581,57 +580,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
 //               </div>
 //             </div>
 //           </li>
-//           <li className="list-row">
-//             <div className="w-30">Presets: </div>
-//             <div className="join">
-//               <button className="btn btn-soft join-item" onClick={normalMode}>
-//                 <InlineMath math="S" />
-//               </button>
-//               <button className="btn btn-soft join-item" onClick={fluoroMode}>
-//                 <InlineMath math="\frac{S}{R}" />
-//               </button>
-//               <button className="btn btn-soft join-item" onClick={transMode}>
-//                 <InlineMath math="\ln \frac{R}{S}" />
-//               </button>
-//             </div>
-//           </li>
 //           <li className="col-span-2">
-//             <div className="space-x-4 m-2 ">
-//               <label className="label">
-//                 <input
-//                   type="checkbox"
-//                   className="checkbox"
-//                   checked={inverted}
-//                   onChange={(e) => setInverted(e.target.checked)}
-//                 />
-//                 Inverted <InlineMath math="\big(\frac{1}{y}\big)" />
-//               </label>
-//               <label className="label">
-//                 <input
-//                   type="checkbox"
-//                   className="checkbox"
-//                   checked={logarithm}
-//                   onChange={(e) => setLogarithm(e.target.checked)}
-//                 />
-//                 Natural logarithm
-//               </label>
-//               {/* Need to get a good gradient function. */}
-//               <div
-//                 className="tooltip"
-//                 data-tip="This feature is in development. Stay tuned."
-//               >
-//                 <label className="label disabled">
-//                   <input
-//                     type="checkbox"
-//                     className="checkbox"
-//                     disabled
-//                     checked={gradient}
-//                     onChange={(e) => setGradient(e.target.checked)}
-//                   />
-//                   Derivative
-//                 </label>
-//               </div>
-//             </div>
 //           </li>
 //         </ul>
 //       </div>
