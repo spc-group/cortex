@@ -114,8 +114,10 @@ describe("the SingleRunPicker() component", () => {
     rows = screen.getAllByRole("row");
     expect(rows.length).toEqual(3);
   });
-  it("lists streams", () => {
+  it("lists streams", async () => {
+    const user = userEvent.setup();
     render(<Component />);
+    await user.click(screen.getByLabelText(/Link Streams/));
     const primaryOptions = screen.getAllByText("primary/");
     expect(primaryOptions).toHaveLength(3);
     const baselineOptions = screen.getAllByText("baseline/");

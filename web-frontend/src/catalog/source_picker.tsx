@@ -1,3 +1,4 @@
+import { LinkIcon } from "@heroicons/react/24/solid";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { InlineMath } from "react-katex";
 import { isEqual } from "lodash";
@@ -83,6 +84,7 @@ const SourcePicker = ({
   axis,
   setSource,
   disabled,
+  streamName,
 }: {
   run: Run;
   localKey: string;
@@ -91,6 +93,7 @@ const SourcePicker = ({
   axis: Axis;
   setSource: (axis: Axis, source: DataSource | null) => void;
   disabled?: boolean;
+  streamName: string | null;
 }) => {
   const signalNames = useRef<Set<string>>(new Set());
   const { streams } = useStreams(run.uid);
@@ -100,17 +103,20 @@ const SourcePicker = ({
     streamNames,
     `${localKey}-stream`,
   );
-  const streamName =
-    activeStream === "" ? (streamNames?.[0] ?? "") : activeStream;
-
+  let _streamName;
+  if (streamName == null) {
+    _streamName = activeStream === "" ? (streamNames?.[0] ?? "") : activeStream;
+  } else {
+    _streamName = streamName;
+  }
   let newSources, newHints: Set<string>;
   const hints = useRef<Set<string>>(new Set());
   const sources = useRef<{ [key: string]: DataSource }>({});
-  if (streamName === "") {
+  if (_streamName === "") {
     newSources = {};
     newHints = new Set();
   } else {
-    const stream = streams[streamName];
+    const stream = streams[_streamName];
     // *dimensions* indicates we have scanning hints (e.g. x-axis),
     // *otherwise use stream hints
     if (dimensions == undefined) {
@@ -123,7 +129,7 @@ const SourcePicker = ({
       newHints = new Set(
         dimensions
           .map(([newHints, stream_]) => {
-            return stream_ === streamName.split("/").slice(-1)[0]
+            return stream_ === _streamName.split("/").slice(-1)[0]
               ? newHints
               : [];
           })
@@ -131,7 +137,7 @@ const SourcePicker = ({
       );
     }
     newSources = signalSources(
-      stream.data_keys,
+      stream?.data_keys ?? {},
       useHints ? [...newHints] : null,
       {},
       stream,
@@ -161,7 +167,7 @@ const SourcePicker = ({
   }
 
   let signalWidget;
-  if (streamName) {
+  if (_streamName) {
     signalWidget = (
       // We needed signal picker to be a separate component because we
       // can't run the use hook if there's no stream. Maybe
@@ -171,7 +177,7 @@ const SourcePicker = ({
           signalNames={signalNames.current}
           setSignal={setSignal}
           disabled={disabled}
-          localKey={`${localKey}-${streamName}`}
+          localKey={`${localKey}-${_streamName}`}
         />
       </>
     );
@@ -180,22 +186,26 @@ const SourcePicker = ({
   }
   return (
     <>
-      <select
-        className="select join-item"
-        value={streamName}
-        disabled={disabled}
-        onChange={(e) => {
-          setActiveStream(e.currentTarget.value);
-        }}
-      >
-        {streamNames.map((streamName, idx) => {
-          return (
-            <option value={streamName} key={`${localKey}-stream${idx}`}>
-              {streamName}/
-            </option>
-          );
-        })}
-      </select>
+      {streamName == null ? (
+        <select
+          className="select join-item"
+          value={_streamName}
+          disabled={disabled || streamName != null}
+          onChange={(e) => {
+            setActiveStream(e.currentTarget.value);
+          }}
+        >
+          {streamNames.map((streamName, idx) => {
+            return (
+              <option value={streamName} key={`${localKey}-stream${idx}`}>
+                {streamName}/
+              </option>
+            );
+          })}
+        </select>
+      ) : (
+        <></>
+      )}
       {signalWidget}
     </>
   );
@@ -207,12 +217,14 @@ const SourceRow = ({
   rowNum,
   hinted,
   setLineInfo,
+  streamName,
 }: {
   run: Run;
   label: string;
   rowNum: number;
   hinted: boolean;
   setLineInfo: (rowNum: number, datum: LineInfo) => void;
+  streamName: string | null;
 }) => {
   const ourInfo = useRef<LineInfo>({ name: "<N/A>" });
   const dimensions = run.metadata.start?.hints?.dimensions ?? [];
@@ -294,6 +306,7 @@ const SourceRow = ({
               useHints={hinted}
               axis={"x"}
               setSource={setSource}
+              streamName={streamName}
             />
           </div>
         </td>
@@ -305,6 +318,7 @@ const SourceRow = ({
               useHints={hinted}
               axis={"s"}
               setSource={setSource}
+              streamName={streamName}
             />
           </div>
         </td>
@@ -328,6 +342,7 @@ const SourceRow = ({
               disabled={operation === ""}
               axis={"r"}
               setSource={setSource}
+              streamName={streamName}
             />
           </div>
         </td>
@@ -418,8 +433,16 @@ export const SingleRunPicker = ({
   lineInfos: LineInfo[];
   setLineInfos: (data: LineInfo[]) => void;
 }) => {
+  const [linkStreams, setLinkStreams] = useState<boolean>(true);
   const [hinted, setHinted] = useState<boolean>(true);
   const [numRows, setNumRows] = useState<number>(1);
+  const { streams } = useStreams(run.uid);
+  const streamNames = Object.keys(streams);
+  const [globalStream, setGlobalStream] = useLastChoice<string>(
+    streamNames[0],
+    streamNames,
+    "linked-stream",
+  );
   const addRow = () => {
     setNumRows((prev) => prev + 1);
   };
@@ -442,7 +465,6 @@ export const SingleRunPicker = ({
     },
     [lineInfos, setLineInfos],
   );
-
   return (
     <>
       <div>
@@ -464,6 +486,30 @@ export const SingleRunPicker = ({
             setHinted(e.currentTarget.checked);
           }}
         />
+        <label htmlFor="linkStreamsCheckbox">
+          <LinkIcon className="inline size-6" /> Link Streams
+        </label>
+        <input
+          className="checkbox"
+          id="linkStreamsCheckbox"
+          type="checkbox"
+          checked={linkStreams}
+          onChange={(e) => {
+            setLinkStreams(e.currentTarget.checked);
+          }}
+        />
+        <select
+          className="select join-item"
+          disabled={!linkStreams}
+          value={globalStream}
+          onChange={(e) => {
+            setGlobalStream(e.currentTarget.value);
+          }}
+        >
+          {streamNames.map((streamName: string) => (
+            <option>{streamName}</option>
+          ))}
+        </select>
       </div>
       <table className="table">
         <thead>
@@ -482,6 +528,7 @@ export const SingleRunPicker = ({
                 label={String(rowNum)}
                 key={rowNum}
                 rowNum={rowNum}
+                streamName={linkStreams ? (globalStream ?? null) : null}
                 hinted={hinted}
                 setLineInfo={setLineInfo}
               />
