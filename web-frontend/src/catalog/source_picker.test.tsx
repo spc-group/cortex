@@ -89,6 +89,7 @@ const Component = () => {
       <QueryClientProvider client={queryClient}>
         <SingleRunPicker
           run={run}
+          rois={{}}
           lineInfos={lineInfos}
           setLineInfos={setLineInfos}
         />

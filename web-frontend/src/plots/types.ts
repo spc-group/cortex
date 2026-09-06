@@ -10,6 +10,7 @@ export interface LineData {
 export interface ROI {
   name: string;
   isActive: boolean;
+  uid: string;
   x0: number;
   x1: number | null;
   y0: number;

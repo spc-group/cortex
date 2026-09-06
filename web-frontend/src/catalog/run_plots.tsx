@@ -13,9 +13,9 @@ import { useMetadata, useArrayZ, useArrayData } from "../tiled";
 import { axisLabels } from "./axis_labels";
 import type { Run, RunMetadata, DataSource, LineInfo } from "./types";
 import type { ROI, ROIUpdate, LineData } from "../plots";
-// import { RoiTable } from "./roi_table";
+import { RoiTable } from "./roi_table";
 import { useDatasets } from "./dataset";
-// import { useLocalStorage } from "@uidotdev/usehooks";
+import { useLocalStorage } from "@uidotdev/usehooks";
 import { SingleRunPicker } from "./source_picker";
 
 const LoadingBadge = () => {
@@ -29,22 +29,85 @@ const LoadingBadge = () => {
 
 export const RunPlots = ({ run }: { run: Run }) => {
   const uid = run.uid;
-  const [lineInfos, setLineData] = useState<LineInfo[]>([]);
+  const [lineInfos, setLineInfos] = useState<LineInfo[]>([]);
+
+  // ROIs let us crop area detector frames and plot their sum
+  const [rois, setRois] = useLocalStorage<{ [key: string]: ROI[] }>(
+    `rois-v1`,
+    {},
+  );
+  const setFrameRois = (name: string) => {
+    return (newRois: ROI[]) => {
+      setRois({
+        ...rois,
+        [name]: newRois,
+      });
+      // Update line infos if they use these ROI's
+      let newLineInfos: LineInfo[] = [];
+      for (const newRoi of newRois) {
+        /**
+         * Helper to update the ROI for any one of the 3 axes.
+         *
+         * Returns a new lineinfo if the ROI is being used by the
+         * given axis, otherwise it returns the original lineinfo
+         * unmodified
+         */
+        const updatedLineInfo = (linfo: LineInfo, axis: "x" | "s" | "r") => {
+          const usesThisRoi = linfo[axis]?.roi?.uid == newRoi.uid;
+          if (usesThisRoi) {
+            linfo = {
+              // other axes and lineinfo params
+              ...linfo,
+              // This axis
+              [axis]: {
+                //
+                ...(linfo?.[axis] ?? {}),
+                ...newRoi,
+              },
+            };
+          }
+          return linfo;
+        };
+
+        newLineInfos = lineInfos.map((linfo) => {
+          linfo = updatedLineInfo(linfo, "x");
+          linfo = updatedLineInfo(linfo, "r");
+          linfo = updatedLineInfo(linfo, "s");
+          return linfo;
+        });
+      }
+      setLineInfos(newLineInfos);
+    };
+  };
+
   // Retrieve metadata and data keys for this dataset
   const { metadata } = useMetadata<RunMetadata>(uid);
-  // Get data from disk
+
+  /**
+   * Come up with a unique ID for this dataset, including ROI
+   */
+  const sourceToID = (source: DataSource) => {
+    let name = source.path;
+    const roi = source?.roi;
+    if (roi != null) {
+      name = `${name}[${roi.y0}:${roi.y1},${roi.x0}:${roi.x1}]`;
+    }
+    return name;
+  };
+
   const sources = Object.fromEntries(
     lineInfos
       .map((info: LineInfo) => {
         return [
-          [info.x?.path, info.x],
-          [info.s?.path, info.s],
-          [info.r?.path, info.r],
+          [info?.x != null ? sourceToID(info.x) : null, info.x],
+          [info?.s != null ? sourceToID(info.s) : null, info.s],
+          [info?.r != null ? sourceToID(info.r) : null, info.r],
         ];
       })
       .flat()
       .filter(([path]) => path != null),
   );
+  // Get data from disk
   const {
     datasets,
     isLoading: isLoadingData,
@@ -73,17 +136,13 @@ export const RunPlots = ({ run }: { run: Run }) => {
 
   const labels = axisLabels(lineInfos);
 
-  const updateRoi = (index: number, update: ROIUpdate) => {
-    console.log("updateRoi", index, update);
-  };
-
   // Re-package the data into lines
   const lineDatasets = lineInfos
     .map((info: LineInfo, i: number) => {
       if (info.s == null) return null;
-      const xData = info.x != null ? datasets?.[info.x.path] : null;
-      const sData = info.s != null ? datasets?.[info.s.path] : null;
-      const rData = info.r != null ? datasets?.[info.r.path] : null;
+      const xData = info.x != null ? datasets?.[sourceToID(info.x)] : null;
+      const sData = info.s != null ? datasets?.[sourceToID(info.s)] : null;
+      const rData = info.r != null ? datasets?.[sourceToID(info.r)] : null;
       return {
         x: xData,
         y: prepareYData(sData, rData, info?.operation ?? null, {
@@ -115,8 +174,9 @@ export const RunPlots = ({ run }: { run: Run }) => {
       {/* New style signal picker */}
       <SingleRunPicker
         run={run}
-        setLineInfos={setLineData}
+        setLineInfos={setLineInfos}
         lineInfos={lineInfos}
+        rois={rois}
       />
       <div className="lg:grid lg:grid-cols-2">
         <div className="m-2 space-x-2">
@@ -146,14 +206,31 @@ export const RunPlots = ({ run }: { run: Run }) => {
         </div>
       </div>
       {uniqueArraySources.map((source) => {
+        const frameRois = rois?.[source.path] ?? [];
         return (
           <div key={source.path}>
             <ArrayPlots
               source={source}
               /* evPerBin={evPerBin} */
-              rois={[]}
-              updateRoi={updateRoi}
+              rois={frameRois}
+              setRois={setFrameRois(source.path)}
             />
+            <div
+              tabIndex={0}
+              className="collapse collapse-arrow bg-base-100 border-base-300 border"
+            >
+              <input type="checkbox" />
+              <div className="collapse-title font-semibold">
+                Regions of Interest (ROIs)
+              </div>
+
+              <div className="collapse-content text-sm">
+                <RoiTable
+                  rois={frameRois}
+                  setRois={setFrameRois(source.path)}
+                />
+              </div>
+            </div>
           </div>
         );
       })}
@@ -703,12 +780,12 @@ export const RunPlots = ({ run }: { run: Run }) => {
 export function ArrayPlots({
   source,
   rois,
-  updateRoi,
+  setRois,
   evPerBin,
 }: {
   source: DataSource;
   rois: ROI[];
-  updateRoi: (index: number, update: ROIUpdate) => void;
+  setRois: (rois: ROI[]) => void;
   evPerBin?: number;
 }) {
   const arrayPath = source.path;
@@ -741,6 +818,17 @@ export function ArrayPlots({
   const imData = frame ?? previousFrame.current;
   // const vMin = reduceStat(stats, "min", Math.min, Infinity);
   const [vMin, vMax] = [0, 200];
+  // Handle updating ROIs in a more global way
+  const updateRoi = (index: number, update: ROIUpdate) => {
+    setRois([
+      ...rois.slice(0, index),
+      {
+        ...rois[index],
+        ...update,
+      },
+      ...rois.slice(index + 1),
+    ]);
+  };
   // const vMax = reduceStat(stats, "max", Math.max, -Infinity);
   // Decide how to plot the individual frames
   let framePlot;

@@ -4,26 +4,62 @@ import {
   EyeSlashIcon,
   PlusIcon,
 } from "@heroicons/react/24/solid";
+import { v4 as uuidv4 } from "uuid";
 
-import type { ROI } from "../plots";
+import type { ROI, ROIUpdate } from "../plots";
 import { COLORS } from "../plots/colors";
 
 const colorCycle = [...Object.values(COLORS)];
 
+/**
+ * A component that provides a way to directly modify
+ * regions-of-interest for a single array. Each array should have its
+ * own RoiTable.
+ *
+ * @param {ROI[]} rois - The ROI definitions state.
+ * @param setRois - A callback to sets the ROIs for this array.
+ */
 export const RoiTable = ({
   rois,
-  addRoi,
-  updateRoi,
-  removeRoi,
+  setRois,
 }: {
   rois: ROI[];
-  addRoi: () => void;
-  updateRoi: (index: number, update: object) => void;
-  removeRoi: (index: number) => void;
+  setRois: (newRois: ROI[]) => void;
 }) => {
   const roundValue = (val: number | null) => {
     return val == null ? undefined : Math.round(val);
   };
+  const addRoi = () => {
+    const theseRois = [
+      ...rois,
+      {
+        isActive: true,
+        name: "",
+        uid: uuidv4(),
+        x0: 0,
+        y0: 0,
+        x1: 50,
+        y1: 50,
+      },
+    ];
+    setRois(theseRois);
+  };
+  const updateRoi = (index: number, update: ROIUpdate) => {
+    setRois([
+      ...rois.slice(0, index),
+      {
+        ...rois[index],
+        ...update,
+      },
+      ...rois.slice(index + 1),
+    ]);
+  };
+
+  const removeRoi = (index: number) => {
+    const newRois = [...rois.slice(0, index), ...rois.slice(index + 1)];
+    setRois(newRois);
+  };
+
   return (
     <>
       <table className="table">
@@ -88,7 +124,7 @@ export const RoiTable = ({
                       min={0}
                       value={roundValue(roi.x0)}
                       onChange={(e) =>
-                        updateRoi(index, { x0: e.currentTarget.value })
+                        updateRoi(index, { x0: Number(e.currentTarget.value) })
                       }
                     />
                     <span className="btn btn-light btn-disabled join-item">
@@ -100,7 +136,7 @@ export const RoiTable = ({
                       min={0}
                       value={roundValue(roi.x1)}
                       onChange={(e) =>
-                        updateRoi(index, { x1: e.currentTarget.value })
+                        updateRoi(index, { x1: Number(e.currentTarget.value) })
                       }
                     />
                   </div>
@@ -113,7 +149,7 @@ export const RoiTable = ({
                       min={0}
                       value={roundValue(roi.y0)}
                       onChange={(e) =>
-                        updateRoi(index, { y0: e.currentTarget.value })
+                        updateRoi(index, { y0: Number(e.currentTarget.value) })
                       }
                     />
                     <div className="btn btn-light btn-disabled join-item">
@@ -125,7 +161,7 @@ export const RoiTable = ({
                       min={0}
                       value={roundValue(roi.y1)}
                       onChange={(e) =>
-                        updateRoi(index, { y1: e.currentTarget.value })
+                        updateRoi(index, { y1: Number(e.currentTarget.value) })
                       }
                     />
                   </div>

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { InlineMath } from "react-katex";
 import { isEqual } from "lodash";
 
+import type { ROI } from "../plots";
 import type { Run, LineInfo, DataSource } from "./types";
 import { Operation } from "./types";
 import { signalSources } from "./signal";
@@ -11,10 +12,27 @@ import { useLastChoice } from "../plots";
 
 type Axis = "x" | "s" | "r";
 
+/** Utility to determine if two sets are equal to one another.
+ *
+ * Checks that set *a* contains the same items as set *b*. Tests by
+ * identity, not deep equality checking,
+ */
 const setsAreEqual = (a: Set<string>, b: Set<string>) => {
   return a.size === b.size && [...a].every((x) => b.has(x));
 };
 
+/**
+ * A component that lets the user pick a signal name from a list.
+ *
+ * The choice will also be saved to local storage and recalled on
+ * subsequent renders if available in *signalNames*.
+ *
+ * @param signalNames - The names of the signals from which one can pick.
+ * @param setSignal - A callback that handles changes to the selected
+ * signal.
+ * @param localKey - A unique key for saving to local storage.
+ * @param disabled - If true, widgets will not be editable.
+ */
 export const SignalPicker = ({
   signalNames,
   setSignal,
@@ -75,7 +93,32 @@ export const SignalPicker = ({
   );
 };
 
-// If *dimensions* is not provided, the stream's hints will be used
+/**
+ * Component for picking a stream and signal that correspond to a data source.
+ *
+ * If *dimensions* is not provided, the stream's hints will be used.
+ *
+ * If *streamName* is not null, then that stream will be used and cannot
+ * be changed. Useful if the app also wants to allow setting a global
+ * stream for multiple sources.
+ *
+ * Choices will be saved to local storage and recalled on future renders
+ * if possible.
+ *
+ * @param run - The bluesky run from which the stream/signal can be picked.
+ * @param localKey - A unique key to use when saving choices to local storage.
+ * @param dimensions - Run-level hints used for determining indepdenent hints.
+ * @param useHints - If true, only hinted signals will be available.
+ * @param axis - The name of the axis, used for setting new sources if widgets are changed.
+ * @param setSource - A callback that lets the parent component respond
+ * to changes in the selected stream/signal.
+ * @param streamName - The name of the stream to use. If not null,
+ * changing streams will not be allowed from inside the component.
+ * @param disabled - If true, widgets will not be changable.
+ * @param rois - Mapping of ROI names and ROIs for array data
+ * sources. Will produce additional signal names to choose a specific ROI
+ * for the array.
+ */
 const SourcePicker = ({
   run,
   localKey,
@@ -85,6 +128,7 @@ const SourcePicker = ({
   setSource,
   disabled,
   streamName,
+  rois,
 }: {
   run: Run;
   localKey: string;
@@ -94,6 +138,7 @@ const SourcePicker = ({
   setSource: (axis: Axis, source: DataSource | null) => void;
   disabled?: boolean;
   streamName: string | null;
+  rois: { [key: string]: ROI[] };
 }) => {
   const signalNames = useRef<Set<string>>(new Set());
   const { streams } = useStreams(run.uid);
@@ -139,7 +184,7 @@ const SourcePicker = ({
     newSources = signalSources(
       stream?.data_keys ?? {},
       useHints ? [...newHints] : null,
-      {},
+      rois,
       stream,
     );
   }
@@ -211,6 +256,24 @@ const SourcePicker = ({
   );
 };
 
+/**
+ * A component for choosing a stream/signal for x, signal and reference axes.
+ *
+ * Choices will be saved to local storage and recalled on future renders
+ * if possible.
+ *
+ * @param run - The bluesky run from which the stream/signal can be picked.
+ * @param localKey - A unique label for the row. Is also used when
+ *   saving choices to local storage.
+ * @param hinted - If true, only hinted signals will be available.
+ * @param setLineInfo - A callback that lets the parent component
+ *   respond to changes in the selected streams/signals.
+ * @param streamName - The name of the stream to use. If not null,
+ *   changing streams will not be allowed from inside the component.
+ * @param rois - Mapping of ROI names and ROIs for array data
+ *   sources. Will produce additional signal names to choose a
+ *   specific ROI for the array.
+ */
 const SourceRow = ({
   run,
   label,
@@ -218,6 +281,7 @@ const SourceRow = ({
   hinted,
   setLineInfo,
   streamName,
+  rois,
 }: {
   run: Run;
   label: string;
@@ -225,6 +289,7 @@ const SourceRow = ({
   hinted: boolean;
   setLineInfo: (rowNum: number, datum: LineInfo) => void;
   streamName: string | null;
+  rois: { [key: string]: ROI[] };
 }) => {
   const ourInfo = useRef<LineInfo>({ name: "<N/A>" });
   const dimensions = run.metadata.start?.hints?.dimensions ?? [];
@@ -307,6 +372,7 @@ const SourceRow = ({
               axis={"x"}
               setSource={setSource}
               streamName={streamName}
+              rois={rois}
             />
           </div>
         </td>
@@ -319,6 +385,7 @@ const SourceRow = ({
               axis={"s"}
               setSource={setSource}
               streamName={streamName}
+              rois={rois}
             />
           </div>
         </td>
@@ -343,6 +410,7 @@ const SourceRow = ({
               axis={"r"}
               setSource={setSource}
               streamName={streamName}
+              rois={rois}
             />
           </div>
         </td>
@@ -424,14 +492,30 @@ const SourceRow = ({
   );
 };
 
+/** A component for selecting multiple stream/signal combinations from
+a single bluesky run.
+
+ * Choices will be saved to local storage and recalled on future renders
+ * if possible.
+ * 
+ * @param run - The bluesky run from which the stream/signal can be picked.
+ * @param lineInfos - The existing line infos.
+ * @param setLineInfos - A callback that lets the parent component
+ *   respond to changes in the selected streams/signals.
+ * @param rois - Mapping of ROI names and ROIs for array data
+ *   sources. Will produce additional signal names to choose a
+ *   specific ROI for the array.
+ */
 export const SingleRunPicker = ({
   run,
   lineInfos,
   setLineInfos,
+  rois,
 }: {
   run: Run;
   lineInfos: LineInfo[];
   setLineInfos: (data: LineInfo[]) => void;
+  rois: { [key: string]: ROI[] };
 }) => {
   const [linkStreams, setLinkStreams] = useState<boolean>(true);
   const [hinted, setHinted] = useState<boolean>(true);
@@ -507,7 +591,7 @@ export const SingleRunPicker = ({
           }}
         >
           {streamNames.map((streamName: string) => (
-            <option>{streamName}</option>
+            <option key={`global-stream-${streamName}`}>{streamName}</option>
           ))}
         </select>
       </div>
@@ -531,6 +615,7 @@ export const SingleRunPicker = ({
                 streamName={linkStreams ? (globalStream ?? null) : null}
                 hinted={hinted}
                 setLineInfo={setLineInfo}
+                rois={rois}
               />
             );
           })}
