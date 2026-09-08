@@ -1,7 +1,6 @@
 import { expect, describe, it } from "vitest";
 import unpack from "ndarray-unpack";
 import ndarray from "ndarray";
-import { loadPyodide } from "pyodide";
 
 import { prepareYData } from "./prepare_data";
 
@@ -47,18 +46,11 @@ describe("the prepareYData() function", () => {
     expect(unpack(absorbance)[0]).toBeCloseTo(-0.6347787032985249);
   });
   it("applies gradient", async () => {
-    const pyodide = await loadPyodide();
-    await pyodide.loadPackage("numpy");
     const xdata = ndarray([2, 4, 6], [3]);
     const sdata = ndarray([10, 20, 40], [3]);
-    const result = await prepareYData(
-      xdata,
-      sdata,
-      null,
-      "",
-      { gradient: true },
-      pyodide,
-    );
+    const result = await prepareYData(xdata, sdata, null, "", {
+      gradient: true,
+    });
     expect(result).toEqual(ndarray([5, 7.5, 10], [3]));
   });
 });

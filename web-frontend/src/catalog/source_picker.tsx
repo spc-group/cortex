@@ -472,7 +472,7 @@ const SourceRow = ({
             {/* Need to get a good gradient function. */}
             <div
               className="tooltip"
-              data-tip="This feature is in development. Stay tuned."
+              data-tip="Show the derivative/gradient of the vertical signal with respect to horizontal."
             >
               <label className="label disabled">
                 <input
