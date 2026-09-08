@@ -1,6 +1,8 @@
 import cwise from "cwise";
 import ndarray from "ndarray";
 import ndunpack from "ndarray-unpack";
+import type { PyodideAPI } from "pyodide";
+import type { TypedArray } from "../tiled";
 
 // Reference correction ops
 const add = cwise({
@@ -47,16 +49,46 @@ const invert = cwise({
   },
 });
 
+/**
+ * Calculate the gradient of y with respect to x (dy/dx).
+ */
+const applyGradient = (
+  xArray: ndarray.NdArray | null,
+  yArray: ndarray.NdArray,
+  pyodide?: PyodideAPI,
+) => {
+  if (pyodide == null) return null;
+  if (xArray == null) return yArray;
+  const globals = pyodide.toPy({ xArray: xArray.data, sdata: yArray.data });
+  const result = pyodide.runPython(
+    `
+  import numpy as np
+  grad = np.gradient(sdata, xArray)
+  # Convert to a form we can easily transer back to javascript
+  [*grad]
+`,
+    { globals: globals },
+  );
+  for (let i = 0; i < result.length; i++) {
+    const yData = yArray.data as TypedArray | number[];
+    yData[i] = result[i];
+  }
+  return yArray;
+};
+
 export function prepareYData(
-  vdata: ndarray.NdArray | null,
+  xdata: ndarray.NdArray | null,
+  sdata: ndarray.NdArray | null,
   rdata: ndarray.NdArray | null,
   operation: string | null,
-  { inverted, logarithm }: { inverted?: boolean; logarithm?: boolean } = {},
+  options?: { inverted?: boolean; logarithm?: boolean; gradient?: boolean },
+  pyodide?: PyodideAPI,
 ) {
+  const { inverted, logarithm, gradient } = options ?? {};
   // Weed out nonsense values
   const operations = ["+", "−", "×", "÷"];
   const isValidOp = operations.includes(operation ?? "");
-  if (vdata == null) {
+  if (sdata == null) {
     return null;
   } else if (rdata == null && isValidOp) {
     return null;
@@ -64,27 +96,27 @@ export function prepareYData(
 
   // We need to limit the array sizes to the smallest one to avoid errors
   const commonShape = Math.min(
-    vdata == null ? Infinity : vdata.shape[0],
+    sdata == null ? Infinity : sdata.shape[0],
     rdata == null || !isValidOp ? Infinity : rdata.shape[0],
   );
-  const ydata = ndarray(ndunpack(vdata).map(Number), [commonShape]);
-  const vdata_ = vdata.hi(commonShape);
+  const ydata = ndarray(ndunpack(sdata).map(Number), [commonShape]);
+  const sdata_ = sdata.hi(commonShape);
 
   // Apply reference correction
   if (isValidOp && rdata != null) {
     const rdata_ = rdata.hi(commonShape);
     switch (operation) {
       case "+":
-        add(ydata, vdata_, rdata_);
+        add(ydata, sdata_, rdata_);
         break;
       case "−":
-        subtract(ydata, vdata_, rdata_);
+        subtract(ydata, sdata_, rdata_);
         break;
       case "×":
-        multiply(ydata, vdata_, rdata_);
+        multiply(ydata, sdata_, rdata_);
         break;
       case "÷":
-        divide(ydata, vdata_, rdata_);
+        divide(ydata, sdata_, rdata_);
         break;
     }
   }
@@ -96,6 +128,8 @@ export function prepareYData(
   if (logarithm) {
     applyLogarithm(ydata);
   }
-
+  if (gradient) {
+    applyGradient(xdata, ydata, pyodide);
+  }
   return ydata;
 }

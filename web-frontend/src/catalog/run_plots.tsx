@@ -3,8 +3,10 @@ import {
   ExclamationTriangleIcon,
   CircleStackIcon,
 } from "@heroicons/react/24/solid";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { NdArray } from "ndarray";
+import { loadPyodide } from "pyodide";
+import type { PyodideAPI } from "pyodide";
 
 import { LinePlot, FramePlot, SpectraPlot } from "../plots";
 import { prepareYData } from "./prepare_data";
@@ -30,6 +32,18 @@ const LoadingBadge = () => {
 export const RunPlots = ({ run }: { run: Run }) => {
   const uid = run.uid;
   const [lineInfos, setLineInfos] = useState<LineInfo[]>([]);
+
+  const [pyodide, setPyodide] = useState<PyodideAPI>();
+  useEffect(() => {
+    const initPyodide = async () => {
+      const pyodide = await loadPyodide();
+      await pyodide.loadPackage("numpy");
+      return pyodide;
+    };
+    initPyodide().then((result) => {
+      setPyodide(result);
+    });
+  }, []);
 
   // ROIs let us crop area detector frames and plot their sum
   const [rois, setRois] = useLocalStorage<{ [key: string]: ROI[] }>(
@@ -145,10 +159,18 @@ export const RunPlots = ({ run }: { run: Run }) => {
       const rData = info.r != null ? datasets?.[sourceToID(info.r)] : null;
       return {
         x: xData,
-        y: prepareYData(sData, rData, info?.operation ?? null, {
-          inverted: info?.inverted ?? false,
-          logarithm: info?.logarithm ?? false,
-        }),
+        y: prepareYData(
+          xData,
+          sData,
+          rData,
+          info?.operation ?? null,
+          {
+            inverted: info?.inverted ?? false,
+            logarithm: info?.logarithm ?? false,
+            gradient: info?.derivative ?? false,
+          },
+          pyodide,
+        ),
         color: `c${i}`,
         name: `Row ${i}`,
       };

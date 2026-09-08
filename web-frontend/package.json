@@ -32,6 +32,7 @@
     "ndarray-unpack": "github:scijs/ndarray-unpack",
     "node": "^24.11.0",
     "plotly.js": "^3.3.1",
+    "pyodide": "^314.0.6",
     "qs": "^6.14.1",
     "react": "^19.2.3",
     "react-katex": "^3.1.0",
@@ -41,6 +42,7 @@
     "save": "^2.9.0",
     "tailwindcss": "^4.1.13",
     "uuid": "^14.0.2",
+    "vite-plugin-static-copy": "^4.1.1",
     "ws": "^8.18.3",
     "zarrita": "^0.6.1"
   },

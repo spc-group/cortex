@@ -478,7 +478,6 @@ const SourceRow = ({
                 <input
                   type="checkbox"
                   className="checkbox"
-                  disabled
                   checked={derivative}
                   onChange={(e) => setDerivative(e.target.checked)}
                 />
