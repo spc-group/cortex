@@ -10,11 +10,13 @@ describe("the axisLabels() utility", () => {
           name: "sim_motor_2",
           dataKey: { dtype: "number", shape: [] },
           path: "",
+          timestampPath: null,
         },
         s: {
           name: "ge_13element",
           dataKey: { dtype: "number", shape: [101, 4, 4096] },
           path: "",
+          timestampPath: null,
         },
         operation: null,
         inverted: false,
@@ -31,11 +33,13 @@ describe("the axisLabels() utility", () => {
         name: "ge_13element",
         x: {
           path: "",
+          timestampPath: null,
           name: "sim_motor_2",
           dataKey: { units: "km", dtype: "int8", shape: [] },
         },
         s: {
           path: "",
+          timestampPath: null,
           name: "ge_13element",
           dataKey: { dtype: "int8", shape: [21, 4, 1024] },
         },

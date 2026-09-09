@@ -4,7 +4,7 @@ import { expect, describe, it } from "vitest";
 import { signalSources } from "./signal";
 
 describe("the signalSources() function", () => {
-  it("returns all signals", () => {
+  it("returns signals", () => {
     const sources = signalSources(
       {
         I0: { dtype: "int32", shape: [101], source: "mock+ca://255idc" },
@@ -23,12 +23,11 @@ describe("the signalSources() function", () => {
         uid: "",
       },
     );
-    expect(sources).toEqual({
-      I0: {
-        path: "run_id/primary/internal/I0",
-        name: "I0",
-        dataKey: { dtype: "int32", shape: [101], source: "mock+ca://255idc" },
-      },
+    expect(sources["I0"]).toEqual({
+      path: "run_id/primary/internal/I0",
+      timestampPath: "run_id/primary/internal/ts_I0",
+      name: "I0",
+      dataKey: { dtype: "int32", shape: [101], source: "mock+ca://255idc" },
     });
   });
   it("filters hints", () => {
@@ -82,7 +81,7 @@ describe("the signalSources() function", () => {
       uid: "",
     };
     const sources = signalSources(dataKeys, null, rois, stream);
-    expect(Object.keys(sources)).toEqual(["I0", "I0 – Ni-Ka"]);
+    expect(Object.keys(sources)).toContain("I0 – Ni-Ka");
   });
   it("skips ROIs for unused signals", () => {
     const dataKeys = {
@@ -113,6 +112,63 @@ describe("the signalSources() function", () => {
       uid: "",
     };
     const sources = signalSources(dataKeys, null, rois, stream);
-    expect(Object.keys(sources)).toEqual(["I0"]);
+    expect(Object.keys(sources)).not.toContain("It – Ni-Ka");
+  });
+  it("includes `time` and `seq_num`", () => {
+    const dataKeys = {
+      I0: { dtype: "int32", shape: [101], source: "mock+ca://255idc" },
+    };
+    const rois = {};
+    const stream = {
+      key: "primary",
+      ancestors: ["run_id"],
+      structure_family: "",
+      specs: [],
+      data_keys: {},
+      configuration: {},
+      hints: {},
+      time: 0,
+      uid: "",
+    };
+    const sources = signalSources(dataKeys, null, rois, stream);
+    const sourceNames = Object.keys(sources);
+    expect(sourceNames).toContain("seq_num");
+    expect(sources.seq_num).toEqual({
+      path: "run_id/primary/internal/seq_num",
+      timestampPath: "run_id/primary/internal/time",
+      dataKey: {
+        dtype: "number",
+        shape: [],
+      },
+      name: "seq_num",
+    });
+    expect(sources.time).toEqual({
+      path: "run_id/primary/internal/time",
+      timestampPath: "run_id/primary/internal/time",
+      dataKey: {
+        dtype: "number",
+        shape: [],
+      },
+      name: "time",
+    });
+  });
+  it("includes timestamp path for internal signls", () => {
+    const dataKeys = {
+      I0: { dtype: "int32", shape: [101], source: "mock+ca://255idc" },
+    };
+    const rois = {};
+    const stream = {
+      key: "primary",
+      ancestors: ["run_id"],
+      structure_family: "",
+      specs: [],
+      data_keys: {},
+      configuration: {},
+      hints: {},
+      time: 0,
+      uid: "",
+    };
+    const sources = signalSources(dataKeys, null, rois, stream);
+    expect(sources.I0.timestampPath).toEqual("run_id/primary/internal/ts_I0");
   });
 });

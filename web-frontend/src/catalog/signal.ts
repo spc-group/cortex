@@ -12,8 +12,19 @@ export const signalSources = (
   hints: string[] | null,
   rois: { [key: string]: ROI[] } = {},
   stream: Stream,
-) => {
-  const dataEntries = Object.entries(dataKeys);
+): { [key: string]: DataSource } => {
+  // Add generic sources that don't have data keys
+  const extraKeys: { [key: string]: DataKey } = {
+    time: {
+      dtype: "number",
+      shape: [],
+    },
+    seq_num: {
+      dtype: "number",
+      shape: [],
+    },
+  };
+  const dataEntries = Object.entries({ ...extraKeys, ...dataKeys });
   const signalEntries = dataEntries
     .filter(([name]) => {
       // Filter data keys that aren't hinted (maybe)
@@ -22,15 +33,22 @@ export const signalSources = (
     .map(([name, key]) => {
       // Decide on the path based on stream and metadata
       const ancestors = [...stream.ancestors, stream.key];
-      if (key?.external == null) {
-        ancestors.push("internal");
+      let timestampName: string;
+      const isExternal = key?.external != null;
+      if (!isExternal) ancestors.push("internal");
+      if (isExternal || name === "time" || name === "seq_num") {
+        timestampName = "time";
+      } else {
+        timestampName = `ts_${name}`;
       }
+
       // Build the source object
       return [
         name,
         {
           path: [...ancestors, name].join("/"),
-          dataKey: dataKeys[name],
+          timestampPath: [...ancestors, timestampName].join("/"),
+          dataKey: key,
           name,
         },
       ];

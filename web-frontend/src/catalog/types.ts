@@ -102,9 +102,12 @@ export interface Stream {
   key: string;
 }
 
+/**
+ * Describes a way to retrieve data from the API and produce a 1D array
+ */
 export interface DataSource {
-  // Describes a way to retrieve data from the API and produce a 1D array
   path: string; // E.g. "<uid>/primary/internal/I0-count_rate"
+  timestampPath: string | null; // E.g. "<uid>/primary/internal/ts_I0-count_rate"
   dataKey: DataKey;
   roi?: ROI; // Will be applied to the dataset after its retrieved
   name: string; // Human-readable description for this data source

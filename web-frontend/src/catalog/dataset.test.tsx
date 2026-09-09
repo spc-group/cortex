@@ -57,6 +57,7 @@ describe("the useDatasets() hook", () => {
       spam: {
         name: "spam",
         path: "spam",
+        timestampPath: null,
         dataKey: {
           dtype: "number",
           shape: [11],
@@ -79,6 +80,7 @@ describe("the useDatasets() hook", () => {
       eggs: {
         name: "eggs",
         path: "eggs",
+        timestampPath: null,
         dataKey: {
           dtype: "array",
           shape: [11, 24, 32],
