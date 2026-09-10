@@ -7,16 +7,16 @@ import { prepareYData } from "./prepare_data";
 describe("the prepareYData() function", () => {
   // +−×÷
   it("applies reference signal", async () => {
-    const sdata = ndarray([10, 20], [2]);
-    const rdata = ndarray([2, 4], [2]);
+    const sdata = { values: ndarray([10, 20], [2]), timestamps: null };
+    const rdata = { values: ndarray([2, 4], [2]), timestamps: null };
     const xdata = null;
     const operation = "÷";
     const result = await prepareYData(xdata, sdata, rdata, operation);
     expect(unpack(result)).toEqual([5, 5]);
   });
   it("applies inverts", async () => {
-    const sdata = ndarray([10, 20], [2]);
-    const rdata = ndarray([2, 4], [2]);
+    const sdata = { values: ndarray([10, 20], [2]), timestamps: null };
+    const rdata = { values: ndarray([2, 4], [2]), timestamps: null };
     const xdata = null;
     const operation = "";
     const result = await prepareYData(xdata, sdata, rdata, operation, {
@@ -27,8 +27,8 @@ describe("the prepareYData() function", () => {
   });
   it("applies logarithm", async () => {
     const xdata = null;
-    const sdata = ndarray([10, 20, 40], [2]);
-    const rdata = ndarray([2, 4, 6], [2]);
+    const sdata = { values: ndarray([10, 20, 40], [2]), timestamps: null };
+    const rdata = { values: ndarray([2, 4, 6], [2]), timestamps: null };
     const operation = "";
     const result = await prepareYData(xdata, sdata, rdata, operation, {
       logarithm: true,
@@ -37,8 +37,8 @@ describe("the prepareYData() function", () => {
     expect(unpack(result)[1]).toBeCloseTo(Math.log(20));
   });
   it("applies inverted logarithm in the right order", async () => {
-    const It = ndarray([4902010], [1]);
-    const I0 = ndarray([2598342], [1]);
+    const It = { values: ndarray([4902010], [1]), timestamps: null };
+    const I0 = { values: ndarray([2598342], [1]), timestamps: null };
     const absorbance = await prepareYData(null, It, I0, "÷", {
       inverted: true,
       logarithm: true,
@@ -46,8 +46,8 @@ describe("the prepareYData() function", () => {
     expect(unpack(absorbance)[0]).toBeCloseTo(-0.6347787032985249);
   });
   it("applies gradient", async () => {
-    const xdata = ndarray([2, 4, 6], [3]);
-    const sdata = ndarray([10, 20, 40], [3]);
+    const xdata = { values: ndarray([2, 4, 6], [3]), timestamps: null };
+    const sdata = { values: ndarray([10, 20, 40], [3]), timestamps: null };
     const result = await prepareYData(xdata, sdata, null, "", {
       gradient: true,
     });

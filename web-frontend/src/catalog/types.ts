@@ -1,3 +1,5 @@
+import type { NdArray } from "ndarray";
+
 import type { Spec } from "../tiled/types";
 import type { ROI } from "../plots";
 
@@ -131,3 +133,11 @@ export type LineInfo = {
   logarithm?: boolean;
   derivative?: boolean;
 };
+
+/**
+ * Related arrays of data for a single signal.
+ */
+export interface Dataset {
+  values: NdArray;
+  timestamps: NdArray | null;
+}

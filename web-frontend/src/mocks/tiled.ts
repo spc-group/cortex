@@ -1,5 +1,5 @@
 import { setupServer } from "msw/node";
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse, ws } from "msw";
 import { tableFromArrays, tableToIPC } from "apache-arrow";
 import runMetadata from "./run_metadata.json";
 import apiInfo from "./api_info.json";
@@ -3608,8 +3608,13 @@ const tableData = {
   ts_sim_motor_2: [1747085782.032349, 1747085783.233922],
 };
 
+const chat = ws.link("ws://localhost:0/api/v1/stream/single");
+
 export const mockUrl = "http://127.0.0.1:0/api/v1";
 export const handlers = [
+  chat.addEventListener("connection", () => {
+    // No-op for now, need to figure out how to properly test websockets
+  }),
   http.get(`${mockUrl}/search/`, () => {
     return HttpResponse.json(searchJson);
   }),

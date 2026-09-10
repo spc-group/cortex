@@ -27,6 +27,9 @@ const LoadingBadge = () => {
   );
 };
 
+/**
+ * A component that shows all the plots for a given bluesky run.
+ */
 export const RunPlots = ({ run }: { run: Run }) => {
   const uid = run.uid;
   const [lineInfos, setLineInfos] = useState<LineInfo[]>([]);
@@ -144,7 +147,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
       const sData = info.s != null ? datasets?.[sourceToID(info.s)] : null;
       const rData = info.r != null ? datasets?.[sourceToID(info.r)] : null;
       return {
-        x: xData,
+        x: xData?.values ?? null,
         y: prepareYData(xData, sData, rData, info?.operation ?? null, {
           inverted: info?.inverted ?? false,
           logarithm: info?.logarithm ?? false,
@@ -805,7 +808,6 @@ export function ArrayPlots({
   if (autoFrame && activeFrame != lastFrame) {
     setActiveFrame(lastFrame);
   }
-  // const frame = useArrayData(arrayPath, activeFrame);
   const frame = useArrayData(arrayPath, activeFrame);
 
   if (frame != null) {

@@ -42,7 +42,10 @@ describe("the useDatasets() hook", () => {
       <>
         <div>Loading: {JSON.stringify(isLoading)}</div>
         {Object.entries(datasets).map(([name, ds]) => {
-          const arr = ds?.data != null ? Array.from(ds.data as number[]) : null;
+          const arr =
+            ds?.values.data != null
+              ? Array.from(ds.values.data as number[])
+              : null;
           return (
             <div key={name}>
               <span>{name}</span>: <span>{JSON.stringify(arr)}</span>
@@ -66,13 +69,12 @@ describe("the useDatasets() hook", () => {
       },
     };
     render(
-      <TiledProvider zarrRoot={root}>
+      <TiledProvider zarrRoot={root} uri="http://localhost:0">
         <MockComponent sources={sources} />
       </TiledProvider>,
     );
     await screen.findByText("Loading: false");
     expect(screen.getByText("spam")).toBeInTheDocument();
-    // await screen.findByText(/\[\d+(,\d+)*\]/);
     await screen.findByText(/\[(\d+,\s*){10}\d+\]/);
   });
   it("reduces a 3D dataset", async () => {
@@ -89,7 +91,7 @@ describe("the useDatasets() hook", () => {
       },
     };
     render(
-      <TiledProvider zarrRoot={root}>
+      <TiledProvider zarrRoot={root} uri="http://localhost:0">
         <MockComponent sources={sources} />
       </TiledProvider>,
     );

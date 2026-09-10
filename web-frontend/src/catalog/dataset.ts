@@ -8,7 +8,7 @@ import { useState, useEffect, useContext } from "react";
 
 import type { ZArray } from "../tiled";
 import { WebSocketContext, decodeMsgPack, ZarrRootContext } from "../tiled";
-import type { DataSource } from "./types";
+import type { DataSource, Dataset } from "./types";
 import type { ROI } from "../plots";
 
 // Semaphore locking mechanism. Returns function to request a lock.
@@ -61,7 +61,7 @@ function webSocketUrl(root: string, source: DataSource) {
 export const useDatasets = (sources: {
   [key: string]: DataSource;
 }): {
-  datasets: { [key: string]: ndarray.NdArray };
+  datasets: { [key: string]: Dataset };
   isLoading: boolean;
   isStreaming: boolean;
   readyState?: ReadyState;
@@ -71,9 +71,7 @@ export const useDatasets = (sources: {
   const wsRoot = useContext(WebSocketContext);
   const maxTasks = 12;
   const { requestLock, lockCount: taskCount } = useSemaphore(maxTasks);
-  const [datasets, setDatasets] = useState<{ [key: string]: ndarray.NdArray }>(
-    {},
-  );
+  const [datasets, setDatasets] = useState<{ [key: string]: Dataset }>({});
   const [rois, setRois] = useState<{ [key: string]: ROI }>({});
   const [sockets, setSockets] = useState<{ [key: string]: WebSocket }>({});
   const [zarrays, setZarrays] = useState<{ [key: string]: ZArray | undefined }>(
@@ -112,7 +110,11 @@ export const useDatasets = (sources: {
       // Clear out any old data
       setDatasets((prev) => {
         if (!Object.keys(prev).includes(name)) {
-          return { ...prev, [name]: ndarray([], [arr.shape[0]]) };
+          const newDataset = {
+            values: ndarray([], [arr.shape[0]]),
+            timestamps: ndarray([], [arr.shape[0]]),
+          };
+          return { ...prev, [name]: newDataset };
         } else {
           return prev;
         }
@@ -162,7 +164,11 @@ export const useDatasets = (sources: {
       const hasDataset = Object.keys(datasets).includes(name);
       if (hasArray && !hasDataset) {
         setDatasets((prev) => {
-          return { ...prev, [name]: ndarray([], [arr.shape[0]]) };
+          const newDataset = {
+            values: ndarray([], [arr.shape[0]]),
+            timestamps: ndarray([], [arr.shape[0]]),
+          };
+          return { ...prev, [name]: newDataset };
         });
       }
     }
@@ -194,7 +200,11 @@ export const useDatasets = (sources: {
       if (toRoiString(source.roi) !== oldRoiString) {
         setDatasets((prev) => {
           // Erase the existing dataset
-          return { ...prev, [name]: ndarray([], [arr.shape[0]]) };
+          const newDataset = {
+            values: ndarray([], [arr.shape[0]]),
+            timestamps: ndarray([], [arr.shape[0]]),
+          };
+          return { ...prev, [name]: newDataset };
         });
         newRois[name] = source.roi;
       }
@@ -212,7 +222,7 @@ export const useDatasets = (sources: {
       const arrayName = source.path;
       const datasetName = name;
       // Get the (possibly filled with nulls) dataset
-      const ds = datasets?.[datasetName];
+      const ds = datasets?.[datasetName]?.values;
       const zarray = zarrays?.[source.path];
       // First decide if there's anything to do
       if (zarray == null) {
@@ -277,18 +287,19 @@ export const useDatasets = (sources: {
         }
         // Reduce dimensions for multi-dimension arrays
         setDatasets((prevDatasets) => {
-          const ds = prevDatasets[datasetName];
-          let newDataset;
+          const prevDataset = prevDatasets[datasetName];
+          const ds = prevDataset.values;
+          let newNdarray;
           if (
             result.dimension === 1 &&
             JSON.stringify(result.shape) === JSON.stringify(zarray.shape)
           ) {
             // A full result, so just replace the array wholesale
-            newDataset = result.lo(0) as ndarray.NdArray;
+            newNdarray = result.lo(0) as ndarray.NdArray;
           } else {
             // Update the rolling results array for each of the slices
-            newDataset = ds.lo(0); // Need a new object to return to react
-            newDataset = ndarray(
+            newNdarray = ds.lo(0); // Need a new object to return to react
+            newNdarray = ndarray(
               ds.data,
               [zarray.shape[0]],
               ds.stride,
@@ -297,9 +308,10 @@ export const useDatasets = (sources: {
             for (let i = 0; i < stop - start; i++) {
               const sliceData = result.lo(i).hi(1) as ndarray.NdArray;
               const sliceSum = sum(sliceData);
-              newDataset.set(i + start, sliceSum);
+              newNdarray.set(i + start, sliceSum);
             }
           }
+          const newDataset = { ...prevDataset, values: newNdarray };
           return { ...prevDatasets, [datasetName]: newDataset };
         });
       };

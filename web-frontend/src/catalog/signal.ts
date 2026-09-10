@@ -32,7 +32,7 @@ export const signalSources = (
     })
     .map(([name, key]) => {
       // Decide on the path based on stream and metadata
-      const ancestors = [...stream.ancestors, stream.key];
+      let ancestors = [...stream.ancestors, stream.key];
       let timestampName: string;
       const isExternal = key?.external != null;
       if (!isExternal) ancestors.push("internal");
@@ -41,7 +41,7 @@ export const signalSources = (
       } else {
         timestampName = `ts_${name}`;
       }
-
+      ancestors = ancestors.filter((ancestor) => ancestor != null);
       // Build the source object
       return [
         name,

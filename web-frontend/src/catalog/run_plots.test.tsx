@@ -38,17 +38,20 @@ vi.mock("../tiled/use_streams", () => {
       return {
         streams: {
           baseline: {
-            data_keys: { "It-count": {}, bdet: { shape: [5, 3, 19] } },
-            ancestors: [],
+            data_keys: {
+              "It-count": {},
+              bdet: { shape: [5, 3, 19], external: "STREAM:" },
+            },
+            ancestors: ["12345-6789", "primary"],
             hints: { fields: ["bdet"] },
           },
 
           primary: {
             data_keys: {
               "It-count": {},
-              bdet: {},
+              bdet: { shape: [5, 3, 19], external: "STREAM:" },
             },
-            ancestors: [],
+            ancestors: ["12345-6789", "primary"],
           },
         },
       };
@@ -98,23 +101,6 @@ beforeEach(async () => {
   });
 });
 
-// vi.mock("../tiled/array", () => {
-//   return {
-//     useArray: () => {
-//       return {
-//         array: [],
-//         readyState: ReadyState.OPEN,
-//       };
-//     },
-//     useArrayStats: () => {
-//       return {
-//         stats: [],
-//         readyState: ReadyState.OPEN,
-//       };
-//     },
-//   };
-// });
-
 afterEach(() => {
   vi.restoreAllMocks();
   cleanup();
@@ -128,7 +114,7 @@ describe("the RunPlots component", () => {
   const Component = () => {
     const queryClient = new QueryClient();
     return (
-      <TiledProvider zarrRoot={root}>
+      <TiledProvider zarrRoot={root} uri="http://localhost:0">
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
             <RunPlots run={run} />
@@ -153,7 +139,6 @@ describe("the RunPlots component", () => {
     render(<Component />);
     await user.click(screen.getByLabelText("Hinted Only"));
     const selectBoxes = screen.getAllByTestId("select-signal");
-    console.log(selectBoxes[0].options);
     await user.selectOptions(selectBoxes[0], "bdet");
     expect(screen.getByRole("heading", { name: "bdet" })).toBeInTheDocument();
   });
@@ -166,11 +151,6 @@ describe("the RunPlots component", () => {
     await user.selectOptions(selectBoxes[1], "bdet");
     expect(screen.getAllByRole("heading", { name: "bdet" })).toHaveLength(1);
   });
-  // it("sorts the primary stream to be first", () => {
-  //   const select = screen.getByTitle("Select a data stream");
-  //   expect(select.children[0].textContent).toEqual("primary");
-  // });
-  // it("sorts the
 });
 
 describe("the ArrayPlots component", () => {

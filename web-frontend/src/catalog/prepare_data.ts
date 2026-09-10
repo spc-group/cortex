@@ -2,6 +2,8 @@ import cwise from "cwise";
 import ndarray from "ndarray";
 import ndunpack from "ndarray-unpack";
 
+import type { Dataset } from "./types";
+
 /**
  * Element-wise addition of one array by another.
  *
@@ -159,10 +161,27 @@ const applyGradient = cwise({
   },
 });
 
+/**
+ * Perform the requested calculations on data to produce dependent
+ * ("Y") data
+ *
+ * Order of operations:
+ *   1. Apply reference correction
+ *   2. Invert
+ *   3. Logarithm
+ *   4. Gradient
+ *
+ * @param xdata - The independent values that would be on the 'x' axis.
+ * @param sdata - The signal of interest.
+ * @param rdata - The reference signal to correct the signal of interest.
+ * @param operation - How to apply the reference data to the signal.
+ * @param options - Additional steps to take when preparing the data.
+ */
+
 export function prepareYData(
-  xdata: ndarray.NdArray | null,
-  sdata: ndarray.NdArray | null,
-  rdata: ndarray.NdArray | null,
+  xdata: Dataset | null,
+  sdata: Dataset | null,
+  rdata: Dataset | null,
   operation: string | null,
   options?: { inverted?: boolean; logarithm?: boolean; gradient?: boolean },
 ) {
@@ -178,15 +197,15 @@ export function prepareYData(
 
   // We need to limit the array sizes to the smallest one to avoid errors
   const commonShape = Math.min(
-    sdata == null ? Infinity : sdata.shape[0],
-    rdata == null || !isValidOp ? Infinity : rdata.shape[0],
+    sdata == null ? Infinity : sdata.values.shape[0],
+    rdata == null || !isValidOp ? Infinity : rdata.values.shape[0],
   );
-  let ydata = ndarray(ndunpack(sdata).map(Number), [commonShape]);
-  const sdata_ = sdata.hi(commonShape);
+  let ydata = ndarray(ndunpack(sdata.values).map(Number), [commonShape]);
+  const sdata_ = sdata.values.hi(commonShape);
 
   // Apply reference correction
   if (isValidOp && rdata != null) {
-    const rdata_ = rdata.hi(commonShape);
+    const rdata_ = rdata.values.hi(commonShape);
     switch (operation) {
       case "+":
         add(ydata, sdata_, rdata_);
@@ -221,7 +240,7 @@ export function prepareYData(
       ydata.offset,
     );
     if (xdata != null) {
-      applyGradient(xdata, ydata, out);
+      applyGradient(xdata.values, ydata, out);
     }
     ydata = out;
   }
