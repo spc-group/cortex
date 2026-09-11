@@ -4,9 +4,10 @@ import {
   CircleStackIcon,
 } from "@heroicons/react/24/solid";
 import { useState, useRef } from "react";
+import ndarray from "ndarray";
 import type { NdArray } from "ndarray";
 
-import { LinePlot, FramePlot, SpectraPlot } from "../plots";
+import { LinePlot, FramePlot, SpectraPlot, GridPlot } from "../plots";
 import { prepareYData } from "./prepare_data";
 import { LiveBadge } from "./live_badge";
 import { useMetadata, useArrayZ, useArrayData } from "../tiled";
@@ -26,6 +27,17 @@ const LoadingBadge = () => {
     </div>
   );
 };
+
+interface GridDataset {
+  data: NdArray;
+  shape: number[];
+  extents: number[][];
+  xlabel: string;
+  ylabel: string;
+  title: string;
+  subtitle: string;
+  key: string;
+}
 
 /**
  * A component that shows all the plots for a given bluesky run.
@@ -173,6 +185,28 @@ export const RunPlots = ({ run }: { run: Run }) => {
     arraySources.map((source: DataSource) => [source.path, source]),
   );
   const uniqueArraySources = Object.values(sourcesByPath);
+  // Prepare grid data if the scan was some sort of grid scan
+  const gridShape = run.metadata.start?.shape ?? [];
+  const isGrid = gridShape.length == 2;
+  let gridDatasets: GridDataset[];
+  if (isGrid) {
+    gridDatasets = lineDatasets
+      .filter((ds) => ds.y?.data != null)
+      .map((ds, idx) => {
+        return {
+          data: ndarray(ds.y.data, gridShape),
+          shape: gridShape,
+          extents: run.metadata.start?.extents ?? [],
+          xlabel: run.metadata.start?.motors?.[1] ?? "",
+          ylabel: run.metadata.start?.motors?.[0] ?? "",
+          title: plotTitle,
+          subtitle: plotSubtitle,
+          key: `${idx}`,
+        };
+      });
+  } else {
+    gridDatasets = [];
+  }
   return (
     <div className="m-4">
       {/* New style signal picker */}
@@ -182,13 +216,27 @@ export const RunPlots = ({ run }: { run: Run }) => {
         lineInfos={lineInfos}
         rois={rois}
       />
-      <div className="lg:grid lg:grid-cols-2">
-        <div className="m-2 space-x-2">
-          <div className={"inline"}>
-            <LiveBadge readyState={readyState} />
-            {isLoadingData ? <LoadingBadge /> : <></>}
-          </div>
+      <div className="m-2 space-x-2">
+        <div className={"inline"}>
+          <LiveBadge readyState={readyState} />
+          {isLoadingData ? <LoadingBadge /> : <></>}
         </div>
+      </div>
+      <div className="lg:grid lg:grid-cols-2">
+        {/* Optional plot is shown only when the scan is a rectilinear grid */}
+        {gridDatasets.map((gridData) => (
+          <GridPlot
+            data={gridData.data}
+            shape={gridData.shape}
+            extents={gridData.extents}
+            xlabel={gridData.xlabel}
+            ylabel={gridData.ylabel}
+            title={gridData.title}
+            subtitle={gridData.subtitle}
+            key={gridData.key}
+          />
+        ))}
+        {/* Line plot data */}
         <div>
           {error != null ? (
             <div role="alert" className="m-2 alert alert-error alert-soft">

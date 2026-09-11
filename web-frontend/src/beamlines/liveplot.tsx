@@ -1,6 +1,8 @@
 import { Link, useParams } from "react-router";
-
+import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { useRef } from "react";
+import { ErrorBoundary, getErrorMessage } from "react-error-boundary";
+
 import { RunPlots } from "../catalog/run_plots";
 import { useLatestRun } from "./latest_run";
 import { BeamlineHeader } from "./header";
@@ -54,8 +56,19 @@ export const LivePlot = () => {
             </tr>
           </tbody>
         </table>
-
-        {plots}
+        <ErrorBoundary
+          fallbackRender={({ error }) => (
+            <div role="alert" className="alert alert-error alert-soft">
+              <span>
+                <ExclamationTriangleIcon className="size-4 inline" />
+                Error! Something went wrong viewing the data for this run.
+                <pre>{getErrorMessage(error)}</pre>
+              </span>
+            </div>
+          )}
+        >
+          {plots}
+        </ErrorBoundary>
       </div>
     </>
   );

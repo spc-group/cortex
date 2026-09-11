@@ -199,9 +199,11 @@ export function prepareYData(
   const commonShape = Math.min(
     sdata == null ? Infinity : sdata.values.shape[0],
     rdata == null || !isValidOp ? Infinity : rdata.values.shape[0],
+    xdata == null || !gradient ? Infinity : xdata.values.shape[0],
   );
   let ydata = ndarray(ndunpack(sdata.values).map(Number), [commonShape]);
   const sdata_ = sdata.values.hi(commonShape);
+  const xdata_ = xdata == null ? null : xdata.values.hi(commonShape);
 
   // Apply reference correction
   if (isValidOp && rdata != null) {
@@ -218,7 +220,6 @@ export function prepareYData(
         break;
       case "÷":
         divide(ydata, sdata_, rdata_);
-        // console.log(sdata_.get(0), "/", rdata_.get(0), "=", ydata.get(0));
         break;
     }
   }
@@ -239,8 +240,8 @@ export function prepareYData(
       ydata.stride,
       ydata.offset,
     );
-    if (xdata != null) {
-      applyGradient(xdata.values, ydata, out);
+    if (xdata_ != null) {
+      applyGradient(xdata_, ydata, out);
     }
     ydata = out;
   }

@@ -23,11 +23,10 @@ export const LinePlot = ({
   ylabel?: string;
   activePoint?: number;
 }) => {
-  // http://localhost:8000/api/v1/table/partition/9e2ac83f-da86-4acd-9a20-26f8263aecf9%2Fstreams%2Fprimary%2Finternal?partition=0&column=sim_motor_2&column=ts_sim_motor_2
-  // https://github.com/bluesky/tiled-viewer-react/blob/eabb0d63a00a31a0630c4cabd1ec35ae5e66ea16/src/components/Tiled/apiClient.ts#L258
   const plotData = data.map(({ x: xdata, y: ydata, name, color }, index) => {
     let color_;
     if (color != null) {
+      // Chec if we have a specific color sequence (e.g. "c3")
       const colorMatch = color.match(/[cC](\d+)/);
       if (colorMatch) {
         color_ = colorCycle[Number(colorMatch[1])];
@@ -52,7 +51,7 @@ export const LinePlot = ({
       name: name,
       type: "scatter",
       mode: "lines+markers",
-      line: { color: color_ },
+      line: { color: color_, dash: "dot" },
       marker: { color: colors, symbol: symbols },
     };
     return ds;
@@ -71,6 +70,8 @@ export const LinePlot = ({
     );
   }
   return (
+    // Responsive layout taken from:
+    // https://dev.to/dheerajmurali/building-a-responsive-chart-in-react-with-plotly-js-4on8
     <>
       <Plot
         data={plotData.filter((ds) => ds != null)}
@@ -79,8 +80,10 @@ export const LinePlot = ({
           xaxis: { title: { text: xtext } },
           yaxis: { title: { text: ylabel } },
           uirevision: "true",
-          /* autosize: true, */
+          autosize: true,
         }}
+        useResizeHandler
+        className="w-full md:aspect-3/2 sm:aspect-square"
         config={{
           editable: true,
           /* responsive: true, */

@@ -3,6 +3,7 @@ import unpack from "ndarray-unpack";
 import ndarray from "ndarray";
 
 import { prepareYData } from "./prepare_data";
+import { Operation } from "./types";
 
 describe("the prepareYData() function", () => {
   // +−×÷
@@ -52,5 +53,18 @@ describe("the prepareYData() function", () => {
       gradient: true,
     });
     expect(result).toEqual(ndarray([5, 7.5, 10], [3]));
+  });
+  it("converts incompatible shapes", async () => {
+    const xdata = { values: ndarray([2, 4, 6, 8], [4]), timestamps: null };
+    const sdata = { values: ndarray([10, 20, 40], [3]), timestamps: null };
+    const rdata = { values: ndarray([15, 18, 33], [2]), timestamps: null };
+    const operation = Operation.DIVIDE;
+    const result = await prepareYData(xdata, sdata, rdata, operation, {
+      inverted: true,
+      logarithm: true,
+      gradient: true,
+    });
+    const smallestCommonShape = [2];
+    expect(result?.shape).toEqual(smallestCommonShape);
   });
 });

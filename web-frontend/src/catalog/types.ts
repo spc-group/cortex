@@ -46,6 +46,9 @@ export interface RunMetadata {
     time: number;
     uid: string;
     hints?: { dimensions: [string[], string][] };
+    shape?: number[];
+    extents?: number[][];
+    motors?: string[];
   };
   stop?: {
     exit_status: string;

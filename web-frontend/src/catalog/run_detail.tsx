@@ -1,5 +1,6 @@
 import { useParams } from "react-router";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
+import { ErrorBoundary, getErrorMessage } from "react-error-boundary";
 
 import { RunPlots } from "./run_plots";
 import { useMetadata } from "../tiled";
@@ -55,9 +56,19 @@ export function RunDetail() {
             <div>Beamline: {run.metadata.start?.beamline_id}</div>
           </li>
         </ul>
-        <div>
+        <ErrorBoundary
+          fallbackRender={({ error }) => (
+            <div role="alert" className="alert alert-error alert-soft">
+              <span>
+                <ExclamationTriangleIcon className="size-4 inline" />
+                Error! Something went wrong viewing the data for this run.
+                <pre>{getErrorMessage(error)}</pre>
+              </span>
+            </div>
+          )}
+        >
           <RunPlots run={run} />
-        </div>
+        </ErrorBoundary>
       </>
     );
   }
