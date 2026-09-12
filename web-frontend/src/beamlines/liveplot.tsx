@@ -57,9 +57,11 @@ export const LivePlot = () => {
             </tr>
           </tbody>
         </table>
-	{run == null ? <></> : (
-	  <MetadataTree runMetadata={run.metadata} key="root"/>
-	)}
+        {run == null ? (
+          <></>
+        ) : (
+          <MetadataTree runMetadata={run.metadata} key="root" />
+        )}
         <ErrorBoundary
           fallbackRender={({ error }) => (
             <div role="alert" className="alert alert-error alert-soft">

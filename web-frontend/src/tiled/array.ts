@@ -1,6 +1,7 @@
 import * as zarr from "zarrita";
 import * as ndzarr from "@zarrita/ndarray";
 import ndarray from "ndarray";
+import type { NdArray } from "ndarray";
 import { useState, useEffect, useContext } from "react";
 
 import { useMetadata } from "./metadata";
@@ -11,6 +12,36 @@ import type { ArrayStructure, ZArray, WebSocketMessage } from "./types";
 interface WebSocketArray extends WebSocketMessage {
   shape: number[];
 }
+type NumericNdArray =
+  | NdArray
+  | NdArray<BigInt64Array | BigUint64Array>
+  | NdArray<unknown[]>;
+
+/**
+ * Produce a new ndarray with any bigInts turned into regular numbers
+
+ * If the input array contains big 64-bit integers and are larger than a 32 bit int can hold, they will be capped 
+ * 
+ * @param src - The ndarray to be converted. May or may not use big integers.
+   
+ */
+const fromBigIntArray = (src: NumericNdArray): NdArray => {
+  const isBigIntArray = src.data instanceof BigInt64Array;
+  const isBigUintArray = src.data instanceof BigUint64Array;
+  if (!(isBigIntArray || isBigUintArray)) return src as NdArray;
+  // We need to handle both signed and unsigned arrays
+  let dest;
+  if (isBigIntArray) {
+    dest = ndarray(new Int32Array(src.size), src.shape.slice());
+  } else {
+    dest = ndarray(new Uint32Array(src.size), src.shape.slice());
+  }
+  for (let i = 0; i < src.shape[0]; i++) {
+    // Round to even
+    dest.set(i, Number(src.get(i)));
+  }
+  return dest;
+};
 
 export const useArrayZ = (path: string) => {
   const [zArr, setZArray] = useState<ZArray | undefined>(undefined);
@@ -70,7 +101,7 @@ export const useArrayData = (
       // Update the array data from the API
       const slc = slice == null ? null : [slice, null, null];
       const arrData = await ndzarr.get(zArr, slc);
-      setArrData(arrData as ndarray.NdArray);
+      setArrData(fromBigIntArray(arrData as NumericNdArray));
     };
     getData().catch(console.error);
   }, [zArr, slice]);
