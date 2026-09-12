@@ -6,6 +6,7 @@ import { RunPlots } from "./run_plots";
 import { useMetadata } from "../tiled";
 import type { Run, RunMetadata } from "./types";
 import { ExitStatus } from "./exit_status";
+import { MetadataTree } from "./metadata_tree";
 
 interface RunParams {
   uid: string;
@@ -56,6 +57,7 @@ export function RunDetail() {
             <div>Beamline: {run.metadata.start?.beamline_id}</div>
           </li>
         </ul>
+        <MetadataTree runMetadata={run.metadata} key="root" />
         <ErrorBoundary
           fallbackRender={({ error }) => (
             <div role="alert" className="alert alert-error alert-soft">

@@ -6,6 +6,7 @@ import { ErrorBoundary, getErrorMessage } from "react-error-boundary";
 import { RunPlots } from "../catalog/run_plots";
 import { useLatestRun } from "./latest_run";
 import { BeamlineHeader } from "./header";
+import { MetadataTree } from "../catalog/metadata_tree";
 
 export const LivePlot = () => {
   const { beamlineId } = useParams<"beamlineId">();
@@ -56,6 +57,9 @@ export const LivePlot = () => {
             </tr>
           </tbody>
         </table>
+	{run == null ? <></> : (
+	  <MetadataTree runMetadata={run.metadata} key="root"/>
+	)}
         <ErrorBoundary
           fallbackRender={({ error }) => (
             <div role="alert" className="alert alert-error alert-soft">

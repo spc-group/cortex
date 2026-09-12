@@ -49,11 +49,14 @@ export interface RunMetadata {
     shape?: number[];
     extents?: number[][];
     motors?: string[];
+    [key: string]: unknown;
   };
   stop?: {
     exit_status: string;
     time: number;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 }
 
 export interface Run {
