@@ -1,8 +1,9 @@
 import type { Data } from "plotly.js";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
-import Plot from "react-plotly.js";
+import Plot from "./plotly";
 import unpack from "ndarray-unpack";
 
+import { copyToClipboard } from "./copy_button";
 import type { LineData } from "./types";
 import { COLORS } from "./colors";
 
@@ -69,6 +70,7 @@ export const LinePlot = ({
       </div>
     );
   }
+  // console.log(plotData[0].x[0], plotData[0].x[1])
   return (
     // Responsive layout taken from:
     // https://dev.to/dheerajmurali/building-a-responsive-chart-in-react-with-plotly-js-4on8
@@ -77,16 +79,19 @@ export const LinePlot = ({
         data={plotData.filter((ds) => ds != null)}
         layout={{
           title: { text: title, subtitle: { text: subtitle } },
-          xaxis: { title: { text: xtext } },
+          xaxis: { title: { text: xtext }, modebardisable: "zoominout" },
           yaxis: { title: { text: ylabel } },
           uirevision: "true",
           autosize: true,
+          dragmode: "pan",
         }}
         useResizeHandler
         className="w-full md:aspect-3/2 sm:aspect-square"
         config={{
           editable: true,
-          /* responsive: true, */
+          scrollZoom: true,
+          // responsive: true,
+          modeBarButtonsToAdd: [copyToClipboard],
         }}
       />
     </>

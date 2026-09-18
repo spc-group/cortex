@@ -1,9 +1,10 @@
 import type { PlotRelayoutEvent, Data, Shape } from "plotly.js";
-import Plot from "react-plotly.js";
+import Plot from "./plotly";
 import unpack from "ndarray-unpack";
 import type { NdArray } from "ndarray";
 
 import { COLORS } from "./colors";
+import { copyToClipboard } from "./copy_button";
 import type { ROI, ROIUpdate } from "./types";
 
 const colorCycle = [...Object.values(COLORS)];
@@ -94,21 +95,24 @@ export const SpectraPlot = ({
       updateRoi(Number(index), update);
     });
   };
-
   return (
     <>
       <div>
         <Plot
           data={plotData}
           layout={{
+            autosize: true,
             title: { text: title, subtitle: { text: subtitle } },
             uirevision: "true",
             xaxis: { title: { text: xtext } },
             yaxis: { title: { text: ylabel } },
             shapes: roiShapes,
+            // dragmode: "pan",
           }}
           config={{
             editable: true,
+            scrollZoom: true,
+            modeBarButtonsToAdd: [copyToClipboard],
           }}
           onRelayout={updateROIs}
         />

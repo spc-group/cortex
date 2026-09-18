@@ -3,34 +3,32 @@ import type { ReactElement } from "react";
 import { render, screen, cleanup, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router";
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { vi, describe, it, expect, afterEach } from "vitest";
 
 import { useStreams, streamsAreEqual } from "./use_streams";
 
-beforeEach(() => {
-  vi.mock("@tanstack/react-query", async (importOriginal) => {
-    return {
-      ...(await importOriginal()),
-      useQuery: () => ({
-        data: {
-          baseline: {},
-        },
-        isLoading: false,
-      }),
-    };
-  });
-  vi.mock("./streaming", async () => {
-    return {
-      useTiledWebSocket: () => ({
-        payload: {
-          type: "container-child-created",
-          sequence: 1,
-          key: "primary",
-        },
-        readyState: 1,
-      }),
-    };
-  });
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  return {
+    ...(await importOriginal()),
+    useQuery: () => ({
+      data: {
+        baseline: {},
+      },
+      isLoading: false,
+    }),
+  };
+});
+vi.mock("./streaming", async () => {
+  return {
+    useTiledWebSocket: () => ({
+      payload: {
+        type: "container-child-created",
+        sequence: 1,
+        key: "primary",
+      },
+      readyState: 1,
+    }),
+  };
 });
 afterEach(() => {
   vi.restoreAllMocks();

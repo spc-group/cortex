@@ -2,9 +2,11 @@ import { useState } from "react";
 import unpack from "ndarray-unpack";
 import type { NdArray } from "ndarray";
 import type { ChangeEvent } from "react";
+// import type { PlotRelayoutEvent, Data, Shape } from "plotly.js/dist/plotly";
 import type { PlotRelayoutEvent, Data, Shape } from "plotly.js";
-import Plot from "react-plotly.js";
 
+import Plot from "./plotly";
+import { copyToClipboard } from "./copy_button";
 import { COLORS } from "./colors";
 import type { ROI, ROIUpdate } from "./types";
 
@@ -275,9 +277,13 @@ export const FramePlot = ({
             yaxis: { title: { text: ylabel } },
             uirevision: "true",
             shapes: roiShapes,
+            dragmode: "pan",
           }}
           config={{
             editable: true,
+            // responsive: true,
+            scrollZoom: true,
+            modeBarButtonsToAdd: [copyToClipboard],
           }}
           onRelayout={updateROIs}
         />

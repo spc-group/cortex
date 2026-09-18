@@ -3,7 +3,7 @@ import type { ReactElement } from "react";
 import { render, cleanup } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router";
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { vi, describe, it, expect, afterEach } from "vitest";
 import { tableFromArrays } from "apache-arrow";
 
 import { updateTableData, useDataTable } from "./use_data_table.ts";
@@ -16,6 +16,31 @@ const oldTable = tableFromArrays({
 const nextRow = tableFromArrays({
   x: [4],
   y: [30],
+});
+
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  return {
+    ...(await importOriginal()),
+    useQuery: () => ({
+      data: tableFromArrays({
+        x: [1, 2, 3],
+      }),
+      isLoading: false,
+    }),
+  };
+});
+vi.mock("./streaming", async () => {
+  return {
+    useTiledWebSocket: () => ({
+      payload: {
+        type: "table-data",
+        sequence: 2,
+        payload: nextRow,
+        append: true,
+      },
+      readyState: 1,
+    }),
+  };
 });
 
 describe("table reducer", () => {
@@ -98,32 +123,6 @@ describe("useDataTable() hook", () => {
       </div>
     );
   };
-  beforeEach(() => {
-    vi.mock("@tanstack/react-query", async (importOriginal) => {
-      return {
-        ...(await importOriginal()),
-        useQuery: () => ({
-          data: tableFromArrays({
-            x: [1, 2, 3],
-          }),
-          isLoading: false,
-        }),
-      };
-    });
-    vi.mock("./streaming", async () => {
-      return {
-        useTiledWebSocket: () => ({
-          payload: {
-            type: "table-data",
-            sequence: 2,
-            payload: nextRow,
-            append: true,
-          },
-          readyState: 1,
-        }),
-      };
-    });
-  });
   afterEach(() => {
     vi.restoreAllMocks();
     cleanup();

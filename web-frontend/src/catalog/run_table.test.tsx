@@ -29,6 +29,31 @@ afterEach(() => {
   cleanup();
 });
 
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  return {
+    ...(await importOriginal()),
+    useQuery: () => ({
+      isLoading: false,
+      error: null,
+      data: {
+        formats: {
+          container: ["application/x-hdf5", "application/json"],
+          XASRun: ["text/x-xdi"],
+        },
+        aliases: {
+          container: {
+            "application/x-hdf5": ["h5", "hdf5"],
+            "application/json": ["json"],
+          },
+          XASRun: {
+            "text/x-xdi": ["xdi"],
+          },
+        },
+      },
+    }),
+  };
+});
+
 describe("run table", () => {
   let user, setSortField;
   beforeEach(() => {
@@ -138,32 +163,6 @@ describe("run table", () => {
 });
 
 describe("run table row", () => {
-  beforeEach(() => {
-    vi.mock("@tanstack/react-query", async (importOriginal) => {
-      return {
-        ...(await importOriginal()),
-        useQuery: () => ({
-          isLoading: false,
-          error: null,
-          data: {
-            formats: {
-              container: ["application/x-hdf5", "application/json"],
-              XASRun: ["text/x-xdi"],
-            },
-            aliases: {
-              container: {
-                "application/x-hdf5": ["h5", "hdf5"],
-                "application/json": ["json"],
-              },
-              XASRun: {
-                "text/x-xdi": ["xdi"],
-              },
-            },
-          },
-        }),
-      };
-    });
-  });
   afterEach(() => {
     vi.restoreAllMocks();
   });

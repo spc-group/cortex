@@ -1,8 +1,10 @@
-import Plot from "react-plotly.js";
 import type { Data } from "plotly.js";
 import ndarray from "ndarray";
 import type { NdArray } from "ndarray";
 import unpack from "ndarray-unpack";
+
+import Plot from "./plotly";
+import { copyToClipboard } from "./copy_button";
 
 /** Create a linearly-spaced ndarray.
  *
@@ -52,11 +54,16 @@ export const GridPlot = (options: {
           title: { text: title, subtitle: { text: subtitle } },
           xaxis: { title: { text: xlabel } },
           yaxis: { title: { text: ylabel }, scaleanchor: "x" },
+          uirevision: "true",
+          dragmode: "pan",
         }}
         className={`w-full`}
         useResizeHandler
         config={{
           editable: true,
+          // responsive: true,
+          scrollZoom: true,
+          modeBarButtonsToAdd: [copyToClipboard],
         }}
       />
     </>
