@@ -57,7 +57,7 @@ describe("the signalSources() function", () => {
       I0: { dtype: "int32", shape: [101], source: "mock+ca://255idc" },
     };
     const rois = {
-      "run_id/primary/internal/I0": [
+      I0: [
         {
           name: "Ni-Ka",
           isActive: true,

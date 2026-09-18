@@ -39,6 +39,11 @@ interface GridDataset {
   key: string;
 }
 
+const sourceSignalName = (source: DataSource): string => {
+  const pathParts = source.path.split("/");
+  return pathParts[pathParts.length - 1];
+};
+
 /**
  * A component that shows all the plots for a given bluesky run.
  */
@@ -109,7 +114,6 @@ export const RunPlots = ({ run }: { run: Run }) => {
     }
     return name;
   };
-
   const sources = Object.fromEntries(
     lineInfos
       .map((info: LineInfo) => {
@@ -258,14 +262,15 @@ export const RunPlots = ({ run }: { run: Run }) => {
         </div>
       </div>
       {uniqueArraySources.map((source) => {
-        const frameRois = rois?.[source.path] ?? [];
+        const signalName = sourceSignalName(source);
+        const frameRois = rois?.[signalName] ?? [];
         return (
           <div key={source.path}>
             <ArrayPlots
               source={source}
               /* evPerBin={evPerBin} */
               rois={frameRois}
-              setRois={setFrameRois(source.path)}
+              setRois={setFrameRois(signalName)}
             />
             <div
               tabIndex={0}
@@ -277,10 +282,7 @@ export const RunPlots = ({ run }: { run: Run }) => {
               </div>
 
               <div className="collapse-content text-sm">
-                <RoiTable
-                  rois={frameRois}
-                  setRois={setFrameRois(source.path)}
-                />
+                <RoiTable rois={frameRois} setRois={setFrameRois(signalName)} />
               </div>
             </div>
           </div>

@@ -55,11 +55,14 @@ export const signalSources = (
     });
   const signalSources: { [key: string]: DataSource } =
     Object.fromEntries(signalEntries);
-  const signalPaths = Object.values(signalSources).map((source) => source.path);
+  const signalNames = Object.values(signalSources).map((source) => {
+    const pathParts = source.path.split("/");
+    return pathParts[pathParts.length - 1];
+  });
   // Add sources for the ROI's of arrays
   const oldRoiEntries = Object.entries(rois)
     // Only include ROIs for signals that are available in this stream
-    .filter(([signalName]) => signalPaths.includes(signalName));
+    .filter(([signalName]) => signalNames.includes(signalName));
   const roiEntries = oldRoiEntries.reduce(
     (
       previousValue: [string, DataSource][],
